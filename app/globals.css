@@ -1,3 +1,147 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+::-ms-reveal {
+  display: none;
+}
+
+@layer components {
+  .benefit-icon {
+    @apply h-16 w-16 text-brg sm:h-20  sm:w-20 xl:h-32 xl:w-32;
+  }
+
+  .input_group {
+    @apply relative flex rounded-xl bg-white;
+  }
+
+  .input_text {
+    @apply w-full rounded-xl border px-3 py-2 text-xs;
+    @apply border-none focus:outline-none;
+  }
+
+  /* .role-select {
+    position: relative;
+    cursor: pointer;
+  }
+
+  .role-select select {
+    @apply w-fit bg-transparent pr-3 text-xl font-semibold text-black underline decoration-brg;
+    -webkit-appearance: none;
+    @apply focus-within:outline-none;
+    appearance: none;
+  }
+
+  .role-select select option {
+    @apply bg-white hover:bg-white;
+  }
+  .role-select::after {
+    content: ">";
+    -webkit-transform: rotate(90deg);
+    -moz-transform: rotate(90deg);
+    -ms-transform: rotate(90deg);
+    transform: rotate(90deg);
+    position: absolute;
+    right: 0;
+    pointer-events: none;
+    text-align: center;
+    height: 100%;
+  } */
+
+  /* snippet found online, prevents the input text box from changing colour when autofill is used */
+  .input_text:-webkit-autofill,
+  .input_text:-webkit-autofill:hover,
+  .input_text:-webkit-autofill:focus,
+  .input_text:-webkit-autofill:active {
+    -webkit-transition: "color 9999s ease-out, background-color 9999s ease-out";
+    -webkit-transition-delay: 9999s;
+    transition: color 9999s ease-out, background-color 9999s ease-out;
+    transition-delay: 9999s;
+  }
+
+  .input_text + * {
+    @apply text-gray-200;
+  }
+
+  .input_text:focus + * {
+    @apply text-brg;
+  }
+}
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 47.4% 11.2%;
+
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 47.4% 11.2%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 47.4% 11.2%;
+
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+
+    --primary: #dbdbdb;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: #004225;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+
+    --accent: #02144f;
+    --accent-foreground: 222.2 47.4% 11.2%;
+
+    --destructive: 0 100% 50%;
+    --destructive-foreground: 210 40% 98%;
+
+    --ring: 215 20.2% 65.1%;
+
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 224 71% 4%;
+    --foreground: 213 31% 91%;
+
+    --muted: 223 47% 11%;
+    --muted-foreground: 215.4 16.3% 56.9%;
+
+    --popover: 224 71% 4%;
+    --popover-foreground: 215 20.2% 65.1%;
+
+    --card: 224 71% 4%;
+    --card-foreground: 213 31% 91%;
+
+    --border: 216 34% 17%;
+    --input: 216 34% 17%;
+
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 1.2%;
+
+    --secondary: 222.2 47.4% 11.2%;
+    --secondary-foreground: 210 40% 98%;
+
+    --accent: 216 34% 17%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 63% 31%;
+    --destructive-foreground: 210 40% 98%;
+
+    --ring: 216 34% 17%;
+
+    --radius: 0.5rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
