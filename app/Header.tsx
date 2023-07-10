@@ -2,13 +2,10 @@
 import { FC } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { useSession } from "next-auth/react";
+import { Button } from "@/components/ui/button";
 
 const Header: FC = () => {
   const pathname = usePathname();
-  // below code is just for logging the session no matter the page
-  // const session = useSession();
-  // console.log(session);
 
   return (
     <header className="sticky top-0 z-50 flex items-center justify-between bg-white px-3 py-2 shadow-md">
@@ -25,13 +22,17 @@ const Header: FC = () => {
             href="/signin"
             className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-brg opacity-75 duration-150 hover:opacity-100 md:text-lg"
           >
-            Login
+            <Button variant={"ghost"} size={"lg"} className="">
+              Login
+            </Button>
           </Link>
           <Link
             href="/signup"
-            className="rounded-full border bg-white  px-4 py-2 text-sm font-semibold text-brg opacity-75 duration-150 hover:opacity-100 md:text-lg"
+            // className={buttonVariants({ variant: "outline" })}
           >
-            Sign Up
+            <Button variant={"outline"} size={"lg"} className="">
+              Sign Up
+            </Button>
           </Link>
         </div>
       )}

@@ -4,6 +4,9 @@ import type { Adapter } from "next-auth/adapters";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { prisma } from "./prisma";
 import bcrypt from "bcrypt";
+import axios from "axios";
+import getURL from "./getURL";
+import { VerificationToken } from "./token";
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma) as Adapter,
@@ -14,28 +17,44 @@ export const authOptions: NextAuthOptions = {
     CredentialsProvider({
       type: "credentials",
       credentials: {},
-      async authorize(credentials, req) {
-        console.log(req);
-        const { email, password } = credentials as {
-          email: string;
-          password: string;
-        };
+      async authorize(credentials) {
+        try {
+          const { email, password } = credentials as {
+            email: string;
+            password: string;
+          };
 
-        const user = await prisma.user.findUnique({
-          where: {
-            email: email,
-          },
-        });
+          const user = await prisma.user.findUnique({
+            where: {
+              email: email,
+            },
+          });
 
-        if (user?.password) {
-          let isCorrectPassword = await bcrypt.compare(password, user.password);
-          console.log(isCorrectPassword);
-          if (isCorrectPassword) {
-            return { id: user.id, name: user.name, email: user.email };
+          if (!user || !user.password) {
+            throw new Error("Email or password are incorrect ");
           }
-        }
 
-        throw new Error("Invalid Credentials");
+          let isCorrectPassword = await bcrypt.compare(password, user.password);
+
+          if (!isCorrectPassword) {
+            throw new Error("Email or password are incorrect ");
+          }
+
+          if (!user.isConfirmed) {
+            const tokenData: VerificationToken = {
+              email: user.email!,
+              userId: user.id,
+            };
+            await axios.post(
+              getURL("/api/auth/sendVerificationEmail"),
+              tokenData
+            );
+          }
+          return { id: user.id, name: user.name, email: user.email };
+        } catch (e) {
+          // Always give same error message to not reveal anything to potential attackers
+          throw new Error("Email or password are incorrect ");
+        }
       },
     }),
   ],
@@ -45,32 +64,34 @@ export const authOptions: NextAuthOptions = {
         session.user.email = token.email;
         session.user.name = token.name;
         session.user.role = token.role;
+        session.user.isConfirmed = token.isConfirmed;
         session.user.image = token.picture;
       }
       return session;
     },
-    async jwt({ token, user }) {
-      const dbUser = await prisma.user.findFirst({
+    async jwt({ token }) {
+      const dbUser = await prisma.user.findUnique({
         where: {
-          id: token.id,
+          email: token.email!,
         },
       });
 
       if (!dbUser) {
-        token.id = user.id;
-        return token;
+        throw new Error("User not in DB");
       }
 
-      return {
-        id: dbUser.id,
-        name: dbUser.name,
-        email: dbUser.email,
-        picture: dbUser.image,
-        role: dbUser.role,
-      };
+      token.id = dbUser.id;
+      token.name = dbUser.name;
+      token.email = dbUser.email;
+      token.picture = dbUser.image;
+      token.role = dbUser.role;
+      token.isConfirmed = dbUser.isConfirmed;
+
+      return token;
     },
   },
   pages: {
-    signIn: "/auth/signin",
+    signIn: "/signin",
+    error: "/signin",
   },
 };

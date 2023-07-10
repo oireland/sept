@@ -1,17 +1,20 @@
+"use client";
+
 import { FC } from "react";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
-import FormikInput from "./FormikInput";
-import FormNavigationButton from "./SubmitButton";
-import PasswordField from "./FormikPasswordField";
+import FormikInput from "../../../components/FormikInput";
+import FormNavigationButton from "../../../components/SubmitButton";
+import PasswordField from "../../../components/FormikPasswordField";
 import { HiAtSymbol } from "react-icons/hi";
 import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { toast } from "react-hot-toast";
+import { redirect, useRouter } from "next/navigation";
+import getURL from "@/lib/getURL";
 
 interface FormData {
   email: string;
   password: string;
-  passwordRepeat: string;
 }
 
 const validationSchema: Yup.ObjectSchema<FormData> = Yup.object().shape({
@@ -19,11 +22,6 @@ const validationSchema: Yup.ObjectSchema<FormData> = Yup.object().shape({
     .email("Please enter a valid email address")
     .required("Email address is required"),
   password: Yup.string().required("Password is required"),
-  passwordRepeat: Yup.string()
-    .required("Required")
-    .test("password-match", "Password must match", function (value) {
-      return this.parent.password === value;
-    }),
 });
 
 interface Credentials {
@@ -34,19 +32,27 @@ interface Credentials {
 const LoginForm: FC = () => {
   const router = useRouter();
   const handleFormSubmit = async ({ email, password }: Credentials) => {
+    let toastId = toast.loading("Signing in...");
+
     const res = await signIn("credentials", {
       email,
       password,
       redirect: false,
     });
+    toast.dismiss(toastId);
     console.log(res);
-    router.push("/dashboard");
+
+    if (res?.error) {
+      toastId = toast.error(res.error);
+    } else {
+      toastId = toast.success("Successfully signed in");
+      router.push("/dashboard");
+    }
   };
 
   const initialValues: FormData = {
     email: "",
     password: "",
-    passwordRepeat: "",
   };
   return (
     <Formik
@@ -65,7 +71,6 @@ const LoginForm: FC = () => {
           Icon={HiAtSymbol}
         />
         <PasswordField name="password" label="Password" />
-        <PasswordField name="passwordRepeat" label="Confirm Password" />
         <div className="flex justify-end">
           <FormNavigationButton type="submit" className="mt-2">
             Login

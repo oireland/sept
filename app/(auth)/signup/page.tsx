@@ -1,5 +1,6 @@
 "use client";
-import SignUpForm from "@/components/SignUpForm";
+import FloatingContainer from "@/components/FloatingContainer";
+import SignUpForm from "@/app/(auth)/signup/SignUpForm";
 import { UserRole } from "@prisma/client";
 import Link from "next/link";
 import { useState } from "react";
@@ -7,9 +8,10 @@ import { useState } from "react";
 const SignUp = () => {
   const [role, setRole] = useState<UserRole>(UserRole.HOST);
   const [showRoleOptions, setShowRoleOptions] = useState<boolean>(false);
+
   return (
-    <div className="relative flex h-screen">
-      <div className="mx-auto mt-8 h-fit w-5/6 max-w-lg rounded-md bg-platinum shadow-lg">
+    <FloatingContainer>
+      <div>
         <div className="mt-2 flex items-center justify-center">
           <h1 className="text-center text-xl font-semibold text-black">
             Sign Up as a&nbsp;
@@ -54,7 +56,7 @@ const SignUp = () => {
           </p>
         </div>
       </div>
-    </div>
+    </FloatingContainer>
   );
 };
 

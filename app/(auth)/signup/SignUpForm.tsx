@@ -1,13 +1,16 @@
 import { FC } from "react";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
-import FormikInput from "./FormikInput";
-import FormNavigationButton from "./SubmitButton";
-import axios from "axios";
-import PasswordField from "./FormikPasswordField";
+import FormikInput from "../../../components/FormikInput";
+
+import PasswordField from "../../../components/FormikPasswordField";
 import { HiOutlineLibrary, HiAtSymbol } from "react-icons/hi";
 import { UserRole } from "@prisma/client";
-import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import axios from "axios";
+import { signIn } from "next-auth/react";
+import getURL from "@/lib/getURL";
+import { toast } from "react-hot-toast";
 
 interface FormData {
   name: string;
@@ -45,14 +48,22 @@ interface Props {
 }
 
 const SignUpForm: FC<Props> = ({ role }) => {
-  const router = useRouter();
   const handleFormSubmit = async (formData: UserData) => {
     const data = { ...formData, role };
+    let toastId = toast.loading("Creating account...");
     try {
-      const res = await axios.post("/api/auth/createUser", data);
-      console.log("response", res);
-      router.push("/signin");
+      await axios.post(getURL("/api/auth/createUser"), data);
+      toast.dismiss(toastId);
+      toastId = toast.success("Account Created", { duration: 300 });
+
+      await signIn("credentials", {
+        email: data.email,
+        password: data.password,
+        callbackUrl: "/confirm",
+      });
     } catch (e) {
+      toast.dismiss(toastId);
+      toastId = toast.error("Something went wrong!");
       console.log("An error has occured creating the user");
     }
   };
@@ -91,9 +102,9 @@ const SignUpForm: FC<Props> = ({ role }) => {
         <PasswordField name="password" label="Password" />
         <PasswordField name="passwordRepeat" label="Confirm Password" />
         <div className="flex justify-end">
-          <FormNavigationButton type="submit" className="mt-2">
+          <Button variant={"form"} type="submit" className="mt-2">
             Create
-          </FormNavigationButton>
+          </Button>
         </div>
       </Form>
     </Formik>
