@@ -17,7 +17,7 @@ const Hero: FC<HeroProps> = ({}) => {
           <b> S</b>ports <b>E</b>vent <b>P</b>erformance <b>T</b>racker.
         </h2>
         <button className="mt-3 rounded-full border bg-white p-2 text-sm font-semibold text-brg shadow-sm transition duration-150 ease-in hover:shadow-xl active:scale-95 sm:mt-5 sm:text-lg md:mt-7 md:p-3  md:text-xl lg:mt-9 lg:p-4 lg:text-2xl xl:mt-11 xl:p-5 xl:text-3xl">
-          <Link href="/auth/signup">Start organising your next event</Link>
+          <Link href="/signup">Start organising your next event</Link>
         </button>
       </div>
       <div className="relative">

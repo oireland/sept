@@ -2,9 +2,14 @@ import { NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 import { prisma } from "@/lib/prisma";
 import { VerificationToken } from "@/lib/token";
+import * as yup from "yup";
+
+const requestSchema = yup.object({
+  token: yup.string().required(),
+});
 
 export async function PATCH(req: Request) {
-  const { token } = (await req.json()) as { token: string };
+  const { token } = await requestSchema.validate(await req.json());
 
   try {
     const { userId, email } = jwt.verify(
@@ -22,9 +27,9 @@ export async function PATCH(req: Request) {
       { status: 200, statusText: `Your email ${email} has been verified.` }
     );
   } catch (e) {
-    return NextResponse.json(
-      {},
-      { status: 400, statusText: "Failed to confirm the email address." }
-    );
+    return NextResponse.json(e, {
+      status: 400,
+      statusText: "Failed to confirm the email address.",
+    });
   }
 }

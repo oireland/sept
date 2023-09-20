@@ -26,8 +26,8 @@ const validationSchema: Yup.ObjectSchema<FormData> = Yup.object().shape({
     .required("Email address is required"),
   password: Yup.string()
     .matches(
-      /(?=^.{8,20}$)((?=.*\w)(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[|!"$%&\/\(\)\?\^\'\\\+\-\*]))^.*/,
-      "At least one: uppercase, lowercase, number and symbol. 8-20 characters."
+      /(?=^.{6,20}$)((?=.*\w)(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[|!"$%&\/\(\)\?\^\'\\\+\-\*]))^.*/,
+      "At least one: uppercase, lowercase, number and symbol. 6-20 characters."
     )
     .required("Password is required"),
   passwordRepeat: Yup.string()
@@ -103,7 +103,7 @@ const SignUpForm: FC<Props> = ({ role }) => {
         <PasswordField name="passwordRepeat" label="Confirm Password" />
         <div className="flex justify-end">
           <Button variant={"form"} type="submit" className="mt-2">
-            Create
+            Submit
           </Button>
         </div>
       </Form>

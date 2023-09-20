@@ -52,8 +52,7 @@ export const authOptions: NextAuthOptions = {
           }
           return { id: user.id, name: user.name, email: user.email };
         } catch (e) {
-          // Always give same error message to not reveal anything to potential attackers
-          throw new Error("Email or password are incorrect ");
+          throw new Error("Something went wrong...");
         }
       },
     }),
@@ -62,6 +61,7 @@ export const authOptions: NextAuthOptions = {
     async session({ token, session }) {
       if (token) {
         session.user.email = token.email;
+        session.user.id = token.id;
         session.user.name = token.name;
         session.user.role = token.role;
         session.user.isConfirmed = token.isConfirmed;

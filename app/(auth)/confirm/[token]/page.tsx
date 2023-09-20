@@ -11,7 +11,7 @@ import Link from "next/link";
 
 const Confirm = async ({ params }: { params: { token: string } }) => {
   try {
-    const res = await axios.patch(getURL("/api/auth/verifyUser"), {
+    await axios.patch(getURL("/api/auth/verifyUser"), {
       token: params.token,
     });
     return (
@@ -19,8 +19,8 @@ const Confirm = async ({ params }: { params: { token: string } }) => {
         <GiConfirmed className="mx-auto h-12 w-12 text-brg" />
         <h2>Success!</h2>
         <p>
-          Your email has been confirmed, you can now finish setting up your
-          account
+          Your email has been confirmed, you can close this window and finish
+          setting up your account.
         </p>
       </FloatingContainer>
     );
@@ -30,7 +30,7 @@ const Confirm = async ({ params }: { params: { token: string } }) => {
         <BiErrorCircle className="mx-auto h-12 w-12 text-red-600" />
         <h2>Oops...</h2>
         <p>Something went wrong so we couldn't verify your email.</p>
-        <p>Please login and we willl send you another email!</p>
+        <p>Please login and we will send you another email!</p>
         <Link href="/signin">
           <Button variant={"outline"} className="text-red-600">
             Login

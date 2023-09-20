@@ -18,7 +18,7 @@ module.exports = {
     extend: {
       colors: {
         brg: "#004225",
-        // platinum: "#E5E4E2",
+        platinum: "#E5E4E2",
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
@@ -74,5 +74,5 @@ module.exports = {
       },
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [require("tailwindcss-animate"), require("@tailwindcss/typography")],
 };

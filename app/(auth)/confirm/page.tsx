@@ -12,31 +12,30 @@ import ConfirmSkeleton from "./ConfirmSkeleton";
 
 const Confirm: FC = () => {
   const [lastSend, setLastSend] = useState(new Date());
-  const timeBetweenSends = 30000;
+  const timeBetweenSends = 30000; // 30 seconds for testing, increase to 10-15 minutes maybe
 
   const session = useSession({
     required: true,
     onUnauthenticated() {
-      throw new Error("Auth is required to access this page");
+      redirect("/signin");
     },
   });
 
   useEffect(() => {
-    console.log(session.data?.user.isConfirmed);
     if (session.data?.user.isConfirmed) redirect("/dashboard");
   }, [session]);
 
   const email = session.data?.user.email;
   const userId = session.data?.user.email;
 
-  const canSendEmail = (lastSendTime: Date) => {
-    const difference = new Date().getTime() - lastSendTime.getTime();
+  const canSendEmail = () => {
+    const difference = new Date().getTime() - lastSend.getTime();
     console.log(difference);
     return difference > timeBetweenSends;
   };
 
   const resendEmail = async () => {
-    if (canSendEmail(lastSend)) {
+    if (canSendEmail()) {
       let toastId = toast.loading("Resending email...");
       try {
         const tokenData: VerificationToken = { email: email!, userId: userId! };
@@ -53,31 +52,31 @@ const Confirm: FC = () => {
     }
   };
 
-  return session.status === "loading" ? (
+  return (
     <FloatingContainer>
-      <ConfirmSkeleton />
-    </FloatingContainer>
-  ) : (
-    <FloatingContainer>
-      <div className="space-y-3 py-2 text-center text-sm sm:text-base">
-        <h2 className="text-base font-semibold sm:text-xl">
-          Please verify your email
-        </h2>
-        <FaPaperPlane className="mx-auto h-10 w-10" />
-        <p className="">
-          You're almost there! We sent an email to
-          <br />
-          <b>{email}</b>
-        </p>
-        <p>
-          Just click on the link in that email to complete your signup. <br />
-          If you don't see it, you may need to check your spam folder.
-        </p>
-        <p className="text-xs">Still can't find the email?</p>
-        <Button variant={"form"} onClick={resendEmail}>
-          Resend Email
-        </Button>
-      </div>
+      {session.status === "loading" ? (
+        <ConfirmSkeleton />
+      ) : (
+        <div className="space-y-3 py-2 text-center text-sm sm:text-base">
+          <h2 className="text-base font-semibold sm:text-xl">
+            Please verify your email
+          </h2>
+          <FaPaperPlane className="mx-auto h-10 w-10" />
+          <p className="">
+            You're almost there! We sent an email to
+            <br />
+            <b>{email}</b>
+          </p>
+          <p>
+            Just click on the link in that email to complete your signup. <br />
+            If you don't see it, you may need to check your spam folder.
+          </p>
+          <p className="text-xs">Still can't find the email?</p>
+          <Button variant={"form"} onClick={resendEmail}>
+            Resend Email
+          </Button>
+        </div>
+      )}
     </FloatingContainer>
   );
 };

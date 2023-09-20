@@ -11,6 +11,7 @@ import { signIn } from "next-auth/react";
 import { toast } from "react-hot-toast";
 import { redirect, useRouter } from "next/navigation";
 import getURL from "@/lib/getURL";
+import { Button } from "@/components/ui/button";
 
 interface FormData {
   email: string;
@@ -72,9 +73,9 @@ const LoginForm: FC = () => {
         />
         <PasswordField name="password" label="Password" />
         <div className="flex justify-end">
-          <FormNavigationButton type="submit" className="mt-2">
+          <Button variant={"form"} type="submit" className="mt-2">
             Login
-          </FormNavigationButton>
+          </Button>
         </div>
       </Form>
     </Formik>
