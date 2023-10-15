@@ -15,12 +15,13 @@
   }
 
   .input_group {
-    @apply relative flex rounded-xl border bg-white;
+    @apply relative flex rounded-md
+    border focus-within:border-0 focus-within:outline-none focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2;
   }
 
   .input_text {
-    @apply w-full rounded-xl border px-3 py-2 text-xs;
-    @apply border-none focus:outline-none;
+    @apply w-full rounded-md border bg-transparent px-3 py-2 text-xs;
+    @apply border-none focus-visible:outline-none;
   }
 
   /* snippet found online, prevents the input text box from changing colour when autofill is used */
@@ -69,7 +70,7 @@
     --accent: 154, 100%, 13%;
     --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 84.2% 60.2%;
+    --destructive: 154, 100%, 13%;
     --destructive-foreground: 210 40% 98%;
 
     --ring: 215 20.2% 65.1%;

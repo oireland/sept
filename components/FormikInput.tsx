@@ -2,6 +2,7 @@ import { FieldAttributes, useField } from "formik";
 import React, { FC } from "react";
 import { RiErrorWarningLine } from "react-icons/ri";
 import { IconType } from "react-icons";
+import { Input } from "./ui/input";
 
 type MyInputProps = {
   placeholder?: string;
@@ -22,7 +23,7 @@ const FormikInput: FC<MyInputProps> = ({
   return (
     <div className="mb-2 space-y-1">
       <div className=" flex gap-2">
-        <label className="text-sm" htmlFor={props.name}>
+        <label className="text-sm" htmlFor={props.id}>
           {label}
         </label>
         {meta.touched && meta.error && (
@@ -39,14 +40,17 @@ const FormikInput: FC<MyInputProps> = ({
           onBlur={field.onBlur}
           onChange={field.onChange}
           placeholder={placeholder ?? label}
-          className="input_text"
+          className="input_text h-10"
         />
-        <div
-          className="icon flex items-center px-4 hover:text-brg"
-          onClick={() => onIconClick()}
-        >
-          {Icon && <Icon />}
-        </div>
+        {/*  */}
+        {Icon && (
+          <div
+            className="icon flex items-center px-4 hover:text-brg"
+            onClick={() => onIconClick()}
+          >
+            <Icon />
+          </div>
+        )}
       </div>
     </div>
   );

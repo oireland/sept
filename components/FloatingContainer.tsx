@@ -12,7 +12,7 @@ const FloatingContainer = ({
     <div className="relative flex h-screen bg-gray-100">
       <div
         className={cn(
-          "mx-auto mt-8 h-fit w-5/6 max-w-lg rounded-md bg-white px-3 py-2 shadow-sm",
+          "mx-auto mt-8 h-fit w-5/6 max-w-3xl rounded-md bg-white px-3 py-2 shadow-sm",
           className
         )}
       >

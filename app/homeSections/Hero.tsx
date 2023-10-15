@@ -2,6 +2,7 @@ import Image from "next/image";
 import { FC } from "react";
 import banner from "/app/assets/images/banner.svg";
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
 interface HeroProps {}
 
 const Hero: FC<HeroProps> = ({}) => {
@@ -16,9 +17,13 @@ const Hero: FC<HeroProps> = ({}) => {
           our
           <b> S</b>ports <b>E</b>vent <b>P</b>erformance <b>T</b>racker.
         </h2>
-        <button className="mt-3 rounded-full border bg-white p-2 text-sm font-semibold text-brg shadow-sm transition duration-150 ease-in hover:shadow-xl active:scale-95 sm:mt-5 sm:text-lg md:mt-7 md:p-3  md:text-xl lg:mt-9 lg:p-4 lg:text-2xl xl:mt-11 xl:p-5 xl:text-3xl">
+        <Button
+          asChild
+          variant="default"
+          className="h-fit rounded-full p-2 text-center font-semibold shadow-sm transition duration-150 ease-in hover:shadow-xl active:scale-95 sm:mt-5 sm:text-base md:mt-7 md:p-3  md:text-lg lg:mt-9 lg:p-4 lg:text-xl xl:mt-11 xl:p-5 xl:text-2xl"
+        >
           <Link href="/signup">Start organising your next event</Link>
-        </button>
+        </Button>
       </div>
       <div className="relative">
         <Image

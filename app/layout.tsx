@@ -3,6 +3,7 @@ import "./globals.css";
 import { Inter } from "next/font/google";
 import { NextAuthProvider } from "./providers";
 import { Toaster } from "react-hot-toast";
+import NextTopLoader from "nextjs-toploader";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -20,8 +21,9 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <NextAuthProvider>
+          <NextTopLoader color="#004225" crawl={true} showSpinner={false} />
           <Header />
-          <Toaster toastOptions={{ duration: 1000 }} />
+          <Toaster />
           {children}
         </NextAuthProvider>
       </body>

@@ -30,7 +30,6 @@ const Confirm: FC = () => {
 
   const canSendEmail = () => {
     const difference = new Date().getTime() - lastSend.getTime();
-    console.log(difference);
     return difference > timeBetweenSends;
   };
 

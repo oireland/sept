@@ -5,7 +5,7 @@ import FormikInput from "../../../components/FormikInput";
 
 import PasswordField from "../../../components/FormikPasswordField";
 import { HiOutlineLibrary, HiAtSymbol } from "react-icons/hi";
-import { UserRole } from "@prisma/client";
+import { SignUpRole } from "./page";
 import { Button } from "@/components/ui/button";
 import axios from "axios";
 import { signIn } from "next-auth/react";
@@ -44,7 +44,7 @@ interface UserData {
 }
 
 interface Props {
-  role: UserRole;
+  role: SignUpRole;
 }
 
 const SignUpForm: FC<Props> = ({ role }) => {
@@ -84,10 +84,10 @@ const SignUpForm: FC<Props> = ({ role }) => {
         <FormikInput
           name="name"
           type="input"
-          label={role === UserRole.HOST ? "School Name" : "Name"}
+          label={role === SignUpRole.HOST ? "School Name" : "Name"}
           Icon={HiOutlineLibrary}
           placeholder={
-            role === UserRole.HOST
+            role === SignUpRole.HOST
               ? "e.g. Blue Finch School"
               : "e.g. John Smith"
           }

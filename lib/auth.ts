@@ -7,6 +7,7 @@ import bcrypt from "bcrypt";
 import axios from "axios";
 import getURL from "./getURL";
 import { VerificationToken } from "./token";
+import { UserRole } from "@prisma/client";
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma) as Adapter,
@@ -52,7 +53,8 @@ export const authOptions: NextAuthOptions = {
           }
           return { id: user.id, name: user.name, email: user.email };
         } catch (e) {
-          throw new Error("Something went wrong...");
+          console.log(e);
+          throw e;
         }
       },
     }),

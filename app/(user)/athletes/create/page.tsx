@@ -1,57 +1,110 @@
 "use client";
 import React, { useState } from "react";
-import AthleteForm from "./AthleteForm";
+import SingleCsvForm from "../../../../components/SingleCsvForm";
 import FloatingContainer from "@/components/FloatingContainer";
 import InfoDialog from "./infoDialog";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import getURL from "@/lib/getURL";
-import { data } from "autoprefixer";
+import * as yup from "yup";
+import { AthleteSchema } from "@/lib/yupSchemas";
+import toast from "react-hot-toast";
+import { useSession } from "next-auth/react";
+import { useRouter, redirect } from "next/navigation";
+
+type Athlete = yup.InferType<typeof AthleteSchema>;
 
 const CreateAthletes = () => {
-  const [athletes, setAthletes] = useState<String[][]>();
+  const session = useSession({ required: true });
+
+  if (session.data?.user.role !== "HOST") {
+    redirect(getURL("/"));
+  }
+
+  const router = useRouter();
+
+  const [athletes, setAthletes] = useState<Athlete[]>();
   const [groups, setGroups] = useState<String[]>();
   const [teams, setTeams] = useState<String[]>();
 
-  const onAthleteFileChange = (resultArray: string[]) => {
-    const arrayOfAthletesSplit: string[][] = [];
-    const groupsSet = new Set<String>();
-    const teamsSet = new Set<String>();
+  const onAthleteFileChange = async (resultArray: string[]) => {
+    let toastId = toast.loading("Loading file...");
+    try {
+      const groupsSet = new Set<String>();
+      const teamsSet = new Set<String>();
 
-    // TODO: validate each line
-    resultArray.forEach((athlete) => {
-      // format: name, email, group, team, boyOrGirl
-      const athleteSplit = athlete.split(",");
+      const unvalidatedAthleteObjectArray: {}[] = [];
 
-      // do not add the athlete if it doesn't have the correct number of columns
-      if (athleteSplit.length !== 5) {
-        return;
+      resultArray.forEach((athlete) => {
+        // Prevents empty lines from throwing an error
+        if (athlete === "") return;
+
+        const athleteSplit = athlete.split(",");
+
+        // do not add the athlete if it doesn't have the correct number of columns
+        if (athleteSplit.length !== 5) {
+          throw new Error("Invalid File Format");
+        }
+
+        groupsSet.add(athleteSplit[2]);
+        teamsSet.add(athleteSplit[3]);
+
+        // forming an object from the array so that it can be validated against the schema
+        unvalidatedAthleteObjectArray.push({
+          name: athleteSplit[0],
+          email: athleteSplit[1],
+          group: athleteSplit[2],
+          team: athleteSplit[3],
+          boyOrGirl: athleteSplit[4],
+        });
+      });
+
+      const athletesObjectArray = await yup
+        .array(AthleteSchema)
+        .validate(unvalidatedAthleteObjectArray);
+
+      if (athletesObjectArray?.length === 0) {
+        throw new Error("No file selected");
       }
 
-      groupsSet.add(athleteSplit[2]);
-      teamsSet.add(athleteSplit[3]);
+      setAthletes(athletesObjectArray);
 
-      arrayOfAthletesSplit.push(athleteSplit);
-    });
-
-    setAthletes(arrayOfAthletesSplit);
-
-    setGroups(Array.from(groupsSet));
-    setTeams(Array.from(teamsSet));
+      setGroups(Array.from(groupsSet));
+      setTeams(Array.from(teamsSet));
+      toast.dismiss(toastId);
+      toastId = toast.success("File uploaded successfully");
+    } catch (e) {
+      if (e instanceof Error) {
+        toast.dismiss(toastId);
+        toastId = toast.error(e.message);
+      } else {
+        toast.dismiss(toastId);
+        toastId = toast.error("The file is invalid");
+      }
+      setAthletes(undefined);
+      setGroups(undefined);
+      setTeams(undefined);
+    }
   };
 
   const onSubmit = async () => {
-    console.log("onSubmit()");
+    let toastId = toast.loading("Submitting...");
     try {
-      const res = await axios.post(getURL("/api/create/createManyAthletes"), {
-        name: "john",
-        email: "john@email.com",
-        group: "year 12",
-        team: "red",
-        boyOrGirl: "BOY",
+      if (!athletes) {
+        throw new Error("Please upload a valid file");
+      }
+      await axios.post(getURL("/api/create/createManyAthletes"), {
+        athletes,
       });
-      console.log(res);
-    } catch (error) {
-      console.log(error);
+      toast.dismiss(toastId);
+      toastId = toast.success("Athletes created successfully");
+      router.push("/athletes");
+    } catch (e) {
+      toast.dismiss(toastId);
+      if (e instanceof Error || e instanceof AxiosError) {
+        toast.error(e.message);
+      } else {
+        toastId = toast.error("Something went wrong");
+      }
     }
   };
 
@@ -65,12 +118,15 @@ const CreateAthletes = () => {
           </h2>
           <InfoDialog />
         </div>
-        <AthleteForm
-          onAthleteFileChange={onAthleteFileChange}
+        <SingleCsvForm
+          onFileChange={onAthleteFileChange}
           onSubmit={onSubmit}
+          inputLabel="Athletes"
+          inputName="athleteInput"
+          backHref="/athletes"
         />
 
-        {(groups || teams) && (
+        {groups && teams && (
           <>
             <hr className="my-2" />
 

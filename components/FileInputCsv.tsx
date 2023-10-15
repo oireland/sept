@@ -20,9 +20,7 @@ const FileInputCsv = ({
   return (
     <div className="mb-2">
       <div className="flex flex-col">
-        <label className="text-lg" htmlFor="files">
-          {label}
-        </label>
+        <label className="text-lg">{label}</label>
         <Button
           variant={"outline"}
           onClick={() => {
@@ -41,7 +39,8 @@ const FileInputCsv = ({
             accept=".csv"
             name="file"
             onChange={(e) => {
-              if (e.currentTarget.files) {
+              if (e.currentTarget.files && e.currentTarget.files.length !== 0) {
+                console.log(e.currentTarget.files);
                 setFileName(e.currentTarget.files[0].name);
                 const fileReader = new FileReader();
                 fileReader.readAsText(e.currentTarget.files[0]);
@@ -53,6 +52,7 @@ const FileInputCsv = ({
                 });
               } else {
                 setFileName(undefined);
+                handleFileChange([]);
               }
             }}
             onBlur={field.onBlur}

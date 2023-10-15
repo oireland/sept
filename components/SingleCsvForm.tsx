@@ -1,43 +1,53 @@
 import FileInputCsv from "@/components/FileInputCsv";
 import { Button } from "@/components/ui/button";
 import { Form, Formik } from "formik";
-import React, { useRef, useState } from "react";
+import Link from "next/link";
+import React, { useRef } from "react";
 import * as Yup from "yup";
 
-type AthleteFormProps = {
-  onAthleteFileChange: (resultArray: string[]) => void;
+type SingleCsvFormProps = {
+  onFileChange: (resultArray: string[]) => void;
   onSubmit: () => void;
+  inputLabel: string;
+  inputName: string;
+  backHref: string;
 };
 
-const AthleteForm = ({ onAthleteFileChange, onSubmit }: AthleteFormProps) => {
-  const athleteFileRef = useRef<HTMLInputElement>(null);
+const SingleCsvForm = ({
+  onFileChange,
+  onSubmit,
+  inputName,
+  inputLabel,
+  backHref,
+}: SingleCsvFormProps) => {
+  const fileRef = useRef<HTMLInputElement>(null);
 
   const validationSchema = Yup.object({
-    athleteFile: Yup.mixed()
+    file: Yup.mixed()
       .test("is-file-too-big", "File exceeds 10MB", () => {
-        if (!athleteFileRef.current?.files) {
+        if (!fileRef.current?.files) {
           return true;
         }
-        if (!athleteFileRef.current.files[0]) {
+        if (!fileRef.current.files[0]) {
           return true;
         }
 
         // if file size is less than 10MB - arbitrary size at the moment research size of a fairly large csv file
-        if (athleteFileRef.current.files[0].size / 1024 / 1024 < 10) {
+        if (fileRef.current.files[0].size / 1024 / 1024 < 10) {
           return true;
         }
 
         return false;
       })
       .test("is-file-of-correct-type", "File must be .csv", () => {
-        if (!athleteFileRef.current?.files) {
+        if (!fileRef.current?.files) {
           return true;
         }
-        if (!athleteFileRef.current.files[0]) {
+        if (!fileRef.current.files[0]) {
           return true;
         }
 
-        if (athleteFileRef.current.files[0].type !== "csv") {
+        if (fileRef.current.files[0].type !== "csv") {
           return true;
         }
         return false;
@@ -45,7 +55,7 @@ const AthleteForm = ({ onAthleteFileChange, onSubmit }: AthleteFormProps) => {
   });
 
   const initialValues = {
-    athleteFile: "",
+    file: "",
   };
 
   return (
@@ -56,12 +66,15 @@ const AthleteForm = ({ onAthleteFileChange, onSubmit }: AthleteFormProps) => {
     >
       <Form className="">
         <FileInputCsv
-          label="Athletes"
-          name="athleteFile"
-          fileRef={athleteFileRef}
-          handleFileChange={onAthleteFileChange}
+          label={inputLabel}
+          name={inputName}
+          fileRef={fileRef}
+          handleFileChange={onFileChange}
         />
-        <div className="flex justify-end">
+        <div className="flex justify-between">
+          <Button type="button" variant="outline">
+            <Link href={backHref}>Back</Link>
+          </Button>
           <Button type="submit" variant={"form"}>
             Submit
           </Button>
@@ -71,4 +84,4 @@ const AthleteForm = ({ onAthleteFileChange, onSubmit }: AthleteFormProps) => {
   );
 };
 
-export default AthleteForm;
+export default SingleCsvForm;

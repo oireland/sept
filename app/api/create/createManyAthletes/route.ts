@@ -1,54 +1,104 @@
+import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { BoyOrGirl, UserRole } from "@prisma/client";
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 import * as yup from "yup";
+import bcrypt from "bcrypt";
+import { AthleteSchema } from "@/lib/yupSchemas";
 
-const requestSchema = yup.array().of(
-  yup.object({
-    name: yup.string().required(),
-    email: yup.string().required().email(),
-    group: yup.string().required(),
-    team: yup.string().required(),
-    boyOrGirl: yup
-      .mixed<BoyOrGirl>()
-      .oneOf(Object.values(BoyOrGirl))
-      .required(),
-  })
-);
+const requestSchema = yup.object({
+  athletes: yup.array(AthleteSchema),
+});
 
 export async function POST(req: Request) {
-  const session = await getServerSession();
-  const request = await req.json();
-  console.log(request);
-  const athletes = await requestSchema.validate(request);
-
   try {
-    if (session?.user.role === "HOST") {
-      athletes?.forEach(async ({ name, email, group, team, boyOrGirl }) => {
-        await prisma.user.create({
-          data: {
-            name,
-            email,
-            role: "ATHLETE",
-            athlete: {
-              create: {
-                boyOrGirl,
-                name,
-                group,
-                team,
-                hostId: session.user.id,
+    const session = await getServerSession(authOptions);
+
+    if (!session || session.user.role !== "HOST") {
+      throw new Error("Unauthorised User");
+    }
+
+    const request = await req.json();
+    const { athletes } = await requestSchema.validate(request);
+
+    if (!athletes) {
+      return NextResponse.json(
+        { message: "No athletes provided" },
+        { status: 400 }
+      );
+    }
+
+    const teamSet = new Set<string>();
+    const groupSet = new Set<string>();
+
+    athletes.forEach(async ({ name, email, group, team, boyOrGirl }) => {
+      teamSet.add(team);
+      groupSet.add(group);
+
+      const password = await bcrypt.hash(email, 10);
+
+      await prisma.user.create({
+        data: {
+          name,
+          email,
+          password,
+          role: "ATHLETE",
+          athlete: {
+            create: {
+              name,
+              group,
+              team,
+              boyOrGirl,
+              host: {
+                connect: {
+                  userId: session.user.id,
+                },
               },
             },
           },
-        });
+        },
       });
-    }
+    });
+
+    // get the teams and groups that the host already has to add to the set
+    const hostData = await prisma.host.findUnique({
+      where: {
+        userId: session.user.id,
+      },
+      select: {
+        teams: true,
+        groups: true,
+      },
+    });
+
+    hostData?.teams.forEach((team) => {
+      teamSet.add(team);
+    });
+    hostData?.groups.forEach((group) => {
+      groupSet.add(group);
+    });
+
+    // update the host to include the full set of unique teams and groups
+    await prisma.host.update({
+      where: {
+        userId: session.user.id,
+      },
+      data: {
+        teams: {
+          set: Array.from(teamSet),
+        },
+        groups: {
+          set: Array.from(groupSet),
+        },
+      },
+    });
+
     return NextResponse.json(
       { message: "Athletes successfully created" },
       { status: 200 }
     );
   } catch (e) {
+    console.log(e);
     return NextResponse.json(e, { status: 500 });
   }
 }

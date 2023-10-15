@@ -1,7 +1,6 @@
 "use client";
 
 import { Button, buttonVariants } from "@/components/ui/button";
-import getURL from "@/lib/getURL";
 import Link from "next/link";
 
 const error = ({ error, reset }: { error: Error; reset: () => void }) => {
