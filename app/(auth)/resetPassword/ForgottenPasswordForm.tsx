@@ -4,47 +4,34 @@ import { FC } from "react";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
 import FormikInput from "../../../components/FormikInput";
-import PasswordField from "../../../components/FormikPasswordField";
 import { HiAtSymbol } from "react-icons/hi";
-import { signIn } from "next-auth/react";
 import { toast } from "react-hot-toast";
-import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import getURL from "@/lib/getURL";
+import axios from "axios";
 
 interface FormData {
   email: string;
-  password: string;
 }
 
 const validationSchema: Yup.ObjectSchema<FormData> = Yup.object().shape({
   email: Yup.string()
     .email("Please enter a valid email address")
     .required("Email address is required"),
-  password: Yup.string().required("Password is required"),
 });
 
-interface Credentials {
-  email: string;
-  password: string;
-}
+type Props = {
+  setIsSent: React.Dispatch<React.SetStateAction<boolean>>;
+};
 
-const LoginForm: FC = () => {
-  const router = useRouter();
-  const handleFormSubmit = async ({ email, password }: Credentials) => {
-    let toastId = toast.loading("Signing in...");
+const ForgottenPasswordForm: FC<Props> = ({ setIsSent }) => {
+  const handleFormSubmit = async (email: string) => {
+    let toastId = toast.loading("Sending email...");
     try {
-      const signinRes = await signIn("credentials", {
-        email,
-        password,
-        redirect: false,
-      });
-      if (signinRes?.error) {
-        throw new Error("Invalid Credentials");
-      }
-      router.push("/dashboard");
+      await axios.post(getURL("/api/auth/sendPasswordResetEmail"), { email });
       toast.dismiss(toastId);
-      toastId = toast.success("Successfully signed in");
+      toastId = toast.success("Email sent!");
+      setIsSent(true);
     } catch (e) {
       toast.dismiss(toastId);
       if (e instanceof Error) {
@@ -57,14 +44,13 @@ const LoginForm: FC = () => {
 
   const initialValues: FormData = {
     email: "",
-    password: "",
   };
   return (
     <Formik
       initialValues={initialValues}
       validationSchema={validationSchema}
-      onSubmit={({ email, password }) => {
-        handleFormSubmit({ email, password });
+      onSubmit={({ email }) => {
+        handleFormSubmit(email);
       }}
     >
       <Form className="p-4">
@@ -75,10 +61,9 @@ const LoginForm: FC = () => {
           placeholder="example@email.com"
           Icon={HiAtSymbol}
         />
-        <PasswordField name="password" label="Password" />
         <div className="flex justify-end">
           <Button variant={"form"} type="submit" className="mt-2">
-            Login
+            Send
           </Button>
         </div>
       </Form>
@@ -86,4 +71,4 @@ const LoginForm: FC = () => {
   );
 };
 
-export default LoginForm;
+export default ForgottenPasswordForm;

@@ -31,7 +31,7 @@ export const StaffTableDataSchema = yup.object({
   numberOfEvents: yup.number().required(),
 });
 
-export const EventValidationSchema = yup.object().shape({
+export const EventValidationSchema = yup.object({
   eventName: yup.string().max(30, "Max 30 characters").required("Required"),
   trackOrField: yup
     .mixed<EventType>()

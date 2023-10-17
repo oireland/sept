@@ -18,8 +18,7 @@ export async function POST(req: Request) {
       throw new Error("Unauthorised User");
     }
 
-    const request = await req.json();
-    const { athletes } = await requestSchema.validate(request);
+    const { athletes } = await requestSchema.validate(await req.json());
 
     if (!athletes) {
       return NextResponse.json(

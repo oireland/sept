@@ -25,15 +25,11 @@ export const authOptions: NextAuthOptions = {
             password: string;
           };
 
-          const user = await prisma.user.findUnique({
+          const user = await prisma.user.findUniqueOrThrow({
             where: {
               email: email,
             },
           });
-
-          if (!user || !user.password) {
-            throw new Error("Email or password are incorrect ");
-          }
 
           let isCorrectPassword = await bcrypt.compare(password, user.password);
 
@@ -62,12 +58,12 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async session({ token, session }) {
       if (token) {
-        session.user.email = token.email;
+        session.user.email = token.email!;
         session.user.id = token.id;
-        session.user.name = token.name;
+        session.user.name = token.name!;
         session.user.role = token.role;
         session.user.isConfirmed = token.isConfirmed;
-        session.user.image = token.picture;
+        session.user.image = token.picture || null;
       }
       return session;
     },

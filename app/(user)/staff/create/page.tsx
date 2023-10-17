@@ -108,6 +108,16 @@ const CreateStaff = () => {
           inputName="staffInput"
           backHref="/staff"
         />
+
+        {staff && (
+          <>
+            <hr className="my-2" />
+
+            <h3 className="text-lg">
+              You are signing up <b>{staff.length}</b> staff members.
+            </h3>
+          </>
+        )}
       </FloatingContainer>
     </>
   );

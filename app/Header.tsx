@@ -1,11 +1,11 @@
 "use client";
 import { FC } from "react";
-import { usePathname } from "next/navigation";
+import { redirect, usePathname } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { signOut, useSession } from "next-auth/react";
 import { HiBars3 } from "react-icons/hi2";
-import { LogOutIcon } from "lucide-react";
+import { LogOutIcon, User2Icon } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,9 +13,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import getURL from "@/lib/getURL";
 
 const Header: FC = () => {
-  const pathname = usePathname();
   const session = useSession();
   const userRole = session.data?.user.role;
 
@@ -57,35 +57,43 @@ const Header: FC = () => {
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
+              <DropdownMenuItem className="p-0">
+                <Link href="/account" className="h-full  w-full px-2 py-1.5 ">
+                  <div className="flex items-center space-x-2">
+                    <h6>Account</h6>
+                    <User2Icon className="h-4 w-4" />
+                  </div>
+                </Link>
+              </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => {
-                  signOut();
+                  signOut({ redirect: false });
                 }}
-                className="cursor-pointer"
+                className="cursor-pointer p-0"
               >
-                <div className="flex items-center space-x-2">
-                  <h6>Sign Out</h6>
-                  <LogOutIcon className="h-4 w-4" />
-                </div>
+                <Link href="/" className="h-full  w-full px-2 py-1.5 ">
+                  <div className="flex items-center space-x-2">
+                    <h6>Sign Out</h6>
+                    <LogOutIcon className="h-4 w-4" />
+                  </div>
+                </Link>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
       ) : (
-        pathname === "/" && (
-          <div>
-            <Link href="/signin">
-              <Button variant={"ghost"} size={"lg"} className="">
-                Login
-              </Button>
-            </Link>
-            <Link href="/signup">
-              <Button variant={"outline"} size={"lg"} className="">
-                Sign Up
-              </Button>
-            </Link>
-          </div>
-        )
+        <div>
+          <Link href="/signin">
+            <Button variant={"ghost"} size={"lg"} className="">
+              Login
+            </Button>
+          </Link>
+          <Link href="/signup">
+            <Button variant={"outline"} size={"lg"} className="">
+              Sign Up
+            </Button>
+          </Link>
+        </div>
       )}
     </header>
   );

@@ -52,7 +52,7 @@ const Staff = async () => {
 
   return (
     <div>
-      <Banner text="Your Staff" />
+      <Banner text="My Staff" />
 
       <div className="container mx-auto mt-2">
         {role === "HOST" && (

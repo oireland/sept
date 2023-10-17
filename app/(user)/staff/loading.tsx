@@ -4,7 +4,7 @@ import Banner from "../banner";
 export default function Loading() {
   return (
     <div>
-      <Banner text="Your Staff" />
+      <Banner text="My Staff" />
       <LoadingSkeleton />
     </div>
   );

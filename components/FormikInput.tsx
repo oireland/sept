@@ -18,7 +18,7 @@ const FormikInput: FC<MyInputProps> = ({
   onIconClick = () => {},
   ...props
 }) => {
-  const [field, meta] = useField<{}>(props);
+  const [field, meta] = useField(props.name);
 
   return (
     <div className="mb-2 space-y-1">
@@ -41,6 +41,7 @@ const FormikInput: FC<MyInputProps> = ({
           onChange={field.onChange}
           placeholder={placeholder ?? label}
           className="input_text h-10"
+          value={field.value}
         />
         {/*  */}
         {Icon && (

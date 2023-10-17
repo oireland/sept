@@ -69,7 +69,7 @@ const Athletes = async () => {
 
   return (
     <div>
-      <Banner text="Your Athletes" />
+      <Banner text="My Athletes" />
 
       <div className="container mx-auto mt-2">
         {role === "HOST" && (

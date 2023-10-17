@@ -15,6 +15,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 import { Checkbox } from "@/components/ui/checkbox";
+import Link from "next/link";
+import getURL from "@/lib/getURL";
 
 export type AthleteTableData = {
   userId: string;
@@ -92,7 +94,9 @@ export const columns: ColumnDef<AthleteTableData>[] = [
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>View events</DropdownMenuItem>
+            <DropdownMenuItem>
+              <Link href={getURL(`/athletes/${userId}`)}>View/Edit Events</Link>
+            </DropdownMenuItem>
             <DropdownMenuItem
               onClick={() => navigator.clipboard.writeText(email)}
             >

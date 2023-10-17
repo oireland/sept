@@ -41,20 +41,4 @@ const Confirm = async ({ params }: { params: { token: string } }) => {
   }
 };
 
-type MessageProps = {
-  Icon: IconType;
-  title: string;
-  message: string;
-};
-
-const Message = ({ Icon, title, message }: MessageProps) => {
-  return (
-    <FloatingContainer>
-      <Icon />
-      <h2>{title}</h2>
-      <p>{message}</p>
-    </FloatingContainer>
-  );
-};
-
 export default Confirm;

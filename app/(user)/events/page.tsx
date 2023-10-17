@@ -67,7 +67,7 @@ const Events = async () => {
 
   return (
     <div>
-      <Banner text="Your Events" />
+      <Banner text="My Events" />
 
       <div className="container mx-auto mt-2">
         {role === "HOST" && (
