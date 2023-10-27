@@ -33,10 +33,6 @@ async function getAthleteData(hostId: string) {
       },
     });
 
-    if (!data) {
-      throw new Error("No data");
-    }
-
     const athletes: AthleteTableData[] = data.map(
       ({ name, group, team, boyOrGirl, userId, user, events }) => ({
         name,
@@ -69,7 +65,7 @@ const Athletes = async () => {
 
   return (
     <div>
-      <Banner text="My Athletes" />
+      <Banner text="Athletes" />
 
       <div className="container mx-auto mt-2">
         {role === "HOST" && (
@@ -77,7 +73,7 @@ const Athletes = async () => {
             <Link href={"/athletes/create"}>Sign up new Athletes</Link>
           </Button>
         )}
-        <AthleteDataTable data={athleteData} />
+        <AthleteDataTable userRole={role} data={athleteData} />
       </div>
     </div>
   );

@@ -1,7 +1,7 @@
 "use client";
 
 import { FC } from "react";
-import { Formik, Form } from "formik";
+import { Formik, Form, FieldAttributes, useField } from "formik";
 
 import { BoyOrGirl, EventType } from "@prisma/client";
 import FormikInput from "@/components/FormikInput";
@@ -13,12 +13,15 @@ import axios, { AxiosError } from "axios";
 import getURL from "@/lib/getURL";
 import { EventValidationSchema } from "@/lib/yupSchemas";
 import Link from "next/link";
+import BackButton from "@/components/BackButton";
+import { RiErrorWarningLine } from "react-icons/ri";
 
 interface FormData {
   eventName: string;
   trackOrField: EventType;
   boyOrGirl: BoyOrGirl[];
   groups: string[];
+  maxNumberOfAthletes: number;
 }
 
 interface Props {
@@ -49,6 +52,7 @@ const EventForm: FC<Props> = ({ groups }) => {
     boyOrGirl: [],
     groups: [],
     trackOrField: "TRACK",
+    maxNumberOfAthletes: 8,
   };
   return (
     <Formik
@@ -90,16 +94,55 @@ const EventForm: FC<Props> = ({ groups }) => {
           ]}
         />
 
+        <FormikNumberInput
+          label="Max Number of Athletes"
+          name="maxNumberOfAthletes"
+          step={1}
+        />
+
         <div className="flex justify-between">
-          <Button type="button" variant="outline">
-            <Link href={"/events"}>Back</Link>
-          </Button>
+          <BackButton />
           <Button type="submit" variant={"form"}>
             Submit
           </Button>
         </div>
       </Form>
     </Formik>
+  );
+};
+
+type NumberInputProps = {
+  label: string;
+} & FieldAttributes<{}>;
+
+const FormikNumberInput: FC<NumberInputProps> = ({ label, ...props }) => {
+  const [field, meta, helpers] = useField<number>(props.name);
+
+  return (
+    <div className="mb-2 space-y-1">
+      <div className=" flex gap-2">
+        <label className="text-sm" htmlFor={props.id}>
+          {label}
+        </label>
+        {meta.touched && meta.error && (
+          <div className="flex items-center text-xs text-brg">
+            <RiErrorWarningLine className="peer h-5 w-5 pr-1" />
+            <p className="hidden hover:flex peer-hover:flex">{meta.error}</p>
+          </div>
+        )}
+      </div>
+      <div className="input_group">
+        <input
+          type="number"
+          name={field.name}
+          onBlur={field.onBlur}
+          onChange={(e) => helpers.setValue(Number(e.currentTarget.value))}
+          className="input_text h-10"
+          step={1}
+          min={2}
+        />
+      </div>
+    </div>
   );
 };
 

@@ -20,7 +20,10 @@ type SelectProps = {
 } & FieldAttributes<{}>;
 
 const FormikSelect: FC<SelectProps> = ({ label, items, ...props }) => {
-  const [field, meta] = useField<{}>(props);
+  const [field, meta, helpers] = useField<string>(props.name);
+
+  const { value } = meta;
+  const { setValue } = helpers;
 
   return (
     <div className="mb-2 space-y-1">
@@ -35,7 +38,12 @@ const FormikSelect: FC<SelectProps> = ({ label, items, ...props }) => {
           </div>
         )}
       </div>
-      <Select required name={field.name}>
+      <Select
+        value={value}
+        onValueChange={(value) => setValue(value)}
+        required
+        name={field.name}
+      >
         <SelectTrigger>
           <SelectValue />
         </SelectTrigger>

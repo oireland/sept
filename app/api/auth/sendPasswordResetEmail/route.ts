@@ -18,7 +18,6 @@ const transporter = nodemailer.createTransport({
 
 export async function POST(req: Request) {
   const { email } = await requestSchema.validate(await req.json());
-  console.log(email);
 
   try {
     const emailToken = jwt.sign({ email }, process.env.EMAIL_SECRET!, {

@@ -36,7 +36,7 @@ async function getStaffData(userId: string): Promise<StaffTableData[]> {
     ({ name, userId, user, events }) => ({
       name,
       numberOfEvents: events.length,
-      id: userId,
+      userId,
       email: user.email!,
     })
   );
@@ -52,7 +52,7 @@ const Staff = async () => {
 
   return (
     <div>
-      <Banner text="My Staff" />
+      <Banner text="Staff" />
 
       <div className="container mx-auto mt-2">
         {role === "HOST" && (

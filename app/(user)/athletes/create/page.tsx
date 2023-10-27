@@ -123,7 +123,6 @@ const CreateAthletes = () => {
           onSubmit={onSubmit}
           inputLabel="Athletes"
           inputName="athleteInput"
-          backHref="/athletes"
         />
 
         {groups && teams && (

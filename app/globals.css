@@ -16,7 +16,7 @@
 
   .input_group {
     @apply relative flex rounded-md
-    border focus-within:border-0 focus-within:outline-none focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2;
+    border focus-within:border-transparent focus-within:outline-none focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2;
   }
 
   .input_text {

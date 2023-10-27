@@ -9,7 +9,6 @@ export async function DELETE(
 ) {
   try {
     const session = await getServerSession(authOptions);
-    console.log(params);
     const commaSeperatedIds = params.commaSeperatedIds;
 
     const idArray = commaSeperatedIds.split(",");

@@ -2,7 +2,6 @@ import { authOptions } from "@/lib/auth";
 import { getHostId } from "@/lib/dbHelpers";
 import { prisma } from "@/lib/prisma";
 import { AthleteTableDataSchema } from "@/lib/yupSchemas";
-import { Athlete } from "@prisma/client";
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 import * as yup from "yup";
@@ -32,6 +31,8 @@ export async function PATCH(req: Request) {
       group: eventGroup,
       athletesBoyOrGirl,
       hostId: eventHostId,
+      maxNumberOfAthletes,
+      athletesCompeting,
     } = await prisma.event.findUniqueOrThrow({
       where: {
         id: eventId,
@@ -40,6 +41,8 @@ export async function PATCH(req: Request) {
         group: true,
         athletesBoyOrGirl: true,
         hostId: true,
+        maxNumberOfAthletes: true,
+        athletesCompeting: true,
       },
     });
 
@@ -80,6 +83,15 @@ export async function PATCH(req: Request) {
 
     if (filteredAthletes.length === 0) {
       return NextResponse.json("Invalid request", { status: 400 });
+    }
+
+    if (
+      filteredAthletes.length + athletesCompeting.length >
+      maxNumberOfAthletes
+    ) {
+      return NextResponse.json("Max number of athletes will be exceeded", {
+        status: 400,
+      });
     }
 
     // update each athlete to be competing in the event

@@ -8,6 +8,7 @@ import { EventTableDataSchema } from "@/lib/yupSchemas";
 import axios, { AxiosError } from "axios";
 import getURL from "@/lib/getURL";
 import toast from "react-hot-toast";
+import { UserRole } from "@prisma/client";
 
 const removeSelectedEvents = async (selectedRowData: EventTableData[]) => {
   let toastId = toast.loading("Deleting events...");
@@ -38,6 +39,7 @@ const removeSelectedEvents = async (selectedRowData: EventTableData[]) => {
     toastId = toast.success("Events deleted!");
     window.location.reload();
   } catch (e) {
+    console.log(e);
     toast.dismiss(toastId);
     if (e instanceof Error || e instanceof AxiosError) {
       toast.error(e.message);
@@ -47,17 +49,31 @@ const removeSelectedEvents = async (selectedRowData: EventTableData[]) => {
   }
 };
 
-const EventDataTable = ({ data }: { data: EventTableData[] }) => {
-  return (
-    <div>
-      <DataTable
-        columns={columns}
-        data={data}
-        selectedRowsAction={removeSelectedEvents}
-        rowActionLabel="Delete"
-      />
-    </div>
-  );
+const EventDataTable = ({
+  data,
+  userRole,
+}: {
+  data: EventTableData[];
+  userRole: UserRole;
+}) => {
+  if (userRole === "HOST") {
+    return (
+      <div>
+        <DataTable
+          columns={columns}
+          data={data}
+          selectedRowsAction={removeSelectedEvents}
+          rowActionLabel="Delete"
+        />
+      </div>
+    );
+  } else {
+    return (
+      <div>
+        <DataTable columns={columns.slice(1)} data={data} />
+      </div>
+    );
+  }
 };
 
 export default EventDataTable;

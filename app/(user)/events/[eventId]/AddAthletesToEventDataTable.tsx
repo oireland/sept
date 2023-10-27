@@ -28,8 +28,11 @@ const AddAthletesToEventDataTable = ({
       window.location.reload();
     } catch (e) {
       toast.dismiss(toastId);
-      if (e instanceof Error || e instanceof AxiosError) {
+      if (e instanceof Error) {
         toast.error(e.message);
+      } else if (e instanceof AxiosError) {
+        console.log(e);
+        toast.error(e.response?.data);
       } else {
         toast.error("Something went wrong!");
       }

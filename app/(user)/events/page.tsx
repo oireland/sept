@@ -1,7 +1,6 @@
 import React from "react";
 import Banner from "../banner";
 
-import events from "@/app/assets/images/events.svg";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { getServerSession } from "next-auth";
@@ -12,7 +11,7 @@ import EventDataTable from "./EventDataTable";
 import { UserRole } from "@prisma/client";
 import { getHostId } from "@/lib/dbHelpers";
 
-async function getEventData(userId: string, role: UserRole) {
+export async function getEventData(userId: string, role: UserRole) {
   try {
     const hostId = await getHostId(userId, role);
 
@@ -31,6 +30,12 @@ async function getEventData(userId: string, role: UserRole) {
         athletesCompeting: true,
         name: true,
         group: true,
+        staffMember: {
+          select: {
+            name: true,
+          },
+        },
+        maxNumberOfAthletes: true,
       },
     });
 
@@ -42,6 +47,8 @@ async function getEventData(userId: string, role: UserRole) {
         athletesCompeting,
         eventType,
         group,
+        staffMember,
+        maxNumberOfAthletes,
       }) => ({
         name,
         id,
@@ -49,6 +56,8 @@ async function getEventData(userId: string, role: UserRole) {
         numberOfAthletes: athletesCompeting.length,
         eventType,
         group,
+        staffName: staffMember?.name,
+        maxNumberOfAthletes,
       })
     );
 
@@ -67,7 +76,7 @@ const Events = async () => {
 
   return (
     <div>
-      <Banner text="My Events" />
+      <Banner text="Events" />
 
       <div className="container mx-auto mt-2">
         {role === "HOST" && (
@@ -75,7 +84,7 @@ const Events = async () => {
             <Link href={"/events/create"}>Create new events</Link>
           </Button>
         )}
-        <EventDataTable data={data} />
+        <EventDataTable userRole={role} data={data} />
       </div>
     </div>
   );

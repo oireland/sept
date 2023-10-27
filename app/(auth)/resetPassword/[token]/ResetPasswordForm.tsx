@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import getURL from "@/lib/getURL";
 import axios from "axios";
 import PasswordField from "@/components/FormikPasswordField";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 interface FormData {
   password: string;
@@ -33,13 +33,14 @@ const validationSchema: yup.ObjectSchema<FormData> = yup.object().shape({
 });
 
 const ResetPasswordForm = ({ token }: { token: string }) => {
+  const router = useRouter();
   const handleFormSubmit = async (password: string) => {
     let toastId = toast.loading("Resetting your password...");
     try {
       await axios.patch(getURL("/api/auth/resetPassword"), { password, token });
       toast.dismiss(toastId);
       toastId = toast.success("Password reset!");
-      redirect(getURL("/signin"));
+      router.push(getURL("/signin"));
     } catch (e) {
       toast.dismiss(toastId);
       if (e instanceof Error) {

@@ -25,14 +25,16 @@ export function FormikMultipleSelect({
   placeholder,
   ...props
 }: Props) {
-  const [field, meta, helpers] = useField<{}>(props);
+  const [field, meta, helpers] = useField<string[]>(props.name);
   const { setValue } = helpers;
   const [open, setOpen] = React.useState(false);
   const [selected, setSelected] = React.useState<Item[]>([]);
 
   const handleUnselect = React.useCallback((item: Item) => {
     setSelected((prev) => prev?.filter((s) => s.value !== item.value));
-    setValue(selected.filter((s) => s.value !== item.value));
+    setValue(
+      selected.filter((s) => s.value !== item.value).map(({ value }) => value)
+    );
   }, []);
 
   const selectables = items.filter((item) => !selected?.includes(item));
@@ -95,10 +97,11 @@ export function FormikMultipleSelect({
                         e.preventDefault();
                         e.stopPropagation();
                       }}
-                      onSelect={(value) => {
+                      onSelect={() => {
                         setSelected((prev) => [...prev, item]);
+                        console.log(selected, item.value);
                         setValue([
-                          ...selected.map((item) => item.value),
+                          ...selected.map(({ value }) => value),
                           item.value,
                         ]);
                       }}

@@ -106,7 +106,6 @@ const CreateStaff = () => {
           onSubmit={onSubmit}
           inputLabel="Staff"
           inputName="staffInput"
-          backHref="/staff"
         />
 
         {staff && (

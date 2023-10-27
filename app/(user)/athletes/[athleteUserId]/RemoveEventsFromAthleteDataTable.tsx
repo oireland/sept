@@ -15,14 +15,14 @@ const RemoveEventsFromAthlete = ({
   athleteUserId: string;
 }) => {
   const removeSelectedEvents = async (selectedRowData: EventTableData[]) => {
-    let toastId = toast.loading("Adding events to the athlete...");
+    let toastId = toast.loading("Removing events from the athlete...");
     try {
       await axios.patch(getURL("/api/update/removeEventsFromAthlete"), {
         selectedRowData,
         athleteUserId,
       });
       toast.dismiss(toastId);
-      toastId = toast.success("Events added!");
+      toastId = toast.success("Events removed!");
       window.location.reload();
     } catch (e) {
       toast.dismiss(toastId);

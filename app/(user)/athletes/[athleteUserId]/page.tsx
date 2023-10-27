@@ -12,6 +12,7 @@ import { BoyOrGirl } from "@prisma/client";
 import { EventTableData } from "../../events/columns";
 import RemoveEventsFromAthlete from "./RemoveEventsFromAthleteDataTable";
 import AddEventsToAthleteDataTable from "./AddEventsToAthleteDataTable";
+import BackButton from "@/components/BackButton";
 
 async function getEventsData(
   hostId: string,
@@ -149,9 +150,7 @@ const EditAthlete = async ({
 
         <hr className="my-5" />
         <div className="flex justify-end">
-          <Button variant="outline">
-            <Link href={getURL("/athletes")}>Back</Link>
-          </Button>
+          <BackButton />
         </div>
       </div>
     </div>

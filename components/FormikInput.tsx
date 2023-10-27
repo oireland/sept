@@ -2,7 +2,6 @@ import { FieldAttributes, useField } from "formik";
 import React, { FC } from "react";
 import { RiErrorWarningLine } from "react-icons/ri";
 import { IconType } from "react-icons";
-import { Input } from "./ui/input";
 
 type MyInputProps = {
   placeholder?: string;
@@ -18,7 +17,7 @@ const FormikInput: FC<MyInputProps> = ({
   onIconClick = () => {},
   ...props
 }) => {
-  const [field, meta] = useField(props.name);
+  const [field, meta] = useField<string>(props.name);
 
   return (
     <div className="mb-2 space-y-1">

@@ -15,14 +15,21 @@ const Dashboard = async () => {
           <Link href="/athletes">Go</Link>
         </Button>
       </div>
-      {session?.user.role === "HOST" && (
+      {session?.user.role === "HOST" ? (
         <div>
           <h1>Manage Staff:</h1>
           <Button asChild variant={"outline"}>
             <Link href="/staff">Go</Link>
           </Button>
         </div>
-      )}
+      ) : session?.user.role === "STAFF" ? (
+        <div>
+          <h1>Your Events:</h1>
+          <Button asChild variant={"outline"}>
+            <Link href="/staffEvents">Go</Link>
+          </Button>
+        </div>
+      ) : null}
       <div>
         <h1>Manage Events:</h1>
         <Button asChild variant={"outline"}>

@@ -8,6 +8,7 @@ import { AthleteTableDataSchema } from "@/lib/yupSchemas";
 import axios, { AxiosError } from "axios";
 import getURL from "@/lib/getURL";
 import toast from "react-hot-toast";
+import { UserRole } from "@prisma/client";
 
 const removeSelectedAthletes = async (selectedRowData: AthleteTableData[]) => {
   let toastId = toast.loading("Deleting athletes...");
@@ -21,7 +22,6 @@ const removeSelectedAthletes = async (selectedRowData: AthleteTableData[]) => {
       0,
       commaSeperatedIds.length - 1
     );
-    console.log(commaSeperatedIds);
 
     await axios.delete(
       getURL(`/api/delete/deleteManyAthletes/${commaSeperatedIds}`)
@@ -40,17 +40,31 @@ const removeSelectedAthletes = async (selectedRowData: AthleteTableData[]) => {
   }
 };
 
-const AthleteDataTable = ({ data }: { data: AthleteTableData[] }) => {
-  return (
-    <div>
-      <DataTable
-        columns={columns}
-        data={data}
-        selectedRowsAction={removeSelectedAthletes}
-        rowActionLabel="Delete"
-      />
-    </div>
-  );
+const AthleteDataTable = ({
+  data,
+  userRole,
+}: {
+  data: AthleteTableData[];
+  userRole: UserRole;
+}) => {
+  if (userRole === "HOST") {
+    return (
+      <div>
+        <DataTable
+          columns={columns}
+          data={data}
+          selectedRowsAction={removeSelectedAthletes}
+          rowActionLabel="Delete"
+        />
+      </div>
+    );
+  } else {
+    return (
+      <div>
+        <DataTable columns={columns.slice(1)} data={data} />
+      </div>
+    );
+  }
 };
 
 export default AthleteDataTable;

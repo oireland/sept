@@ -4,13 +4,13 @@ import { Form, Formik } from "formik";
 import Link from "next/link";
 import React, { useRef } from "react";
 import * as Yup from "yup";
+import BackButton from "./BackButton";
 
 type SingleCsvFormProps = {
   onFileChange: (resultArray: string[]) => void;
   onSubmit: () => void;
   inputLabel: string;
   inputName: string;
-  backHref: string;
 };
 
 const SingleCsvForm = ({
@@ -18,7 +18,6 @@ const SingleCsvForm = ({
   onSubmit,
   inputName,
   inputLabel,
-  backHref,
 }: SingleCsvFormProps) => {
   const fileRef = useRef<HTMLInputElement>(null);
 
@@ -72,9 +71,7 @@ const SingleCsvForm = ({
           handleFileChange={onFileChange}
         />
         <div className="flex justify-between">
-          <Button type="button" variant="outline">
-            <Link href={backHref}>Back</Link>
-          </Button>
+          <BackButton />
           <Button type="submit" variant={"form"}>
             Submit
           </Button>

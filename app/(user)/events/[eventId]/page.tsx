@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import RemoveAthletesFromEventDataTable from "./RemoveAthletesFromEventDataTable";
 import { getHostId } from "@/lib/dbHelpers";
+import BackButton from "@/components/BackButton";
 
 async function getEventData(eventId: string, hostId: string) {
   try {
@@ -168,9 +169,7 @@ const EditEvent = async ({ params }: { params: { eventId: string } }) => {
         />
         <hr className="my-5" />
         <div className="flex justify-end">
-          <Button variant="outline">
-            <Link href={getURL("/events")}>Back</Link>
-          </Button>
+          <BackButton />
         </div>
       </div>
     </div>

@@ -11,6 +11,7 @@ import { toast } from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import getURL from "@/lib/getURL";
+import Link from "next/link";
 
 interface FormData {
   email: string;
@@ -76,7 +77,10 @@ const LoginForm: FC = () => {
           Icon={HiAtSymbol}
         />
         <PasswordField name="password" label="Password" />
-        <div className="flex justify-end">
+        <div className="flex items-baseline justify-between">
+          <Link href="/resetPassword" className="text-xs text-brg underline">
+            Forgot your password?
+          </Link>
           <Button variant={"form"} type="submit" className="mt-2">
             Login
           </Button>

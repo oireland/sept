@@ -16,25 +16,13 @@ import toast from "react-hot-toast";
 import axios from "axios";
 import getURL from "@/lib/getURL";
 import { Checkbox } from "@/components/ui/checkbox";
+import Link from "next/link";
 
 export type StaffTableData = {
-  id: string;
+  userId: string;
   name: string;
   email: string;
   numberOfEvents: number;
-};
-
-const removeStaff = async (userId: string) => {
-  let toastId = toast.loading("Removing...");
-  try {
-    await axios.delete(getURL(`/api/delete/deleteStaff/${userId}`));
-    toast.dismiss(toastId);
-    toastId = toast.success("Staff member removed");
-    window.location.reload();
-  } catch (error) {
-    toast.dismiss(toastId);
-    toast.error("Something went wrong...");
-  }
 };
 
 export const columns: ColumnDef<StaffTableData>[] = [
@@ -84,7 +72,7 @@ export const columns: ColumnDef<StaffTableData>[] = [
     id: "actions",
 
     cell: ({ row }) => {
-      const { id, email } = row.original;
+      const { userId, email } = row.original;
 
       return (
         <DropdownMenu>
@@ -97,15 +85,13 @@ export const columns: ColumnDef<StaffTableData>[] = [
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>View events</DropdownMenuItem>
+            <DropdownMenuItem>
+              <Link href={`/staff/${userId}`}>View/Edit Events</Link>
+            </DropdownMenuItem>
             <DropdownMenuItem
               onClick={() => navigator.clipboard.writeText(email)}
             >
               Copy email
-            </DropdownMenuItem>
-
-            <DropdownMenuItem onClick={() => removeStaff(id)}>
-              Remove
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

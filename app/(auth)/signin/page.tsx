@@ -11,9 +11,9 @@ const SignIn = () => {
 
       <div className="mb-1 flex justify-center px-2">
         <p className=" text-sm">
-          Forgotten your password?
+          Need to create an account?
           <span className="cursor-pointer text-sm text-brg">
-            <Link href="/resetPassword"> Click here</Link>
+            <Link href="/signup"> Click here</Link>
           </span>
         </p>
       </div>

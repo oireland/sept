@@ -47,6 +47,12 @@ export const EventValidationSchema = yup.object({
     .of(yup.string())
     .min(1, "You must choose at least 1 group")
     .required("Required"),
+  maxNumberOfAthletes: yup
+    .number()
+    .integer()
+    .min(2, "Must be at least 2")
+    .integer("Must be a whole number")
+    .required("Required"),
 });
 
 export const EventTableDataSchema = yup.object({
@@ -59,4 +65,14 @@ export const EventTableDataSchema = yup.object({
     .required("Required"),
   id: yup.string().required(),
   numberOfAthletes: yup.number().required(),
+  maxNumberOfAthletes: yup.number().min(2).required("Required"),
+});
+
+export const ResultSchema = yup.object({
+  athleteId: yup.string().required(),
+  score: yup.number().required(),
+});
+
+export const ResultsInputSchema = yup.object({
+  results: yup.array().of(ResultSchema).required(),
 });

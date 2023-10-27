@@ -10,6 +10,7 @@ type SingleEvent = {
   eventType: EventType;
   boyOrGirl: BoyOrGirl;
   group: string;
+  maxNumberOfAthletes: number;
 };
 
 export async function POST(req: Request) {
@@ -17,13 +18,6 @@ export async function POST(req: Request) {
     const session = await getServerSession(authOptions);
     const request = await req.json();
     const eventsData = await EventValidationSchema.validate(request);
-
-    if (!eventsData) {
-      return NextResponse.json(
-        { message: "No data provided" },
-        { status: 400 }
-      );
-    }
 
     if (session?.user.role !== "HOST") {
       throw new Error("Unauthorised User");
@@ -60,6 +54,7 @@ export async function POST(req: Request) {
           boyOrGirl,
           group,
           eventType: eventsData.trackOrField,
+          maxNumberOfAthletes: eventsData.maxNumberOfAthletes,
         };
 
         eventsToBeCreated.push(event);
@@ -67,13 +62,16 @@ export async function POST(req: Request) {
     });
 
     await prisma.event.createMany({
-      data: eventsToBeCreated.map((event) => ({
-        name: event.name,
-        athletesBoyOrGirl: event.boyOrGirl,
-        eventType: event.eventType,
-        group: event.group,
-        hostId,
-      })),
+      data: eventsToBeCreated.map(
+        ({ boyOrGirl, eventType, group, maxNumberOfAthletes, name }) => ({
+          athletesBoyOrGirl: boyOrGirl,
+          eventType,
+          group,
+          hostId,
+          maxNumberOfAthletes,
+          name,
+        })
+      ),
     });
 
     return NextResponse.json(

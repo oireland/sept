@@ -3,7 +3,7 @@
 import { BoyOrGirl, EventType } from "@prisma/client";
 import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
-import { ArrowUpDown, MoreHorizontal } from "lucide-react";
+import { ArrowUpDown, MoreHorizontal, X } from "lucide-react";
 
 import {
   DropdownMenu,
@@ -28,6 +28,8 @@ export type EventTableData = {
   boyOrGirl: BoyOrGirl;
   id: string;
   numberOfAthletes: number;
+  staffName?: string;
+  maxNumberOfAthletes: number;
 };
 
 export const columns: ColumnDef<EventTableData>[] = [
@@ -88,9 +90,22 @@ export const columns: ColumnDef<EventTableData>[] = [
     header: () => <div className="text-left">Boy/Girl</div>,
   },
   {
+    accessorKey: "eventType",
+    id: "Track/Field",
+    header: () => <div className="text-left">Track/Field</div>,
+  },
+  {
     accessorKey: "numberOfAthletes",
     id: "Number of Athletes",
     header: () => <div className="text-left"># Athletes</div>,
+  },
+  {
+    accessorKey: "staffName",
+    id: "Staff",
+    header: () => <div className="text-left">Staff</div>,
+    cell: ({ row }) => (
+      <div className="text-left">{row.original.staffName || <X />}</div>
+    ),
   },
   {
     id: "actions",

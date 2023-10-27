@@ -44,18 +44,42 @@ const Header: FC = () => {
                   Athletes
                 </Link>
               </DropdownMenuItem>
-              {userRole === "HOST" && (
-                <DropdownMenuItem className="p-0">
-                  <Link href="/staff" className="h-full  w-full px-2 py-1.5 ">
-                    Staff
-                  </Link>
-                </DropdownMenuItem>
-              )}
-              <DropdownMenuItem className="p-0">
-                <Link href="/events" className="h-full  w-full px-2 py-1.5 ">
-                  Events
-                </Link>
-              </DropdownMenuItem>
+              {userRole === "HOST" ? (
+                <>
+                  <DropdownMenuItem className="p-0">
+                    <Link href="/staff" className="h-full  w-full px-2 py-1.5 ">
+                      Staff
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="p-0">
+                    <Link
+                      href="/events"
+                      className="h-full  w-full px-2 py-1.5 "
+                    >
+                      Events
+                    </Link>
+                  </DropdownMenuItem>
+                </>
+              ) : userRole === "STAFF" ? (
+                <>
+                  <DropdownMenuItem className="p-0">
+                    <Link
+                      href="/events"
+                      className="h-full  w-full px-2 py-1.5 "
+                    >
+                      All Events
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="p-0">
+                    <Link
+                      href="/staffEvents"
+                      className="h-full  w-full px-2 py-1.5 "
+                    >
+                      My Events
+                    </Link>
+                  </DropdownMenuItem>
+                </>
+              ) : null}
               <DropdownMenuSeparator />
               <DropdownMenuItem className="p-0">
                 <Link href="/account" className="h-full  w-full px-2 py-1.5 ">
