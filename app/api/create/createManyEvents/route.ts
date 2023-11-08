@@ -11,6 +11,9 @@ type SingleEvent = {
   boyOrGirl: BoyOrGirl;
   group: string;
   maxNumberOfAthletes: number;
+  numberOfAttempts: number;
+  locationId: string;
+  date: Date;
 };
 
 export async function POST(req: Request) {
@@ -18,6 +21,8 @@ export async function POST(req: Request) {
     const session = await getServerSession(authOptions);
     const request = await req.json();
     const eventsData = await EventValidationSchema.validate(request);
+
+    console.log("eventsdata", eventsData);
 
     if (session?.user.role !== "HOST") {
       throw new Error("Unauthorised User");
@@ -30,11 +35,20 @@ export async function POST(req: Request) {
       select: {
         groups: true,
         id: true,
+        locations: {
+          select: {
+            locationId: true,
+          },
+        },
       },
     });
 
-    const groups = host.groups;
-    const hostId = host.id;
+    const { groups, id: hostId, locations: locationsObjects } = host;
+    const locations = locationsObjects.map(({ locationId }) => locationId);
+
+    if (!locations.includes(eventsData.locationId)) {
+      return NextResponse.json("Invalid Location", { status: 400 });
+    }
 
     const eventsToBeCreated: SingleEvent[] = [];
 
@@ -55,6 +69,9 @@ export async function POST(req: Request) {
           group,
           eventType: eventsData.trackOrField,
           maxNumberOfAthletes: eventsData.maxNumberOfAthletes,
+          numberOfAttempts: eventsData.numberOfAttempts,
+          date: eventsData.date,
+          locationId: eventsData.locationId,
         };
 
         eventsToBeCreated.push(event);
@@ -63,13 +80,25 @@ export async function POST(req: Request) {
 
     await prisma.event.createMany({
       data: eventsToBeCreated.map(
-        ({ boyOrGirl, eventType, group, maxNumberOfAthletes, name }) => ({
+        ({
+          boyOrGirl,
+          eventType,
+          group,
+          maxNumberOfAthletes,
+          name,
+          numberOfAttempts,
+          date,
+          locationId,
+        }) => ({
           athletesBoyOrGirl: boyOrGirl,
           eventType,
           group,
           hostId,
           maxNumberOfAthletes,
           name,
+          numberOfAttempts,
+          date,
+          locationId,
         })
       ),
     });

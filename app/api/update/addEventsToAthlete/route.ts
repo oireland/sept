@@ -15,15 +15,19 @@ export async function PATCH(req: Request) {
   try {
     const session = await getServerSession(authOptions);
 
+    const { selectedRowData: events, athleteUserId } =
+      await requestSchema.validate(await req.json());
+
     if (
       !session ||
-      !(session.user.role === "HOST" || session.user.role === "STAFF")
+      !(
+        session.user.role === "HOST" ||
+        session.user.role === "STAFF" ||
+        session.user.id === athleteUserId
+      )
     ) {
       return NextResponse.json("Unauthorised request", { status: 401 });
     }
-
-    const { selectedRowData: events, athleteUserId } =
-      await requestSchema.validate(await req.json());
 
     // get the group and gender of the athlete for filtering the events later
     const {

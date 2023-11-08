@@ -19,7 +19,7 @@ const buttonVariants = cva(
         outline:
           "text-primary-foreground bg-primary opacity-75 duration-150 hover:opacity-100 border",
         link: "text-primary underline-offset-4 hover:underline",
-        form: " border border-brg bg-brg bg-opacity-75 text-white transition duration-200 hover:bg-opacity-100",
+        form: "bg-brg bg-opacity-75 text-white transition duration-200 hover:bg-opacity-100",
       },
       size: {
         default: "px-3 py-1 h-10 text-base",

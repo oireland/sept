@@ -4,10 +4,6 @@ import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 import * as yup from "yup";
 
-const requestSchema = yup.object({
-  id: yup.string().required(),
-});
-
 export async function DELETE(
   req: Request,
   { params }: { params: { id: string } }

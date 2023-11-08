@@ -20,7 +20,7 @@ const FormikInput: FC<MyInputProps> = ({
   const [field, meta] = useField<string>(props.name);
 
   return (
-    <div className="mb-2 space-y-1">
+    <div className="mb-2 w-full space-y-1">
       <div className=" flex gap-2">
         <label className="text-sm" htmlFor={props.id}>
           {label}

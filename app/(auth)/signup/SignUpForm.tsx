@@ -1,3 +1,5 @@
+"use client";
+
 import { FC } from "react";
 import { Formik, Form } from "formik";
 import * as Yup from "yup";
@@ -5,7 +7,6 @@ import FormikInput from "../../../components/FormikInput";
 
 import PasswordField from "../../../components/FormikPasswordField";
 import { HiOutlineLibrary, HiAtSymbol } from "react-icons/hi";
-import { SignUpRole } from "./page";
 import { Button } from "@/components/ui/button";
 import axios from "axios";
 import { signIn } from "next-auth/react";
@@ -43,22 +44,17 @@ interface UserData {
   password: string;
 }
 
-interface Props {
-  role: SignUpRole;
-}
-
-const SignUpForm: FC<Props> = ({ role }) => {
+const SignUpForm = () => {
   const handleFormSubmit = async (formData: UserData) => {
-    const data = { ...formData, role };
     let toastId = toast.loading("Creating account...");
     try {
-      await axios.post(getURL("/api/auth/createUser"), data);
+      await axios.post(getURL("/api/auth/createUser"), formData);
       toast.dismiss(toastId);
       toastId = toast.success("Account Created", { duration: 300 });
 
       await signIn("credentials", {
-        email: data.email,
-        password: data.password,
+        email: formData.email,
+        password: formData.password,
         callbackUrl: "/confirm",
       });
     } catch (e) {
@@ -84,13 +80,9 @@ const SignUpForm: FC<Props> = ({ role }) => {
         <FormikInput
           name="name"
           type="input"
-          label={role === SignUpRole.HOST ? "School Name" : "Name"}
+          label="School Name"
           Icon={HiOutlineLibrary}
-          placeholder={
-            role === SignUpRole.HOST
-              ? "e.g. Blue Finch School"
-              : "e.g. John Smith"
-          }
+          placeholder="e.g. Blue Finch School"
         />
         <FormikInput
           name="email"

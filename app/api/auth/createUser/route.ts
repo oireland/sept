@@ -13,11 +13,10 @@ const requestSchema = yup.object({
       /(?=^.{6,20}$)((?=.*\w)(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[|!"$%&\/\(\)\?\^\'\\\+\-\*]))^.*/
     )
     .required(),
-  role: yup.mixed<UserRole>().oneOf(Object.values(UserRole)).required(),
 });
 
 export async function POST(req: Request) {
-  const { name, email, password, role } = await requestSchema.validate(
+  const { name, email, password } = await requestSchema.validate(
     await req.json()
   );
 
@@ -25,41 +24,21 @@ export async function POST(req: Request) {
     const saltRound = 10;
     const hash = await bcrypt.hash(password, saltRound);
 
-    switch (role) {
-      case "HOST":
-        const userHost = await prisma.user.create({
-          data: {
+    const user = await prisma.user.create({
+      data: {
+        name,
+        email,
+        password: hash,
+        role: "HOST",
+        host: {
+          create: {
             name,
-            email,
-            password: hash,
-            role: role,
-            host: {
-              create: {
-                name,
-              },
-            },
           },
-        });
-        return NextResponse.json(userHost);
-      case "SPECTATOR":
-        const userSpectator = await prisma.user.create({
-          data: {
-            name,
-            email,
-            password: hash,
-            role: role,
-            spectator: {
-              create: {
-                name,
-              },
-            },
-          },
-        });
-        return NextResponse.json(userSpectator);
+        },
+      },
+    });
 
-      default:
-        return NextResponse.json({ message: "invalid role" }, { status: 400 });
-    }
+    return NextResponse.json(user);
   } catch (e) {
     return NextResponse.json(e, { status: 500 });
   }

@@ -14,6 +14,7 @@ const requestSchema = yup.object({
 export async function PATCH(req: Request) {
   try {
     const session = await getServerSession(authOptions);
+    console.log(session);
 
     if (
       !session ||
@@ -22,8 +23,11 @@ export async function PATCH(req: Request) {
       return NextResponse.json("Unauthorised request", { status: 401 });
     }
 
+    const body = await req.json();
+    console.log(body);
+
     const { eventId, selectedRowData: athletes } = await requestSchema.validate(
-      await req.json()
+      body
     );
 
     // get the group and gender of the event for filtering the athletes later

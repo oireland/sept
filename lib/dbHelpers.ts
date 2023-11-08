@@ -23,6 +23,16 @@ export async function getHostId(userId: string, userRole: UserRole) {
         },
       });
       return hostId;
+    } else if (userRole === "ATHLETE") {
+      const { hostId } = await prisma.athlete.findUniqueOrThrow({
+        where: {
+          userId,
+        },
+        select: {
+          hostId: true,
+        },
+      });
+      return hostId;
     }
     return null;
   } catch (error) {

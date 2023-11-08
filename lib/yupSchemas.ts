@@ -53,6 +53,21 @@ export const EventValidationSchema = yup.object({
     .min(2, "Must be at least 2")
     .integer("Must be a whole number")
     .required("Required"),
+  numberOfAttempts: yup
+    .number()
+    .integer()
+    .min(1, "Must be at least 1")
+    .integer("Must be a whole number")
+    .required("Required"),
+  date: yup
+    .date()
+    .required()
+    .test(
+      "futureDate",
+      "Date must be in the future",
+      (date) => new Date() < date
+    ),
+  locationId: yup.string().required("Required"),
 });
 
 export const EventTableDataSchema = yup.object({
@@ -70,7 +85,10 @@ export const EventTableDataSchema = yup.object({
 
 export const ResultSchema = yup.object({
   athleteId: yup.string().required(),
-  score: yup.number().required(),
+  scores: yup
+    .array()
+    .of(yup.number().required().min(0, "Scores must not be negative"))
+    .required(),
 });
 
 export const ResultsInputSchema = yup.object({

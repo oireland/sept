@@ -31,7 +31,7 @@ export default function RootLayout({
         <NextAuthProvider>
           <NextTopLoader color="#004225" crawl={true} showSpinner={false} />
           <Header />
-          <Toaster />
+          <Toaster position="top-center" />
           {children}
         </NextAuthProvider>
       </body>

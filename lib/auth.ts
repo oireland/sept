@@ -7,7 +7,6 @@ import bcrypt from "bcrypt";
 import axios from "axios";
 import getURL from "./getURL";
 import { VerificationToken } from "./token";
-import { UserRole } from "@prisma/client";
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma) as Adapter,

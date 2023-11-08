@@ -15,7 +15,7 @@ type SelectItemType = {
 };
 
 type SelectProps = {
-  label: string;
+  label?: string;
   items: SelectItemType[];
 } & FieldAttributes<{}>;
 
@@ -26,11 +26,9 @@ const FormikSelect: FC<SelectProps> = ({ label, items, ...props }) => {
   const { setValue } = helpers;
 
   return (
-    <div className="mb-2 space-y-1">
+    <div className="mb-2 w-full space-y-1">
       <div className=" flex gap-2">
-        <label className="text-sm" htmlFor={props.id}>
-          {label}
-        </label>
+        <label className="text-sm">{label}</label>
         {meta.touched && meta.error && (
           <div className="flex items-center text-xs text-brg">
             <RiErrorWarningLine className="peer h-5 w-5 pr-1" />

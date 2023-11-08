@@ -1,6 +1,5 @@
 "use client";
 import { FC } from "react";
-import { redirect, usePathname } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { signOut, useSession } from "next-auth/react";
@@ -13,7 +12,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import getURL from "@/lib/getURL";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const Header: FC = () => {
   const session = useSession();
@@ -39,16 +38,27 @@ const Header: FC = () => {
                   Dashboard
                 </Link>
               </DropdownMenuItem>
-              <DropdownMenuItem className="p-0">
-                <Link href="/athletes" className="h-full w-full px-2 py-1.5 ">
-                  Athletes
-                </Link>
-              </DropdownMenuItem>
               {userRole === "HOST" ? (
                 <>
                   <DropdownMenuItem className="p-0">
+                    <Link
+                      href="/athletes"
+                      className="h-full w-full px-2 py-1.5 "
+                    >
+                      Athletes
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="p-0">
                     <Link href="/staff" className="h-full  w-full px-2 py-1.5 ">
                       Staff
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="p-0">
+                    <Link
+                      href="/locations"
+                      className="h-full  w-full px-2 py-1.5 "
+                    >
+                      Locations
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem className="p-0">
@@ -62,6 +72,14 @@ const Header: FC = () => {
                 </>
               ) : userRole === "STAFF" ? (
                 <>
+                  <DropdownMenuItem className="p-0">
+                    <Link
+                      href="/athletes"
+                      className="h-full w-full px-2 py-1.5 "
+                    >
+                      Athletes
+                    </Link>
+                  </DropdownMenuItem>
                   <DropdownMenuItem className="p-0">
                     <Link
                       href="/events"
@@ -79,7 +97,18 @@ const Header: FC = () => {
                     </Link>
                   </DropdownMenuItem>
                 </>
-              ) : null}
+              ) : (
+                <>
+                  <DropdownMenuItem className="p-0">
+                    <Link
+                      href={`/athletes/${session.data.user.id}`}
+                      className="h-full  w-full px-2 py-1.5 "
+                    >
+                      My Events
+                    </Link>
+                  </DropdownMenuItem>
+                </>
+              )}
               <DropdownMenuSeparator />
               <DropdownMenuItem className="p-0">
                 <Link href="/account" className="h-full  w-full px-2 py-1.5 ">
@@ -104,6 +133,10 @@ const Header: FC = () => {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
+        </div>
+      ) : session.status === "loading" ? (
+        <div>
+          <Skeleton className="h-10 w-20" />
         </div>
       ) : (
         <div>
