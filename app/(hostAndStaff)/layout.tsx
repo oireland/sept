@@ -17,8 +17,6 @@ export default async function UserLayout({
     redirect(getURL("/confirm"));
   }
 
-  // For testing, will change URL and conditions when all pages are made
-  console.log(session.user.role);
   if (!(session.user.role === "HOST" || session.user.role === "STAFF")) {
     redirect(getURL("/"));
   }

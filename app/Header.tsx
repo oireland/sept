@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useSession } from "next-auth/react";
 import HeaderDropdownMenu from "./HeaderDropdownMenu";
+import getURL from "@/lib/getURL";
 
 const Header: FC = () => {
   const session = useSession();
