@@ -19,25 +19,33 @@ async function getAthleteData(hostId: string) {
         hostId,
       },
       select: {
-        name: true,
-        group: true,
-        team: true,
+        group: {
+          select: {
+            groupName: true,
+          },
+        },
+        team: {
+          select: {
+            teamName: true,
+          },
+        },
         boyOrGirl: true,
         userId: true,
         events: true,
         user: {
           select: {
             email: true,
+            name: true,
           },
         },
       },
     });
 
     const athletes: AthleteTableData[] = data.map(
-      ({ name, group, team, boyOrGirl, userId, user, events }) => ({
-        name,
-        group,
-        team,
+      ({ group, team, boyOrGirl, userId, user, events }) => ({
+        name: user.name,
+        groupName: group.groupName,
+        teamName: team.teamName,
         boyOrGirl,
         userId,
         email: user.email!,
@@ -56,7 +64,7 @@ const Athletes = async () => {
 
   const role = session!.user.role;
 
-  const hostId = await getHostId(session!.user.id, role);
+  const hostId = await getHostId(session!.user.userId, role);
 
   if (hostId === null) {
     redirect("/");

@@ -21,25 +21,23 @@ async function getStaffData(userId: string): Promise<StaffTableData[]> {
       },
     },
     select: {
-      name: true,
       userId: true,
       events: true,
       user: {
         select: {
+          name: true,
           email: true,
         },
       },
     },
   });
 
-  const staff: StaffTableData[] = data.map(
-    ({ name, userId, user, events }) => ({
-      name,
-      numberOfEvents: events.length,
-      userId,
-      email: user.email!,
-    })
-  );
+  const staff: StaffTableData[] = data.map(({ userId, user, events }) => ({
+    name: user.name,
+    numberOfEvents: events.length,
+    userId,
+    email: user.email!,
+  }));
 
   return staff;
 }
@@ -48,7 +46,7 @@ const Staff = async () => {
   const session = await getServerSession(authOptions);
   const role = session!.user.role;
 
-  const staffData = await getStaffData(session!.user.id);
+  const staffData = await getStaffData(session!.user.userId);
 
   return (
     <div>

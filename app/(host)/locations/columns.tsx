@@ -6,7 +6,6 @@ import { Checkbox } from "@/components/ui/checkbox";
 
 export type LocationsTableData = {
   locationName: string;
-  locationId: string;
   numberOfEvents: number;
 };
 

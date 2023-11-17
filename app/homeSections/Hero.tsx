@@ -31,6 +31,7 @@ const Hero: FC<HeroProps> = ({}) => {
           alt="An animated cartoon showing 3 athletes. One is doing the high jump, one hurdles, and the last a sprint."
           fill
           className="object-contain"
+          priority
         />
         <a
           href="https://storyset.com/"

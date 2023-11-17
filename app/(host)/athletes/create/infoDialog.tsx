@@ -74,6 +74,10 @@ const InfoDialog = () => {
             </TableBody>
           </Table>
           <AlertDialogDescription className="text-left">
+            The groups and teams must match one of the groups/teams you have
+            added.
+          </AlertDialogDescription>
+          <AlertDialogDescription className="text-left">
             Export the spreadsheet to a{" "}
             <a
               className="font-semibold underline"
@@ -84,8 +88,7 @@ const InfoDialog = () => {
             </a>{" "}
             file and upload the file.
             <br />
-            Once the file has been uploaded the number of athletes, the year
-            groups and the teams that have been found when processing the file
+            Once the file has been uploaded the number of athletes in the file
             will be displayed.
             <br />
             You <b>must</b> make sure that these details are correct before you

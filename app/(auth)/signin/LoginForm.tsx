@@ -38,10 +38,11 @@ const LoginForm: FC = () => {
       const signinRes = await signIn("credentials", {
         email,
         password,
-        redirect: false,
+        redirect: true,
+        callbackUrl: "/dashboard",
       });
       if (signinRes?.error) {
-        throw new Error("Invalid Credentials");
+        throw new Error(signinRes.error);
       }
       router.push("/dashboard");
       toast.dismiss(toastId);

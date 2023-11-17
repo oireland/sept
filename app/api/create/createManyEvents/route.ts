@@ -8,12 +8,13 @@ import { prisma } from "@/lib/prisma";
 type SingleEvent = {
   name: string;
   eventType: EventType;
-  boyOrGirl: BoyOrGirl;
-  group: string;
+  athletesBoyOrGirl: BoyOrGirl;
+  groupName: string;
   maxNumberOfAthletes: number;
   numberOfAttempts: number;
-  locationId: string;
+  locationName: string;
   date: Date;
+  hostId: string;
 };
 
 export async function POST(req: Request) {
@@ -22,85 +23,65 @@ export async function POST(req: Request) {
     const request = await req.json();
     const eventsData = await EventValidationSchema.validate(request);
 
-    console.log("eventsdata", eventsData);
-
     if (session?.user.role !== "HOST") {
       throw new Error("Unauthorised User");
     }
 
     const host = await prisma.host.findUniqueOrThrow({
       where: {
-        userId: session.user.id,
+        userId: session.user.userId,
       },
       select: {
-        groups: true,
-        id: true,
+        groups: {
+          select: {
+            groupName: true,
+          },
+        },
+        hostId: true,
         locations: {
           select: {
-            locationId: true,
+            locationName: true,
           },
         },
       },
     });
 
-    const { groups, id: hostId, locations: locationsObjects } = host;
-    const locations = locationsObjects.map(({ locationId }) => locationId);
+    const { groups: groupsObjects, hostId, locations: locationsObjects } = host;
+    const locations = locationsObjects.map(({ locationName }) => locationName);
+    const groups = groupsObjects.map(({ groupName }) => groupName);
 
-    if (!locations.includes(eventsData.locationId)) {
+    if (!locations.includes(eventsData.locationName)) {
       return NextResponse.json("Invalid Location", { status: 400 });
     }
+
+    eventsData.groupNames.forEach((groupName) => {
+      if (!groups.includes(groupName)) {
+        return NextResponse.json("Invalid Groups", { status: 400 });
+      }
+    });
 
     const eventsToBeCreated: SingleEvent[] = [];
 
     eventsData.boyOrGirl.forEach((boyOrGirl) => {
-      if (!boyOrGirl) return;
-      eventsData.groups.forEach((group) => {
-        if (!group) {
-          return;
-        }
-        // if the group isn't one of the host's groups
-        if (!groups.includes(group)) {
-          return;
-        }
-
+      eventsData.groupNames.forEach((groupName) => {
         const event: SingleEvent = {
           name: eventsData.eventName,
-          boyOrGirl,
-          group,
+          athletesBoyOrGirl: boyOrGirl,
+          groupName,
           eventType: eventsData.trackOrField,
           maxNumberOfAthletes: eventsData.maxNumberOfAthletes,
           numberOfAttempts: eventsData.numberOfAttempts,
           date: eventsData.date,
-          locationId: eventsData.locationId,
+          locationName: eventsData.locationName,
+          hostId,
         };
 
         eventsToBeCreated.push(event);
       });
-    });
+    }); 
 
     await prisma.event.createMany({
-      data: eventsToBeCreated.map(
-        ({
-          boyOrGirl,
-          eventType,
-          group,
-          maxNumberOfAthletes,
-          name,
-          numberOfAttempts,
-          date,
-          locationId,
-        }) => ({
-          athletesBoyOrGirl: boyOrGirl,
-          eventType,
-          group,
-          hostId,
-          maxNumberOfAthletes,
-          name,
-          numberOfAttempts,
-          date,
-          locationId,
-        })
-      ),
+      data: eventsToBeCreated,
     });
 
     return NextResponse.json(

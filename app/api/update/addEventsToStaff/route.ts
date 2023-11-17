@@ -24,7 +24,7 @@ export async function PATCH(req: Request) {
 
     const staffHostId = await getHostId(staffUserId, "STAFF");
 
-    const hostId = await getHostId(session.user.id, session.user.role);
+    const hostId = await getHostId(session.user.userId, session.user.role);
 
     if (hostId === null || staffHostId === null || hostId !== staffHostId) {
       return NextResponse.json("Invalid request", { status: 400 });
@@ -35,15 +35,15 @@ export async function PATCH(req: Request) {
         hostId,
       },
       select: {
-        id: true,
+        eventId: true,
       },
     });
     // filter the events from the request to only include those with a valid ID
 
-    const validEventIds: string[] = eventsOfHost.map(({ id }) => id);
+    const validEventIds: string[] = eventsOfHost.map(({ eventId }) => eventId);
 
-    const filteredEvents = events?.filter(({ id }) =>
-      validEventIds.includes(id)
+    const filteredEvents = events?.filter(({ eventId }) =>
+      validEventIds.includes(eventId)
     );
 
     if (filteredEvents.length === 0) {
@@ -53,10 +53,10 @@ export async function PATCH(req: Request) {
     // update each event to have the staff member
     await Promise.all(
       filteredEvents?.map(
-        async ({ id }) =>
+        async ({ eventId }) =>
           await prisma.event.update({
             where: {
-              id,
+              eventId,
             },
             data: {
               staffMember: {

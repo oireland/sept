@@ -1,12 +1,10 @@
 import { UserRole, User } from "@prisma/client";
 
-type UserId = string;
-
 declare module "next-auth/jwt" {
   interface JWT {
-    id: UserId;
+    userId: string;
     role: UserRole;
-    isConfirmed: boolean;
+    emailVerified: Date | null;
   }
 }
 

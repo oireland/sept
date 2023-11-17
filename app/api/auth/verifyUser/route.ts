@@ -18,8 +18,8 @@ export async function PATCH(req: Request) {
     ) as VerificationToken;
 
     await prisma.user.update({
-      where: { id: userId },
-      data: { emailVerified: new Date().toISOString(), isConfirmed: true },
+      where: { userId },
+      data: { emailVerified: new Date().toISOString() },
     });
 
     return NextResponse.json(

@@ -12,13 +12,12 @@ export const getLocations = async (hostId: string) => {
   try {
     const { locations } = await prisma.host.findUniqueOrThrow({
       where: {
-        id: hostId,
+        hostId,
       },
       select: {
         locations: {
           select: {
             events: true,
-            locationId: true,
             locationName: true,
           },
         },
@@ -33,7 +32,7 @@ export const getLocations = async (hostId: string) => {
 
 const Locations = async () => {
   const session = await getServerSession(authOptions);
-  const hostId = await getHostId(session!.user.id, "HOST");
+  const hostId = await getHostId(session!.user.userId, "HOST");
   if (!hostId) {
     redirect("/");
   }
@@ -43,7 +42,7 @@ const Locations = async () => {
     <div>
       <Banner text="Locations" />
 
-      <div className="container p-4">
+      <div className="container px-10 py-4">
         <h2 className="mb-2 text-xl font-semibold">Add a new Location</h2>
         <LocationForm />
 
@@ -51,8 +50,7 @@ const Locations = async () => {
         <h2 className="mb-2 text-xl font-semibold">Your Locations</h2>
 
         <LocationDataTable
-          data={locations.map(({ locationName, locationId, events }) => ({
-            locationId,
+          data={locations.map(({ locationName, events }) => ({
             locationName,
             numberOfEvents: events.length,
           }))}

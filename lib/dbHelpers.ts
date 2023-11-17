@@ -4,15 +4,15 @@ import { prisma } from "./prisma";
 export async function getHostId(userId: string, userRole: UserRole) {
   try {
     if (userRole === "HOST") {
-      const { id } = await prisma.host.findUniqueOrThrow({
+      const { hostId } = await prisma.host.findUniqueOrThrow({
         where: {
           userId,
         },
         select: {
-          id: true,
+          hostId: true,
         },
       });
-      return id;
+      return hostId;
     } else if (userRole === "STAFF") {
       const { hostId } = await prisma.staff.findUniqueOrThrow({
         where: {

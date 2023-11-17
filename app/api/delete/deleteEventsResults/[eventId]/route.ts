@@ -13,16 +13,14 @@ export async function DELETE(
       return NextResponse.json("Unauthorised Request", { status: 401 });
     }
 
-    console.log("params", params);
-
     // delete all results for the event (if the user is the staff of the event)
     await prisma.result.deleteMany({
       where: {
         event: {
-          id: params.eventId,
+          eventId: params.eventId,
           AND: {
             staffMember: {
-              userId: session.user.id,
+              userId: session.user.userId,
             },
           },
         },

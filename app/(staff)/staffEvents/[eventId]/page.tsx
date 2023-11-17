@@ -7,7 +7,7 @@ import { getHostId } from "@/lib/dbHelpers";
 import EnterResultsForm from "./EnterResultsForm";
 import FloatingContainer from "@/components/FloatingContainer";
 import InfoDialog from "./infoDialog";
-import { Medal, Trophy } from "lucide-react";
+import { Medal } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -20,12 +20,13 @@ import BackButton from "@/components/BackButton";
 import { Button } from "@/components/ui/button";
 import axios from "axios";
 import ClearResultsButton from "./ClearResultsButton";
+import Link from "next/link";
 
 async function getEventData(eventId: string, hostId: string) {
   try {
     const event = await prisma.event.findUniqueOrThrow({
       where: {
-        id: eventId,
+        eventId,
       },
       select: {
         hostId: true,
@@ -33,12 +34,12 @@ async function getEventData(eventId: string, hostId: string) {
         athletesBoyOrGirl: true,
         athletesCompeting: {
           select: {
-            name: true,
+            user: { select: { name: true } },
             boyOrGirl: true,
-            group: true,
+            groupName: true,
             userId: true,
-            id: true,
-            team: true,
+            athleteId: true,
+            teamName: true,
             hostId: true,
             results: {
               where: {
@@ -51,8 +52,9 @@ async function getEventData(eventId: string, hostId: string) {
           },
         },
         name: true,
-        group: true,
+        groupName: true,
         numberOfAttempts: true,
+        maxNumberOfAthletes: true,
         results: {
           select: {
             athleteId: true,
@@ -80,7 +82,7 @@ const EnterEventResults = async ({
   params: { eventId: string };
 }) => {
   const session = await getServerSession(authOptions);
-  const userId = session!.user.id;
+  const userId = session!.user.userId;
 
   const hostId = await getHostId(userId, session!.user.role);
 
@@ -96,23 +98,48 @@ const EnterEventResults = async ({
 
   const {
     name,
-    group,
+    groupName,
     athletesBoyOrGirl,
     athletesCompeting,
     eventType,
     numberOfAttempts,
     results: eventResults,
+    maxNumberOfAthletes,
   } = eventData;
 
-  const titleText = `${group} ${
+  const titleText = `${groupName} ${
     athletesBoyOrGirl === "BOY" ? "Boy's" : "Girl's"
   } ${name}`;
+
+  if (athletesCompeting.length > maxNumberOfAthletes) {
+    return (
+      <FloatingContainer className="space-y-3 p-4">
+        <h2 className="mt-2 text-center text-xl font-semibold text-brg sm:text-2xl">
+          There are too many athletes signed up for this event!
+        </h2>
+        <p className="text-center">
+          There are {athletesCompeting.length} athletes registered for this
+          event, but the maximum number of athletes is {maxNumberOfAthletes}.
+          Please remove at least{" "}
+          {athletesCompeting.length - maxNumberOfAthletes} athletes before
+          entering the results.
+        </p>
+        <div className="flex justify-center">
+          <Button variant={"outline"}>
+            <Link href={getURL(`/events/${params.eventId}`)}>
+              Edit Athletes
+            </Link>
+          </Button>
+        </div>
+      </FloatingContainer>
+    );
+  }
 
   // if there is no result on the event with the athlete's id, then results need to be entered.
   let haveAthletesCompeted = true;
   const eventResultAThleteIds = eventResults.map(({ athleteId }) => athleteId);
-  athletesCompeting.forEach(({ id }) => {
-    if (!eventResultAThleteIds.includes(id)) {
+  athletesCompeting.forEach(({ athleteId }) => {
+    if (!eventResultAThleteIds.includes(athleteId)) {
       // no result for this athlete for this event
       haveAthletesCompeted = false;
     }
@@ -134,29 +161,31 @@ const EnterEventResults = async ({
               </TableRow>
             </TableHeader>
             <TableBody>
-              {eventResults.map(({ place, points, scores, athleteId }) => {
-                let athleteName = athletesCompeting.filter(
-                  ({ id }) => id === athleteId
-                )[0].name;
-                return (
-                  <TableRow key={athleteId}>
-                    <TableCell className="font-medium">
-                      {place === 1 ? (
-                        <Medal className="text-[#FFD700]" />
-                      ) : place === 2 ? (
-                        <Medal className="text-[#C0C0C0]" />
-                      ) : place === 3 ? (
-                        <Medal className="text-[#CD7F32]" />
-                      ) : (
-                        place
-                      )}
-                    </TableCell>
-                    <TableCell>{athleteName}</TableCell>
-                    <TableCell>{points}</TableCell>
-                    <TableCell>{scores.toString()}</TableCell>
-                  </TableRow>
-                );
-              })}
+              {eventResults.map(
+                ({ place, points, scores, athleteId: eventAthleteId }) => {
+                  let athleteName = athletesCompeting.filter(
+                    ({ athleteId }) => athleteId === eventAthleteId
+                  )[0].user.name;
+                  return (
+                    <TableRow key={eventAthleteId}>
+                      <TableCell className="flex justify-start text-left font-medium">
+                        {place === 1 ? (
+                          <Medal className="h-6 w-6 text-[#FFD700]" />
+                        ) : place === 2 ? (
+                          <Medal className="h-6 w-6 text-[#C0C0C0]" />
+                        ) : place === 3 ? (
+                          <Medal className="h-6 w-6 text-[#CD7F32]" />
+                        ) : (
+                          <span className="ml-1">{place}</span>
+                        )}
+                      </TableCell>
+                      <TableCell>{athleteName}</TableCell>
+                      <TableCell>{points}</TableCell>
+                      <TableCell>{scores.toString()}</TableCell>
+                    </TableRow>
+                  );
+                }
+              )}
             </TableBody>
           </Table>
         </div>
@@ -178,9 +207,9 @@ const EnterEventResults = async ({
         </h2>
 
         <EnterResultsForm
-          athletes={athletesCompeting.map(({ results, id, name }) => ({
-            id,
-            name,
+          athletes={athletesCompeting.map(({ results, athleteId, user }) => ({
+            athleteId,
+            name: user.name,
             scores:
               results[0]?.scores ||
               Array.from(Array(numberOfAttempts), () => 0),

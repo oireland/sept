@@ -7,6 +7,7 @@ import bcrypt from "bcrypt";
 import axios from "axios";
 import getURL from "./getURL";
 import { VerificationToken } from "./token";
+import { PrismaClientInitializationError } from "@prisma/client/runtime/library";
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma) as Adapter,
@@ -36,19 +37,27 @@ export const authOptions: NextAuthOptions = {
             throw new Error("Email or password are incorrect ");
           }
 
-          if (!user.isConfirmed) {
+          if (!user.emailVerified) {
             const tokenData: VerificationToken = {
               email: user.email!,
-              userId: user.id,
+              userId: user.userId,
             };
             await axios.post(
               getURL("/api/auth/sendVerificationEmail"),
               tokenData
             );
           }
-          return { id: user.id, name: user.name, email: user.email };
+          return {
+            id: user.userId,
+            name: user.name,
+            email: user.email,
+            emailVerified: user.emailVerified,
+          };
         } catch (e) {
           console.log(e);
+          if (e instanceof PrismaClientInitializationError) {
+            throw new Error("Connection Error");
+          }
           throw e;
         }
       },
@@ -58,31 +67,35 @@ export const authOptions: NextAuthOptions = {
     async session({ token, session }) {
       if (token) {
         session.user.email = token.email!;
-        session.user.id = token.id;
+        session.user.userId = token.userId;
         session.user.name = token.name!;
         session.user.role = token.role;
-        session.user.isConfirmed = token.isConfirmed;
+        session.user.emailVerified = token.emailVerified;
         session.user.image = token.picture || null;
       }
       return session;
     },
     async jwt({ token }) {
-      const dbUser = await prisma.user.findUnique({
+      const dbUser = await prisma.user.findUniqueOrThrow({
         where: {
           email: token.email!,
         },
+        select: {
+          userId: true,
+          name: true,
+          email: true,
+          image: true,
+          role: true,
+          emailVerified: true,
+        },
       });
 
-      if (!dbUser) {
-        throw new Error("User not in DB");
-      }
-
-      token.id = dbUser.id;
+      token.userId = dbUser.userId;
       token.name = dbUser.name;
       token.email = dbUser.email;
       token.picture = dbUser.image;
       token.role = dbUser.role;
-      token.isConfirmed = dbUser.isConfirmed;
+      token.emailVerified = dbUser.emailVerified;
 
       return token;
     },

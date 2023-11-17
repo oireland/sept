@@ -25,7 +25,7 @@ const LocationForm: FC = () => {
   const handleFormSubmit = async (data: FormData) => {
     let toastId = toast.loading("Adding...");
     try {
-      await axios.patch(getURL("/api/create/addLocation"), data);
+      await axios.post(getURL("/api/create/addLocation"), data);
       toast.dismiss(toastId);
       toastId = toast.success("Location Added");
       router.refresh();

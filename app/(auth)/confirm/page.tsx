@@ -22,7 +22,7 @@ const Confirm: FC = () => {
   });
 
   useEffect(() => {
-    if (session.data?.user.isConfirmed) redirect("/dashboard");
+    if (session.data?.user.emailVerified) redirect("/dashboard");
   }, [session]);
 
   const email = session.data?.user.email;

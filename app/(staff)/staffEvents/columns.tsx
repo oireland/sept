@@ -69,7 +69,7 @@ export const columns: ColumnDef<EventTableData>[] = [
     id: "actions",
 
     cell: ({ row }) => {
-      const { id } = row.original;
+      const { eventId } = row.original;
 
       return (
         <DropdownMenu>
@@ -84,7 +84,7 @@ export const columns: ColumnDef<EventTableData>[] = [
             <DropdownMenuSeparator />
             <DropdownMenuItem className="p-0">
               <Link
-                href={getURL(`/events/${id}`)}
+                href={getURL(`/events/${eventId}`)}
                 className="h-full  w-full px-2 py-1.5 "
               >
                 View/Edit Competitors
@@ -93,7 +93,7 @@ export const columns: ColumnDef<EventTableData>[] = [
             <DropdownMenuItem className="p-0">
               <Link
                 className="h-full  w-full px-2 py-1.5 "
-                href={getURL(`/staffEvents/${id}`)}
+                href={getURL(`/staffEvents/${eventId}`)}
               >
                 Results
               </Link>

@@ -24,7 +24,7 @@ export async function getEventData(userId: string, role: UserRole) {
         hostId,
       },
       select: {
-        id: true,
+        eventId: true,
         eventType: true,
         athletesBoyOrGirl: true,
         athletesCompeting: true,
@@ -32,8 +32,12 @@ export async function getEventData(userId: string, role: UserRole) {
         group: true,
         staffMember: {
           select: {
-            name: true,
-            userId: true,
+            user: {
+              select: {
+                userId: true,
+                name: true,
+              },
+            },
           },
         },
         maxNumberOfAthletes: true,
@@ -49,7 +53,7 @@ export async function getEventData(userId: string, role: UserRole) {
     const data: EventTableData[] = events.map(
       ({
         name,
-        id,
+        eventId,
         athletesBoyOrGirl,
         athletesCompeting,
         eventType,
@@ -60,13 +64,12 @@ export async function getEventData(userId: string, role: UserRole) {
         date,
       }) => ({
         name,
-        id,
+        eventId,
         boyOrGirl: athletesBoyOrGirl,
         numberOfAthletes: athletesCompeting.length,
         eventType,
-        group,
-        staffName: staffMember?.name,
-        staffUserId: staffMember?.userId,
+        groupName: group.groupName,
+        staffName: staffMember?.user.name,
         maxNumberOfAthletes,
         locationName: location.locationName,
         date,
@@ -84,7 +87,7 @@ const Events = async () => {
 
   const role = session!.user.role;
 
-  const data: EventTableData[] = await getEventData(session!.user.id, role);
+  const data: EventTableData[] = await getEventData(session!.user.userId, role);
 
   console.log("event table data", data);
 

@@ -21,7 +21,7 @@ const getStaffData = async (staffUserId: string, hostId: string) => {
         userId: staffUserId,
       },
       select: {
-        id: true,
+        staffId: true,
         hostId: true,
         events: {
           select: {
@@ -29,24 +29,26 @@ const getStaffData = async (staffUserId: string, hostId: string) => {
             athletesBoyOrGirl: true,
             athletesCompeting: true,
             eventType: true,
-            group: true,
-            id: true,
-            staffMember: {
+            group: {
               select: {
-                name: true,
+                groupName: true,
               },
             },
+            eventId: true,
             maxNumberOfAthletes: true,
             date: true,
             location: {
               select: {
                 locationName: true,
-                locationId: true,
               },
             },
           },
         },
-        name: true,
+        user: {
+          select: {
+            name: true,
+          },
+        },
       },
     });
 
@@ -68,7 +70,7 @@ const EditStaffPage = async ({
 
   const staffUserId = params.staffUserId;
 
-  const hostId = await getHostId(session!.user.id, session!.user.role);
+  const hostId = await getHostId(session!.user.userId, session!.user.role);
 
   if (hostId === null) {
     redirect(getURL("/"));
@@ -81,7 +83,7 @@ const EditStaffPage = async ({
   }
 
   const allEventsData = await getEventData(
-    session!.user.id,
+    session!.user.userId,
     session!.user.role
   );
 
@@ -93,37 +95,37 @@ const EditStaffPage = async ({
       athletesBoyOrGirl,
       eventType,
       group,
-      id,
+      eventId,
       athletesCompeting,
-      staffMember,
       maxNumberOfAthletes,
       date,
       location,
     }) => ({
-      id,
+      eventId,
       boyOrGirl: athletesBoyOrGirl,
       eventType,
-      group,
+      groupName: group.groupName,
       name,
       numberOfAthletes: athletesCompeting.length,
-      staffName: staffMember?.name,
+      staffName: staffData.user.name,
       maxNumberOfAthletes,
       date,
       locationName: location.locationName,
-      locationId: location.locationId,
       staffUserId,
     })
   );
 
-  const staffsEventsIds: string[] = staffData.events.map(({ id }) => id);
+  const staffsEventsIds: string[] = staffData.events.map(
+    ({ eventId }) => eventId
+  );
 
   const availableEventsTableData: EventTableData[] = allEventsData.filter(
-    ({ id, staffName }) => !staffsEventsIds.includes(id) && !staffName
+    ({ eventId, staffName }) => !staffsEventsIds.includes(eventId) && !staffName
   );
 
   return (
     <div className="max-w-full overflow-x-hidden">
-      <Banner text={staffData.name} />
+      <Banner text={staffData.user.name} />
 
       <div className="container mx-auto mt-2 ">
         <h2 className="text-2xl font-semibold">Events Staffing</h2>

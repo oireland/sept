@@ -15,10 +15,7 @@ export async function PATCH(req: Request) {
   try {
     const session = await getServerSession(authOptions);
 
-    if (
-      !session ||
-      !(session.user.role === "HOST" || session.user.role === "STAFF")
-    ) {
+    if (!(session?.user.role === "HOST" || session?.user.role === "STAFF")) {
       return NextResponse.json("Unauthorised request", { status: 401 });
     }
 
@@ -28,22 +25,22 @@ export async function PATCH(req: Request) {
 
     // get the group and gender of the event for filtering the athletes later
     const {
-      group: eventGroup,
+      groupName: eventGroupName,
       athletesBoyOrGirl,
       hostId: eventHostId,
     } = await prisma.event.findUniqueOrThrow({
       where: {
-        id: eventId,
+        eventId,
       },
       select: {
-        group: true,
+        groupName: true,
         athletesBoyOrGirl: true,
         hostId: true,
       },
     });
 
     // to be used to check that athletes from the request belong to the host
-    const hostId = await getHostId(session.user.id, session.user.role);
+    const hostId = await getHostId(session.user.userId, session.user.role);
 
     if (hostId === null) {
       return NextResponse.json("Invalid request", { status: 400 });
@@ -57,7 +54,7 @@ export async function PATCH(req: Request) {
     const athletesOfHost = await prisma.athlete.findMany({
       where: {
         hostId,
-        group: eventGroup,
+        groupName: eventGroupName,
         boyOrGirl: athletesBoyOrGirl,
       },
       select: {
@@ -71,8 +68,8 @@ export async function PATCH(req: Request) {
     );
 
     const filteredAthletes = athletes?.filter(
-      ({ group, boyOrGirl, userId }) =>
-        group === eventGroup &&
+      ({ groupName, boyOrGirl, userId }) =>
+        groupName === eventGroupName &&
         boyOrGirl === athletesBoyOrGirl &&
         validAthleteIds.includes(userId)
     );
@@ -92,7 +89,7 @@ export async function PATCH(req: Request) {
             data: {
               events: {
                 disconnect: {
-                  id: eventId,
+                  eventId,
                 },
               },
             },

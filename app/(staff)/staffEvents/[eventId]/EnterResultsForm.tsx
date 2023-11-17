@@ -21,7 +21,7 @@ type FormData = {
 };
 
 type Props = {
-  athletes: { id: string; name: string; scores: number[] }[];
+  athletes: { athleteId: string; name: string; scores: number[] }[];
   eventId: string;
   eventType: EventType;
   numberOfAttempts: number;
@@ -57,8 +57,8 @@ const EnterResultsForm: FC<Props> = ({
   };
 
   const initialValues: FormData = {
-    results: athletes.map(({ id, scores }) => ({
-      athleteId: id,
+    results: athletes.map(({ athleteId, scores }) => ({
+      athleteId,
       scores,
     })),
   };

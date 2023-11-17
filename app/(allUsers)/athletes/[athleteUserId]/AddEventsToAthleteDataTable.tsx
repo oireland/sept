@@ -20,7 +20,6 @@ const AddEventsToAthleteDataTable = ({
   athleteUserId: string;
 }) => {
   const session = useSession({ required: true });
-  console.log(session);
 
   const addSelectedEvents = async (selectedRowData: EventTableData[]) => {
     let toastId = toast.loading("Adding events to the athlete...");

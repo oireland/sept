@@ -1,20 +1,12 @@
 import { BoyOrGirl, EventType } from "@prisma/client";
 import * as yup from "yup";
 
-export const AthleteSchema = yup.object({
-  name: yup.string().required(),
-  email: yup.string().required().email(),
-  group: yup.string().required(),
-  team: yup.string().required(),
-  boyOrGirl: yup.mixed<BoyOrGirl>().oneOf(Object.values(BoyOrGirl)).required(),
-});
-
 export const AthleteTableDataSchema = yup.object({
   userId: yup.string().required(),
   name: yup.string().required(),
   email: yup.string().email().required(),
-  team: yup.string().required(),
-  group: yup.string().required(),
+  teamName: yup.string().required(),
+  groupName: yup.string().required(),
   numberOfEvents: yup.number().required(),
   boyOrGirl: yup.mixed<BoyOrGirl>().oneOf(Object.values(BoyOrGirl)).required(),
 });
@@ -39,12 +31,12 @@ export const EventValidationSchema = yup.object({
     .required("Required"),
   boyOrGirl: yup
     .array()
-    .of(yup.mixed<BoyOrGirl>().oneOf(Object.values(BoyOrGirl)))
+    .of(yup.mixed<BoyOrGirl>().oneOf(Object.values(BoyOrGirl)).required())
     .min(1, "Required")
     .required("Required"),
-  groups: yup
+  groupNames: yup
     .array()
-    .of(yup.string())
+    .of(yup.string().required())
     .min(1, "You must choose at least 1 group")
     .required("Required"),
   maxNumberOfAthletes: yup
@@ -67,7 +59,7 @@ export const EventValidationSchema = yup.object({
       "Date must be in the future",
       (date) => new Date() < date
     ),
-  locationId: yup.string().required("Required"),
+  locationName: yup.string().required("Required"),
 });
 
 export const EventTableDataSchema = yup.object({
@@ -78,7 +70,7 @@ export const EventTableDataSchema = yup.object({
     .mixed<EventType>()
     .oneOf(Object.values(EventType))
     .required("Required"),
-  id: yup.string().required(),
+  eventId: yup.string().required(),
   numberOfAthletes: yup.number().required(),
   maxNumberOfAthletes: yup.number().min(2).required("Required"),
 });

@@ -20,31 +20,17 @@ export async function DELETE(
       );
     }
 
-    idArray.forEach(async (id) => {
-      // find the event that the request is attempting to delete, select the userId of its host.
-      const event = await prisma.event.findUnique({
-        where: {
-          id,
+    await prisma.event.deleteMany({
+      where: {
+        eventId: {
+          in: idArray,
         },
-        select: {
+        AND: {
           host: {
-            select: {
-              userId: true,
-            },
+            userId: session.user.userId,
           },
         },
-      });
-
-      // if no such event exists or if the currently signed in user is not the host of the event
-      if (!event || event.host.userId !== session.user.id) {
-        return NextResponse.json("Invalid request", { status: 400 });
-      }
-
-      await prisma.event.delete({
-        where: {
-          id,
-        },
-      });
+      },
     });
 
     return NextResponse.json({ message: "Success" });

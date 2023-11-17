@@ -19,27 +19,19 @@ type FormData = {
   eventName: string;
   trackOrField: EventType;
   boyOrGirl: BoyOrGirl[];
-  groups: string[];
+  groupNames: string[];
   maxNumberOfAthletes: number;
   numberOfAttempts: number;
   date: string;
-  locationId: string;
-};
-
-type Props = {
-  groups: string[];
-  locations: {
-    locationId: string;
-    locationName: string;
-  }[];
+  locationName: string;
 };
 
 const handleFormSubmit = async ({
   boyOrGirl,
   date,
   eventName,
-  groups,
-  locationId,
+  groupNames,
+  locationName,
   maxNumberOfAthletes,
   numberOfAttempts,
   trackOrField,
@@ -49,12 +41,12 @@ const handleFormSubmit = async ({
     const data = {
       boyOrGirl,
       eventName,
-      groups,
+      groupNames,
       maxNumberOfAthletes,
       numberOfAttempts,
       trackOrField,
       date: new Date(Date.parse(date)),
-      locationId,
+      locationName,
     };
     await axios.post(getURL("/api/create/createManyEvents"), data);
 
@@ -71,16 +63,21 @@ const handleFormSubmit = async ({
   }
 };
 
+type Props = {
+  groups: string[];
+  locations: string[];
+};
+
 const EventForm: FC<Props> = ({ groups, locations }) => {
   const initialValues: FormData = {
     eventName: "",
     boyOrGirl: [],
-    groups: [],
+    groupNames: [],
     trackOrField: "TRACK",
     maxNumberOfAthletes: 8,
     numberOfAttempts: 1,
     date: "",
-    locationId: locations[0].locationId,
+    locationName: locations[0],
   };
   return (
     <Formik
@@ -111,18 +108,21 @@ const EventForm: FC<Props> = ({ groups, locations }) => {
         <FormikInput type="datetime-local" name="date" label="Date" />
 
         <FormikSelect
-          items={locations.map(({ locationId, locationName }) => ({
-            content: locationName,
-            value: locationId,
+          items={locations.map((location) => ({
+            content: location,
+            value: location,
           }))}
           label="Location"
-          name="locationId"
+          name="locationName"
         />
 
         <FormikMultipleSelect
-          name="groups"
+          name="groupNames"
           label="Groups"
-          items={groups.map((group) => ({ value: group, label: group }))}
+          items={groups.map((group) => ({
+            value: group,
+            label: group,
+          }))}
         />
 
         <FormikMultipleSelect
@@ -155,11 +155,13 @@ const EventForm: FC<Props> = ({ groups, locations }) => {
   );
 };
 
-type NumberInputProps = {
+export default EventForm;
+
+type IntegerInputProps = {
   label: string;
 } & FieldAttributes<{}>;
 
-const FormikIntegerInput: FC<NumberInputProps> = ({ label, ...props }) => {
+const FormikIntegerInput: FC<IntegerInputProps> = ({ label, ...props }) => {
   const [field, meta, helpers] = useField<number>(props.name);
 
   return (
@@ -180,14 +182,13 @@ const FormikIntegerInput: FC<NumberInputProps> = ({ label, ...props }) => {
           type="number"
           name={field.name}
           onBlur={field.onBlur}
-          onChange={(e) => helpers.setValue(Number(e.currentTarget.value))}
+          onChange={(e) => helpers.setValue(parseInt(e.currentTarget.value))}
           className="input_text h-10"
           step={1}
+          min={1}
           value={parseInt(field.value.toString()).toString()}
         />
       </div>
     </div>
   );
 };
-
-export default EventForm;

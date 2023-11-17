@@ -14,11 +14,10 @@ enum UserRole {
 }
 
 model User {
-  id            String     @id @default(cuid())
+  userId            String     @id @default(cuid())
   name          String
   email         String     @unique
   emailVerified DateTime?
-  isConfirmed   Boolean    @default(false)
   password      String
   image         String?
   role          UserRole
@@ -28,35 +27,18 @@ model User {
 }
 
 
+
+
 model Host {
-  id         String      @id @default(cuid())
-  user       User        @relation("User - Host", fields: [userId], references: [id], onDelete: Cascade)
+  hostId         String      @id @default(cuid())
+  user       User        @relation("User - Host", fields: [userId], references: [userId], onDelete: Cascade)
   userId     String      @unique
-  name       String
   athletes   Athlete[]   @relation("Host - Athletes")
   events     Event[]     @relation("Host - Events")
   staff      Staff[]     @relation("Host - Staff")
-  groups     String[]
-  teams      String[]
+  groups     Group[] @relation("Host - Groups")
+  teams      Team[] @relation("Host - Teams")
   locations Location[] @relation("Host - Locations")
-}
-
-model Location {
-  locationId String @id @default(cuid())
-  locationName String
-  events Event[] @relation("Location - Events")
-  host Host @relation("Host - Locations", fields: [hostId], references: [id])
-  hostId String
-}
-
-model Staff {
-  id     String  @id @default(cuid())
-  name   String
-  user   User    @relation("User - Staff", fields: [userId], references: [id], onDelete: Cascade)
-  userId String  @unique
-  host   Host    @relation("Host - Staff", fields: [hostId], references: [id], onDelete: Cascade)
-  hostId String
-  events Event[] @relation("StaffMember - Events")
 }
 
 enum BoyOrGirl {
@@ -64,19 +46,56 @@ enum BoyOrGirl {
   GIRL
 }
 
+model Group {
+  groupName String
+  athletes Athlete[] @relation("Group - Athletes")
+  host Host @relation("Host - Groups", fields: [hostId], references: [hostId])
+  hostId String
+  events Event[] @relation("Group - Events")
+  @@id([groupName, hostId])
+}
+
+model Team {
+  teamName String
+  athletes Athlete[] @relation("Team - Athletes")
+  host Host @relation("Host - Teams", fields: [hostId], references: [hostId])
+  hostId String
+  @@id([teamName, hostId])
+}
+
 model Athlete {
-  id        String    @id @default(cuid())
-  name      String
-  group     String
-  team      String
-  user      User      @relation("User - Athlete", fields: [userId], references: [id], onDelete: Cascade)
+  athleteId        String    @id @default(cuid())
+  group     Group @relation("Group - Athletes", fields: [groupName, hostId], references: [groupName, hostId])
+  groupName String
+  team      Team @relation("Team - Athletes", fields: [teamName, hostId], references: [teamName, hostId])
+  teamName String
+  user      User      @relation("User - Athlete", fields: [userId], references: [userId], onDelete: Cascade)
   userId    String    @unique
-  host      Host      @relation("Host - Athletes", fields: [hostId], references: [id], onDelete: Cascade)
+  host      Host      @relation("Host - Athletes", fields: [hostId], references: [hostId], onDelete: Cascade)
   hostId    String
   events    Event[]   @relation("Athletes - Events")
   boyOrGirl BoyOrGirl
   results   Result[]  @relation("Athlete - Results")
 }
+
+model Location {
+  locationName String
+  events Event[] @relation("Location - Events")
+  host Host @relation("Host - Locations", fields: [hostId], references: [hostId])
+  hostId String
+  @@id([locationName, hostId])
+}
+
+model Staff {
+  staffId     String  @id @default(cuid())
+  user   User    @relation("User - Staff", fields: [userId], references: [userId], onDelete: Cascade)
+  userId String  @unique
+  host   Host    @relation("Host - Staff", fields: [hostId], references: [hostId], onDelete: Cascade)
+  hostId String
+  events Event[] @relation("StaffMember - Events")
+}
+
+
 
 enum EventType {
   TRACK
@@ -84,28 +103,29 @@ enum EventType {
 }
 
 model Event {
-  id                  String    @id @default(cuid())
+  eventId                  String    @id @default(cuid())
   name                String
   eventType           EventType
   athletesBoyOrGirl   BoyOrGirl
-  group               String
-  host                Host      @relation("Host - Events", fields: [hostId], references: [id], onDelete: Cascade)
+  group               Group @relation("Group - Events", fields: [groupName, hostId], references: [groupName, hostId])
+  groupName String
+  host                Host      @relation("Host - Events", fields: [hostId], references: [hostId], onDelete: Cascade)
   hostId              String
   athletesCompeting   Athlete[] @relation("Athletes - Events")
   maxNumberOfAthletes Int
   numberOfAttempts Int @default(1)
   date DateTime
-  location Location @relation("Location - Events", fields: [locationId], references: [locationId])
-  locationId String
+  location Location @relation("Location - Events", fields: [locationName, hostId], references: [locationName, hostId])
+  locationName String
   results             Result[]  @relation("Event - Results")
-  staffMember         Staff?    @relation("StaffMember - Events", fields: [staffId], references: [id])
+  staffMember         Staff?    @relation("StaffMember - Events", fields: [staffId], references: [staffId])
   staffId             String?
 }
 
 model Result {
-  event     Event   @relation("Event - Results", fields: [eventId], references: [id])
+  event     Event   @relation("Event - Results", fields: [eventId], references: [eventId], onDelete: Cascade)
   eventId   String
-  athlete   Athlete @relation("Athlete - Results", fields: [athleteId], references: [id])
+  athlete   Athlete @relation("Athlete - Results", fields: [athleteId], references: [athleteId], onDelete: Cascade)
   athleteId String
   place     Int
   points    Int

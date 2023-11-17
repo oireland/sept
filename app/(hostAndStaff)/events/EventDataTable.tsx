@@ -22,8 +22,8 @@ const removeSelectedEvents = async (selectedRowData: EventTableData[]) => {
     }
 
     let commaSeperatedIds = "";
-    validatedData.forEach(({ id }) => {
-      commaSeperatedIds = commaSeperatedIds.concat(id + ",");
+    validatedData.forEach(({ eventId }) => {
+      commaSeperatedIds = commaSeperatedIds.concat(eventId + ",");
     });
     // to remove the comma from the end
     commaSeperatedIds = commaSeperatedIds.substring(

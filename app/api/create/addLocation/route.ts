@@ -8,29 +8,25 @@ const validationSchema = yup.object().shape({
   locationName: yup.string().required("Required"),
 });
 
-export async function PATCH(req: Request) {
+export async function POST(req: Request) {
   try {
-    console.log("before req.json");
     const data = await req.json();
-    console.log("after req.json");
 
     const { locationName } = await validationSchema.validate(data);
 
     const session = await getServerSession(authOptions);
 
-    if (!session || session.user.role !== "HOST") {
+    if (session?.user.role !== "HOST") {
       return NextResponse.json("Unauthorised Request", { status: 401 });
     }
 
     // add location to the host's list of locations
-    await prisma.host.update({
-      where: {
-        userId: session.user.id,
-      },
+    await prisma.location.create({
       data: {
-        locations: {
-          create: {
-            locationName,
+        locationName,
+        host: {
+          connect: {
+            userId: session.user.userId,
           },
         },
       },

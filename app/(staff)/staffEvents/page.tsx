@@ -28,18 +28,24 @@ const getStaffEventsTableData = async (
         },
       },
       select: {
-        id: true,
+        eventId: true,
         name: true,
-        group: true,
+        groupName: true,
         athletesBoyOrGirl: true,
         athletesCompeting: true,
         eventType: true,
         staffMember: {
           select: {
-            name: true,
+            user: {
+              select: {
+                name: true,
+              },
+            },
           },
         },
         maxNumberOfAthletes: true,
+        locationName: true,
+        date: true,
       },
     });
 
@@ -48,20 +54,24 @@ const getStaffEventsTableData = async (
         athletesBoyOrGirl,
         name,
         eventType,
-        group,
-        id,
+        groupName,
+        eventId,
         staffMember,
         athletesCompeting,
         maxNumberOfAthletes,
+        locationName,
+        date,
       }) => ({
-        id,
+        eventId,
         name,
         boyOrGirl: athletesBoyOrGirl,
         eventType,
-        group,
+        groupName,
         numberOfAthletes: athletesCompeting.length,
-        staffName: staffMember?.name,
+        staffName: staffMember?.user.name,
         maxNumberOfAthletes,
+        locationName,
+        date,
       })
     );
   } catch (e) {
@@ -72,7 +82,9 @@ const getStaffEventsTableData = async (
 const StaffEventsPage = async () => {
   const session = await getServerSession(authOptions);
 
-  const StaffEventsTableData = await getStaffEventsTableData(session!.user.id);
+  const StaffEventsTableData = await getStaffEventsTableData(
+    session!.user.userId
+  );
 
   return (
     <div>

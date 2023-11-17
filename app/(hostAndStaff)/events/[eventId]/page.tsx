@@ -1,4 +1,3 @@
-import React from "react";
 import Banner from "../../../../components/banner";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
@@ -6,22 +5,19 @@ import getURL from "@/lib/getURL";
 import AddAthletesToEventDataTable from "./AddAthletesToEventDataTable";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { BoyOrGirl, UserRole } from "@prisma/client";
+import { BoyOrGirl } from "@prisma/client";
 import { AthleteTableData } from "../../athletes/columns";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
 import RemoveAthletesFromEventDataTable from "./RemoveAthletesFromEventDataTable";
 import { getHostId } from "@/lib/dbHelpers";
 import BackButton from "@/components/BackButton";
 import { getLocations } from "@/app/(host)/locations/page";
-import UpdateLocationForm from "./UpdateLocationForm";
-import UpdateStaffForm from "./UpdateStaffForm";
+import UpdateEventDetailsForm from "./UpdateEventDetailsForm";
 
 async function getEventData(eventId: string, hostId: string) {
   try {
     const event = await prisma.event.findUniqueOrThrow({
       where: {
-        id: eventId,
+        eventId,
       },
       select: {
         hostId: true,
@@ -29,35 +25,35 @@ async function getEventData(eventId: string, hostId: string) {
         athletesBoyOrGirl: true,
         athletesCompeting: {
           select: {
-            name: true,
             boyOrGirl: true,
             events: true,
-            group: true,
+            groupName: true,
             userId: true,
-            id: true,
-            team: true,
+            athleteId: true,
+            teamName: true,
             user: {
               select: {
                 email: true,
+                name: true,
               },
             },
           },
         },
         staffMember: {
           select: {
-            name: true,
-            id: true,
+            staffId: true,
+            user: {
+              select: {
+                name: true,
+              },
+            },
           },
         },
         name: true,
-        group: true,
+        groupName: true,
         maxNumberOfAthletes: true,
-        location: {
-          select: {
-            locationId: true,
-            locationName: true,
-          },
-        },
+        locationName: true,
+        date: true,
       },
     });
 
@@ -73,36 +69,39 @@ async function getEventData(eventId: string, hostId: string) {
 
 async function getAthleteData(
   hostId: string,
-  group: string,
+  groupName: string,
   boyOrGirl: BoyOrGirl
 ) {
   try {
     const data = await prisma.athlete.findMany({
       where: {
         hostId,
-        group,
+        groupName,
         boyOrGirl,
       },
       select: {
-        name: true,
-        group: true,
-        team: true,
+        team: {
+          select: {
+            teamName: true,
+          },
+        },
         boyOrGirl: true,
         userId: true,
         events: true,
         user: {
           select: {
             email: true,
+            name: true,
           },
         },
       },
     });
 
     const athletes: AthleteTableData[] = data.map(
-      ({ name, group, team, boyOrGirl, userId, user, events }) => ({
-        name,
-        group,
-        team,
+      ({ team, boyOrGirl, userId, user, events }) => ({
+        name: user.name,
+        groupName,
+        teamName: team.teamName,
         boyOrGirl,
         userId,
         email: user.email,
@@ -120,13 +119,17 @@ async function getStaffData(hostId: string) {
   try {
     const { staff } = await prisma.host.findUniqueOrThrow({
       where: {
-        id: hostId,
+        hostId,
       },
       select: {
         staff: {
           select: {
-            id: true,
-            name: true,
+            staffId: true,
+            user: {
+              select: {
+                name: true,
+              },
+            },
           },
         },
       },
@@ -140,7 +143,7 @@ async function getStaffData(hostId: string) {
 
 const EditEvent = async ({ params }: { params: { eventId: string } }) => {
   const session = await getServerSession(authOptions);
-  const userId = session!.user.id;
+  const userId = session!.user.userId;
 
   const hostId = await getHostId(userId, session!.user.role);
 
@@ -156,26 +159,27 @@ const EditEvent = async ({ params }: { params: { eventId: string } }) => {
 
   const {
     name,
-    group,
+    groupName,
     athletesBoyOrGirl,
     athletesCompeting,
     maxNumberOfAthletes,
-    location: currentLocation,
+    locationName: currentLocationName,
     staffMember: currentStaff,
+    date: eventDate,
   } = eventData;
 
   const allLocations = await getLocations(hostId);
   const allStaff = await getStaffData(hostId);
 
   const competingAthletesTableData: AthleteTableData[] = athletesCompeting.map(
-    ({ userId, name, boyOrGirl, group, team, user, events }) => ({
+    ({ userId, boyOrGirl, groupName, teamName, user, events }) => ({
       userId,
-      name,
+      name: user.name,
       numberOfEvents: events.length,
       boyOrGirl,
       email: user.email,
-      group,
-      team,
+      groupName,
+      teamName,
     })
   );
 
@@ -185,7 +189,7 @@ const EditEvent = async ({ params }: { params: { eventId: string } }) => {
 
   const allAthletesData: AthleteTableData[] = await getAthleteData(
     hostId,
-    group,
+    groupName,
     athletesBoyOrGirl
   );
 
@@ -193,7 +197,7 @@ const EditEvent = async ({ params }: { params: { eventId: string } }) => {
     ({ userId }) => !competingAthletesIds.includes(userId)
   );
 
-  const bannerText = `${group} ${
+  const bannerText = `${groupName} ${
     athletesBoyOrGirl === "BOY" ? "Boy's" : "Girl's"
   } ${name}`;
 
@@ -203,32 +207,29 @@ const EditEvent = async ({ params }: { params: { eventId: string } }) => {
 
       <div className="container mx-auto mt-2 space-y-5">
         {session?.user.role === "HOST" && (
-          <>
-            <div>
-              <h2 className="text-xl font-semibold">Location</h2>
-              <UpdateLocationForm
-                locations={allLocations}
-                currentLocation={currentLocation}
-                eventId={params.eventId}
-              />
-            </div>
-
-            <div>
-              <h2 className="text-xl font-semibold">Staff</h2>
-              <UpdateStaffForm
-                staff={allStaff.map(({ id, name }) => ({
-                  staffId: id,
-                  staffName: name,
-                }))}
-                currentStaff={
-                  currentStaff
-                    ? { staffId: currentStaff.id, staffName: currentStaff.name }
-                    : undefined
-                }
-                eventId={params.eventId}
-              />
-            </div>
-          </>
+          <div>
+            <h2 className="text-xl font-semibold">Event Details</h2>
+            <UpdateEventDetailsForm
+              locationNames={allLocations.map(
+                ({ locationName }) => locationName
+              )}
+              currentLocationName={currentLocationName}
+              eventId={params.eventId}
+              staff={allStaff.map(({ staffId, user }) => ({
+                staffId,
+                staffName: user.name,
+              }))}
+              currentStaff={
+                currentStaff
+                  ? {
+                      staffId: currentStaff.staffId,
+                      staffName: currentStaff.user.name,
+                    }
+                  : undefined
+              }
+              currentDate={eventDate}
+            />
+          </div>
         )}
 
         <div>

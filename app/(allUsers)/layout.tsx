@@ -9,11 +9,11 @@ export default async function UserLayout({
   children: React.ReactNode;
 }) {
   const session = await getServerSession(authOptions);
-  if (!session || !session.user) {
+  if (!session?.user) {
     redirect(getURL("/signin"));
   }
 
-  if (!session.user.isConfirmed) {
+  if (!session.user.emailVerified) {
     redirect(getURL("/confirm"));
   }
 

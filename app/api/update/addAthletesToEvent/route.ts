@@ -14,7 +14,6 @@ const requestSchema = yup.object({
 export async function PATCH(req: Request) {
   try {
     const session = await getServerSession(authOptions);
-    console.log(session);
 
     if (
       !session ||
@@ -24,7 +23,6 @@ export async function PATCH(req: Request) {
     }
 
     const body = await req.json();
-    console.log(body);
 
     const { eventId, selectedRowData: athletes } = await requestSchema.validate(
       body
@@ -32,17 +30,17 @@ export async function PATCH(req: Request) {
 
     // get the group and gender of the event for filtering the athletes later
     const {
-      group: eventGroup,
+      groupName: eventGroupName,
       athletesBoyOrGirl,
       hostId: eventHostId,
       maxNumberOfAthletes,
       athletesCompeting,
     } = await prisma.event.findUniqueOrThrow({
       where: {
-        id: eventId,
+        eventId,
       },
       select: {
-        group: true,
+        groupName: true,
         athletesBoyOrGirl: true,
         hostId: true,
         maxNumberOfAthletes: true,
@@ -51,11 +49,7 @@ export async function PATCH(req: Request) {
     });
 
     // to be used to check that athletes from the request belong to the host
-    const hostId = await getHostId(session.user.id, session.user.role);
-
-    if (hostId === null) {
-      return NextResponse.json("Invalid request", { status: 400 });
-    }
+    const hostId = await getHostId(session.user.userId, session.user.role);
 
     // check that the event belongs to the host/ host of the staff member
     if (hostId !== eventHostId) {
@@ -65,7 +59,7 @@ export async function PATCH(req: Request) {
     const athletesOfHost = await prisma.athlete.findMany({
       where: {
         hostId,
-        group: eventGroup,
+        groupName: eventGroupName,
         boyOrGirl: athletesBoyOrGirl,
       },
       select: {
@@ -79,8 +73,8 @@ export async function PATCH(req: Request) {
     );
 
     const filteredAthletes = athletes?.filter(
-      ({ group, boyOrGirl, userId }) =>
-        group === eventGroup &&
+      ({ groupName, boyOrGirl, userId }) =>
+        groupName === eventGroupName &&
         boyOrGirl === athletesBoyOrGirl &&
         validAthleteIds.includes(userId)
     );
@@ -109,7 +103,7 @@ export async function PATCH(req: Request) {
             data: {
               events: {
                 connect: {
-                  id: eventId,
+                  eventId,
                 },
               },
             },

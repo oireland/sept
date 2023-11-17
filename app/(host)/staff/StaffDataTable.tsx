@@ -10,7 +10,7 @@ import getURL from "@/lib/getURL";
 import toast from "react-hot-toast";
 
 const removeSelectedStaff = async (selectedRowData: StaffTableData[]) => {
-  let toastId = toast.loading("Deleting staff...");
+  let toastId = toast.loading("Deleting...");
   try {
     const validatedData = await yup
       .array(StaffTableDataSchema)
@@ -31,7 +31,7 @@ const removeSelectedStaff = async (selectedRowData: StaffTableData[]) => {
     );
 
     await axios.delete(
-      getURL(`/api/delete/deleteManyStaff/${commaSeperatedIds}`)
+      getURL(`/api/delete/deleteManyOfHostsUsers/${commaSeperatedIds}`)
     );
 
     toast.dismiss(toastId);

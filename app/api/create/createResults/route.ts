@@ -14,13 +14,13 @@ const requestSchema = yup.object({
 export async function POST(req: Request) {
   try {
     const session = await getServerSession(authOptions);
-    if (!session || session.user.role !== "STAFF") {
+    if (session?.user.role !== "STAFF") {
       return NextResponse.json("Unauthorised Request", { status: 401 });
     }
 
     let { results, eventId } = await requestSchema.validate(await req.json());
 
-    const hostId = await getHostId(session.user.id, session.user.role);
+    const hostId = await getHostId(session.user.userId, session.user.role);
     if (hostId === null) {
       return NextResponse.json("Unauthorised Request", { status: 401 });
     }
@@ -34,7 +34,7 @@ export async function POST(req: Request) {
       numberOfAttempts,
     } = await prisma.event.update({
       where: {
-        id: eventId,
+        eventId,
       },
       select: {
         hostId: true,
@@ -54,7 +54,7 @@ export async function POST(req: Request) {
       },
     });
 
-    if (staffMember?.userId !== session.user.id) {
+    if (staffMember?.userId !== session.user.userId) {
       return NextResponse.json("Unauthorised Request", { status: 401 });
     }
 
@@ -85,8 +85,6 @@ export async function POST(req: Request) {
       })
       .map(({ athleteId }) => athleteId);
 
-    console.log("athletes with all zero", athletesWithAllZero);
-
     // remove results with wrong numberOfAttempts, or all attempts are 0.
     results = results.filter(
       ({ scores }) =>
@@ -110,9 +108,8 @@ export async function POST(req: Request) {
     }[] = [];
 
     let currentIndex = 0;
-    let placeAdjustment = 0; // used to give same place and points in the case of a draw
-
-    console.log("results before while", results);
+    let placeAdjustment = 0;
+    // used to give same place and points in the case of a draw. It is incremented when ther is a draw, and because it is subtracted from the place and added to the points when adding to the array, the two athletes that draw receieve the same.
 
     while (currentIndex < results.length - 1) {
       const current = results[currentIndex];
@@ -132,7 +129,7 @@ export async function POST(req: Request) {
 
         continue;
       }
-      // draw if only 1 attempt or second attempt the same
+      // a draw if only 1 attempt or second attempt the same
       if (numberOfAttempts === 1 || current.scores[1] === next.scores[1]) {
         resultsToBeCreated.push({
           athleteId: current.athleteId,
@@ -176,7 +173,7 @@ export async function POST(req: Request) {
         }
       } else {
         if (eventType === "FIELD") {
-          // current is better score
+          // current is the better score
           resultsToBeCreated.push({
             athleteId: current.athleteId,
             eventId,
@@ -225,13 +222,13 @@ export async function POST(req: Request) {
 
     // remove the event from athletes who didn't compete (all 0s)
     await Promise.all(
-      athletesWithAllZero.map((id) =>
+      athletesWithAllZero.map((athleteId) =>
         prisma.athlete.update({
-          where: { id },
+          where: { athleteId },
           data: {
             events: {
               disconnect: {
-                id: eventId,
+                eventId,
               },
             },
           },

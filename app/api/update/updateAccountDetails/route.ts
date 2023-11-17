@@ -33,7 +33,7 @@ export async function PATCH(req: Request) {
 
     const { password } = await prisma.user.findUniqueOrThrow({
       where: {
-        id: session.user.id,
+        userId: session.user.userId,
       },
       select: {
         password: true,
@@ -51,20 +51,19 @@ export async function PATCH(req: Request) {
     if (email !== session.user.email) {
       await prisma.user.update({
         where: {
-          id: session.user.id,
+          userId: session.user.userId,
         },
         data: {
           password: hashedNewPassword,
           email,
           name,
           emailVerified: null,
-          isConfirmed: false,
         },
       });
     } else {
       await prisma.user.update({
         where: {
-          id: session.user.id,
+          userId: session.user.userId,
         },
         data: {
           password: hashedNewPassword,

@@ -22,8 +22,8 @@ export type AthleteTableData = {
   userId: string;
   name: string;
   email: string;
-  group: string;
-  team: string;
+  groupName: string;
+  teamName: string;
   numberOfEvents: number;
   boyOrGirl: BoyOrGirl;
 };
@@ -63,10 +63,15 @@ export const columns: ColumnDef<AthleteTableData>[] = [
     },
   },
   {
-    accessorKey: "group",
+    accessorKey: "groupName",
+    id: "Group",
     header: () => <div className="text-left">Group</div>,
   },
-  { accessorKey: "team", header: () => <div className="text-left">Team</div> },
+  {
+    accessorKey: "teamName",
+    id: "Team",
+    header: () => <div className="text-left">Team</div>,
+  },
   {
     accessorKey: "boyOrGirl",
     id: "Boy/Girl",
@@ -79,7 +84,6 @@ export const columns: ColumnDef<AthleteTableData>[] = [
   },
   {
     id: "actions",
-
     cell: ({ row }) => {
       const { userId, email } = row.original;
 
@@ -102,10 +106,18 @@ export const columns: ColumnDef<AthleteTableData>[] = [
                 View/Edit Events
               </Link>
             </DropdownMenuItem>
+            <DropdownMenuItem className="p-0">
+              <Link
+                className="h-full  w-full px-2 py-1.5 "
+                href={getURL(`/results/${userId}`)}
+              >
+                View Results
+              </Link>
+            </DropdownMenuItem>
             <DropdownMenuItem
               onClick={() => navigator.clipboard.writeText(email)}
             >
-              Copy email
+              Copy email address
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

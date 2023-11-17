@@ -13,44 +13,59 @@ import { EventTableData } from "../../../(hostAndStaff)/events/columns";
 import RemoveEventsFromAthlete from "./RemoveEventsFromAthleteDataTable";
 import AddEventsToAthleteDataTable from "./AddEventsToAthleteDataTable";
 import BackButton from "@/components/BackButton";
+import {
+  Table,
+  TableHead,
+  TableHeader,
+  TableRow,
+  TableBody,
+  TableCell,
+} from "@/components/ui/table";
 
 async function getEventsData(
   hostId: string,
-  group: string,
+  groupName: string,
   boyOrGirl: BoyOrGirl
 ) {
   try {
     const events = await prisma.event.findMany({
       where: {
         hostId,
-        group,
+        groupName,
         athletesBoyOrGirl: boyOrGirl,
       },
       select: {
         eventType: true,
         athletesCompeting: true,
         name: true,
-        id: true,
+        eventId: true,
         maxNumberOfAthletes: true,
+        locationName: true,
+        date: true,
       },
     });
 
-    const eventsTableData: EventTableData[] = events
-      .map(
-        ({ name, athletesCompeting, eventType, id, maxNumberOfAthletes }) => ({
-          name,
-          numberOfAthletes: athletesCompeting.length,
-          boyOrGirl,
-          group,
-          eventType,
-          id,
-          maxNumberOfAthletes,
-        })
-      )
-      .filter(
-        ({ numberOfAthletes, maxNumberOfAthletes }) =>
-          numberOfAthletes < maxNumberOfAthletes
-      );
+    const eventsTableData: EventTableData[] = events.map(
+      ({
+        name,
+        athletesCompeting,
+        eventType,
+        eventId,
+        maxNumberOfAthletes,
+        locationName,
+        date,
+      }) => ({
+        name,
+        numberOfAthletes: athletesCompeting.length,
+        boyOrGirl,
+        groupName,
+        eventType,
+        eventId,
+        maxNumberOfAthletes,
+        locationName,
+        date,
+      })
+    );
 
     return eventsTableData;
   } catch (e) {
@@ -58,38 +73,43 @@ async function getEventsData(
   }
 }
 
-async function getAthleteData(athleteUserId: string) {
+async function getAthleteData(athleteUserId: string, hostId: string) {
   try {
-    console.log(athleteUserId);
     const athlete = await prisma.athlete.findUniqueOrThrow({
       where: {
         userId: athleteUserId,
+        AND: {
+          hostId,
+        },
       },
       select: {
-        name: true,
-        group: true,
-        team: true,
+        user: {
+          select: {
+            name: true,
+          },
+        },
+        groupName: true,
+        teamName: true,
         boyOrGirl: true,
         events: {
           select: {
             name: true,
-            id: true,
+            eventId: true,
             athletesBoyOrGirl: true,
             athletesCompeting: true,
-            group: true,
+            groupName: true,
             eventType: true,
             maxNumberOfAthletes: true,
+            locationName: true,
+            date: true,
           },
         },
         hostId: true,
       },
     });
 
-    console.log(athlete);
-
     return athlete;
   } catch (error) {
-    console.log(error);
     return null;
   }
 }
@@ -99,9 +119,16 @@ const EditAthlete = async ({
 }: {
   params: { athleteUserId: string };
 }) => {
-  console.log(params);
   const session = await getServerSession(authOptions);
-  const userId = session!.user.id;
+  const userId = session!.user.userId;
+
+  if (
+    session?.user.role === "ATHLETE" &&
+    session.user.userId !== params.athleteUserId
+  ) {
+    // user is an athlete but this is not the page for editing their events.
+    redirect(getURL("/dashboard"));
+  }
 
   const hostId = await getHostId(userId, session!.user.role);
 
@@ -109,47 +136,56 @@ const EditAthlete = async ({
     redirect(getURL("/"));
   }
 
-  const athlete = await getAthleteData(params.athleteUserId);
+  const athlete = await getAthleteData(params.athleteUserId, hostId);
 
   if (athlete === null) {
     redirect(getURL("/athletes"));
   }
 
-  const { name, team, boyOrGirl, events: athleteEvents, group } = athlete;
+  const {
+    user,
+    teamName,
+    boyOrGirl,
+    events: athleteEvents,
+    groupName,
+  } = athlete;
+  const name = user.name;
 
-  const allEvents = await getEventsData(hostId, group, boyOrGirl);
+  const allEvents = await getEventsData(hostId, groupName, boyOrGirl);
 
   const competingEventsTableData: EventTableData[] = athleteEvents.map(
     ({
       name,
       eventType,
-      id,
+      eventId,
       athletesBoyOrGirl,
-      group,
+      groupName,
       athletesCompeting,
       maxNumberOfAthletes,
+      date,
+      locationName,
     }) => ({
       name,
       eventType,
-      id,
+      eventId,
       boyOrGirl: athletesBoyOrGirl,
-      group,
+      groupName,
       numberOfAthletes: athletesCompeting.length,
       maxNumberOfAthletes,
+      locationName,
+      date,
     })
   );
 
-  const competingEventsIds = athleteEvents.map(({ id }) => id);
+  const competingEventsIds = athleteEvents.map(({ eventId }) => eventId);
 
   const availableEventsTableData = allEvents.filter(
-    ({ id }) => !competingEventsIds.includes(id)
+    ({ eventId }) => !competingEventsIds.includes(eventId)
   );
-
-  const bannerText = `${name} - ${team} - ${group}`;
 
   return (
     <div>
-      <Banner text={bannerText} />
+      <Banner text={name} />
 
       <div className="container mx-auto mt-2">
         <h2 className="text-2xl font-semibold">Competing in</h2>

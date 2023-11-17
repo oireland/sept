@@ -13,7 +13,7 @@ export default async function UserLayout({
     redirect(getURL("/signin"));
   }
 
-  if (!session.user.isConfirmed) {
+  if (!session.user.emailVerified) {
     redirect(getURL("/confirm"));
   }
 

@@ -9,15 +9,16 @@ export default async function UserLayout({
   children: React.ReactNode;
 }) {
   const session = await getServerSession(authOptions);
-  if (!session || !session.user) {
+  if (!session?.user) {
     redirect(getURL("/signin"));
   }
 
-  if (!session.user.isConfirmed) {
+  if (!session.user.emailVerified) {
     redirect(getURL("/confirm"));
   }
 
   // For testing, will change URL and conditions when all pages are made
+  console.log(session.user.role);
   if (!(session.user.role === "HOST" || session.user.role === "STAFF")) {
     redirect(getURL("/"));
   }

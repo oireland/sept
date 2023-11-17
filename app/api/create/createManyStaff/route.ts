@@ -36,10 +36,9 @@ export async function POST(req: Request) {
           role: "STAFF",
           staff: {
             create: {
-              name,
               host: {
                 connect: {
-                  userId: session.user.id,
+                  userId: session.user.userId,
                 },
               },
             },

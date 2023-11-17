@@ -31,9 +31,7 @@ export async function POST(req: Request) {
         password: hash,
         role: "HOST",
         host: {
-          create: {
-            name,
-          },
+          create: {},
         },
       },
     });

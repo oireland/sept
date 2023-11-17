@@ -23,7 +23,7 @@ export async function PATCH(req: Request) {
       !(
         session.user.role === "HOST" ||
         session.user.role === "STAFF" ||
-        session.user.id === athleteUserId
+        session.user.userId === athleteUserId
       )
     ) {
       return NextResponse.json("Unauthorised request", { status: 401 });
@@ -31,7 +31,7 @@ export async function PATCH(req: Request) {
 
     // get the group and gender of the athlete for filtering the events later
     const {
-      group: athleteGroup,
+      groupName: athleteGroupName,
       boyOrGirl: athleteBoyOrGirl,
       hostId: athleteHostId,
     } = await prisma.athlete.findUniqueOrThrow({
@@ -39,14 +39,14 @@ export async function PATCH(req: Request) {
         userId: athleteUserId,
       },
       select: {
-        group: true,
+        groupName: true,
         boyOrGirl: true,
         hostId: true,
       },
     });
 
     // to be used to check that athletes from the request belong to the host
-    const hostId = await getHostId(session.user.id, session.user.role);
+    const hostId = await getHostId(session.user.userId, session.user.role);
 
     if (hostId === null) {
       return NextResponse.json("Invalid request", { status: 400 });
@@ -60,22 +60,22 @@ export async function PATCH(req: Request) {
     const eventsOfHost = await prisma.event.findMany({
       where: {
         hostId,
-        group: athleteGroup,
+        groupName: athleteGroupName,
         athletesBoyOrGirl: athleteBoyOrGirl,
       },
       select: {
-        id: true,
+        eventId: true,
       },
     });
     // filter the events from the request to only include those with a valid ID, group and boyOrGirl
 
-    const validEventIds: string[] = eventsOfHost.map(({ id }) => id);
+    const validEventIds: string[] = eventsOfHost.map(({ eventId }) => eventId);
 
     const filteredEvents = events?.filter(
-      ({ group, boyOrGirl, id }) =>
-        group === athleteGroup &&
+      ({ group, boyOrGirl, eventId }) =>
+        group === athleteGroupName &&
         boyOrGirl === athleteBoyOrGirl &&
-        validEventIds.includes(id)
+        validEventIds.includes(eventId)
     );
 
     if (filteredEvents.length === 0) {
@@ -85,10 +85,10 @@ export async function PATCH(req: Request) {
     // update each event to have the athlete competing
     await Promise.all(
       filteredEvents?.map(
-        async ({ id }) =>
+        async ({ eventId }) =>
           await prisma.event.update({
             where: {
-              id,
+              eventId,
             },
             data: {
               athletesCompeting: {

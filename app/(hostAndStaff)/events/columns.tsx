@@ -12,13 +12,12 @@ import Link from "next/link";
 
 export type EventTableData = {
   name: string;
-  group: string;
+  groupName: string;
   eventType: EventType;
   boyOrGirl: BoyOrGirl;
-  id: string;
+  eventId: string;
   numberOfAthletes: number;
   staffName?: string;
-  staffUserId?: string;
   maxNumberOfAthletes: number;
   locationName: string;
   date: Date;
@@ -60,7 +59,7 @@ export const columns: ColumnDef<EventTableData>[] = [
     },
   },
   {
-    accessorKey: "group",
+    accessorKey: "groupName",
     header: ({ column }) => {
       return (
         <Button
@@ -132,11 +131,11 @@ export const columns: ColumnDef<EventTableData>[] = [
     id: "actions",
 
     cell: ({ row }) => {
-      const { id } = row.original;
+      const { eventId } = row.original;
 
       return (
         <div className="mx-auto flex items-center">
-          <Link href={getURL(`/events/${id}`)}>
+          <Link href={getURL(`/events/${eventId}`)}>
             <Edit className="h-5 w-5" />
           </Link>
         </div>
