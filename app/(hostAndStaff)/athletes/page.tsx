@@ -1,16 +1,18 @@
+import dynamic from "next/dynamic";
+
 import Banner from "../../../components/banner";
 
-import athlete from "@/app/assets/images/athlete.svg";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { AthleteTableData } from "./columns";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import AthleteDataTable from "./AthleteDataTable";
-import { UserRole } from "@prisma/client";
 import { getHostId } from "@/lib/dbHelpers";
 import { redirect } from "next/navigation";
+
+// client components
+const AthleteDataTable = dynamic(() => import("./AthleteDataTable"));
 
 async function getAthleteData(hostId: string) {
   try {
@@ -69,7 +71,7 @@ const Athletes = async () => {
   if (hostId === null) {
     redirect("/");
   }
-  const athleteData = await getAthleteData(hostId);
+  const athleteData = await getAthleteData(hostId!);
 
   return (
     <div>

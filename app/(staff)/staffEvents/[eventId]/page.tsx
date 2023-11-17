@@ -4,9 +4,7 @@ import getURL from "@/lib/getURL";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { getHostId } from "@/lib/dbHelpers";
-import EnterResultsForm from "./EnterResultsForm";
 import FloatingContainer from "@/components/FloatingContainer";
-import InfoDialog from "./infoDialog";
 import { Medal } from "lucide-react";
 import {
   Table,
@@ -18,9 +16,12 @@ import {
 } from "@/components/ui/table";
 import BackButton from "@/components/BackButton";
 import { Button } from "@/components/ui/button";
-import axios from "axios";
-import ClearResultsButton from "./ClearResultsButton";
 import Link from "next/link";
+import dynamic from "next/dynamic";
+
+// client components
+const ClearResultsButton = dynamic(() => import("./ClearResultsButton"));
+const EnterResultsForm = dynamic(() => import("./EnterResultsForm"));
 
 async function getEventData(eventId: string, hostId: string) {
   try {
@@ -90,7 +91,7 @@ const EnterEventResults = async ({
     redirect(getURL("/"));
   }
 
-  const eventData = await getEventData(params.eventId, hostId);
+  const eventData = await getEventData(params.eventId, hostId!);
 
   if (eventData === null) {
     redirect(getURL("/events"));
@@ -105,7 +106,7 @@ const EnterEventResults = async ({
     numberOfAttempts,
     results: eventResults,
     maxNumberOfAthletes,
-  } = eventData;
+  } = eventData!;
 
   const titleText = `${groupName} ${
     athletesBoyOrGirl === "BOY" ? "Boy's" : "Girl's"

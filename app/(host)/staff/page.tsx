@@ -1,16 +1,15 @@
-import React from "react";
 import Banner from "../../../components/banner";
 
-import staff from "@/app/assets/images/staff.svg";
-import { StaffTableData } from "./columns";
+import { Button } from "@/components/ui/button";
+import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
-import { redirect } from "next/navigation";
-import getURL from "@/lib/getURL";
-import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import StaffDataTable from "./StaffDataTable";
+import { StaffTableData } from "./columns";
+import dynamic from "next/dynamic";
+
+// client components
+const StaffDataTable = dynamic(() => import("./StaffDataTable"))
 
 async function getStaffData(userId: string): Promise<StaffTableData[]> {
   // fetch data

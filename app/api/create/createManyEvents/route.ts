@@ -1,9 +1,9 @@
 import { authOptions } from "@/lib/auth";
 import { getServerSession } from "next-auth";
-import { NextResponse } from "next/server";
 import { EventValidationSchema } from "@/lib/yupSchemas";
 import { BoyOrGirl, EventType } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
+import { NextResponse } from "next/server";
 
 type SingleEvent = {
   name: string;
@@ -78,7 +78,7 @@ export async function POST(req: Request) {
 
         eventsToBeCreated.push(event);
       });
-    }); 
+    });
 
     await prisma.event.createMany({
       data: eventsToBeCreated,

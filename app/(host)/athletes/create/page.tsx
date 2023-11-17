@@ -1,3 +1,5 @@
+import dynamic from "next/dynamic";
+
 import FloatingContainer from "@/components/FloatingContainer";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -5,7 +7,10 @@ import { getServerSession } from "next-auth";
 import getURL from "@/lib/getURL";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import CreateAthletesForm from "./CreateAthletesForm";
+
+
+// client components
+const CreateAthletesForm = dynamic(() => import("./CreateAthletesForm"))
 
 async function getGroupsAndTeams(userId: string) {
   try {

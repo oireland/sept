@@ -35,7 +35,7 @@ const removeLocations = async (locations: LocationsTableData[]) => {
   }
 };
 
-export const LocationDataTable = ({ data }: { data: LocationsTableData[] }) => {
+export default function LocationDataTable  ({ data }: { data: LocationsTableData[] })  {
   return (
     <div>
       <DataTable

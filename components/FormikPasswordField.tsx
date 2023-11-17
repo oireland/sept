@@ -1,7 +1,7 @@
 import { FieldAttributes } from "formik";
-import React, { FC, useState } from "react";
-import { HiOutlineEye, HiOutlineEyeOff } from "react-icons/hi";
+import { FC, useState } from "react";
 import FormikInput from "./FormikInput";
+import { Eye, EyeOff } from "lucide-react";
 
 type MyInputProps = {
   placeholder?: string;
@@ -15,7 +15,7 @@ const PasswordField: FC<MyInputProps> = (props) => {
       <FormikInput
         type={show ? "text" : "password"}
         {...props}
-        Icon={show ? HiOutlineEye : HiOutlineEyeOff}
+        Icon={show ? Eye : EyeOff}
         onIconClick={() => setShow(!show)}
       />
     </>

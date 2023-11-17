@@ -1,86 +1,14 @@
-import React from "react";
 import Banner from "../../../components/banner";
 
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
-import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { getEventData } from "@/lib/dbHelpers";
+import { getServerSession } from "next-auth";
+import Link from "next/link";
 import { EventTableData } from "./columns";
-import { prisma } from "@/lib/prisma";
-import EventDataTable from "./EventDataTable";
-import { UserRole } from "@prisma/client";
-import { getHostId } from "@/lib/dbHelpers";
+import dynamic from "next/dynamic";
 
-export async function getEventData(userId: string, role: UserRole) {
-  try {
-    const hostId = await getHostId(userId, role);
-
-    if (hostId === null) {
-      return [];
-    }
-
-    const events = await prisma.event.findMany({
-      where: {
-        hostId,
-      },
-      select: {
-        eventId: true,
-        eventType: true,
-        athletesBoyOrGirl: true,
-        athletesCompeting: true,
-        name: true,
-        group: true,
-        staffMember: {
-          select: {
-            user: {
-              select: {
-                userId: true,
-                name: true,
-              },
-            },
-          },
-        },
-        maxNumberOfAthletes: true,
-        location: {
-          select: {
-            locationName: true,
-          },
-        },
-        date: true,
-      },
-    });
-
-    const data: EventTableData[] = events.map(
-      ({
-        name,
-        eventId,
-        athletesBoyOrGirl,
-        athletesCompeting,
-        eventType,
-        group,
-        staffMember,
-        maxNumberOfAthletes,
-        location,
-        date,
-      }) => ({
-        name,
-        eventId,
-        boyOrGirl: athletesBoyOrGirl,
-        numberOfAthletes: athletesCompeting.length,
-        eventType,
-        groupName: group.groupName,
-        staffName: staffMember?.user.name,
-        maxNumberOfAthletes,
-        locationName: location.locationName,
-        date,
-      })
-    );
-
-    return data;
-  } catch (error) {
-    return [];
-  }
-}
+const EventDataTable = dynamic(() => import("./EventDataTable"));
 
 const Events = async () => {
   const session = await getServerSession(authOptions);

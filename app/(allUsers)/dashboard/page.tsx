@@ -1,11 +1,14 @@
 import Banner from "../../../components/banner";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { Scoreboard, ScoreboardData } from "./Scoreboard";
+import { ScoreboardData } from "./Scoreboard";
 import { getHostId } from "@/lib/dbHelpers";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import getURL from "@/lib/getURL";
+import dynamic from "next/dynamic";
+
+const Scoreboard = dynamic(() => import("./Scoreboard"));
 
 async function getScoreboardData(hostId: string) {
   try {
@@ -64,7 +67,7 @@ const Dashboard = async () => {
     redirect(getURL("/"));
   }
 
-  const scoreboardData = await getScoreboardData(hostId);
+  const scoreboardData = await getScoreboardData(hostId!);
 
   return (
     <div>

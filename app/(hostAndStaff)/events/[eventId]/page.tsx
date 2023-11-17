@@ -2,16 +2,21 @@ import Banner from "../../../../components/banner";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import getURL from "@/lib/getURL";
-import AddAthletesToEventDataTable from "./AddAthletesToEventDataTable";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { BoyOrGirl } from "@prisma/client";
 import { AthleteTableData } from "../../athletes/columns";
-import RemoveAthletesFromEventDataTable from "./RemoveAthletesFromEventDataTable";
-import { getHostId } from "@/lib/dbHelpers";
+import { getHostId, getLocations } from "@/lib/dbHelpers";
 import BackButton from "@/components/BackButton";
-import { getLocations } from "@/app/(host)/locations/page";
 import UpdateEventDetailsForm from "./UpdateEventDetailsForm";
+import dynamic from "next/dynamic";
+
+const AddAthletesToEventDataTable = dynamic(
+  () => import("./AddAthletesToEventDataTable")
+);
+const RemoveAthletesFromEventDataTable = dynamic(
+  () => import("./RemoveAthletesFromEventDataTable")
+);
 
 async function getEventData(eventId: string, hostId: string) {
   try {
@@ -151,7 +156,7 @@ const EditEvent = async ({ params }: { params: { eventId: string } }) => {
     redirect(getURL("/"));
   }
 
-  const eventData = await getEventData(params.eventId, hostId);
+  const eventData = await getEventData(params.eventId, hostId!);
 
   if (eventData === null) {
     redirect(getURL("/events"));
@@ -166,10 +171,10 @@ const EditEvent = async ({ params }: { params: { eventId: string } }) => {
     locationName: currentLocationName,
     staffMember: currentStaff,
     date: eventDate,
-  } = eventData;
+  } = eventData!;
 
-  const allLocations = await getLocations(hostId);
-  const allStaff = await getStaffData(hostId);
+  const allLocations = await getLocations(hostId!);
+  const allStaff = await getStaffData(hostId!);
 
   const competingAthletesTableData: AthleteTableData[] = athletesCompeting.map(
     ({ userId, boyOrGirl, groupName, teamName, user, events }) => ({
@@ -188,7 +193,7 @@ const EditEvent = async ({ params }: { params: { eventId: string } }) => {
   );
 
   const allAthletesData: AthleteTableData[] = await getAthleteData(
-    hostId,
+    hostId!,
     groupName,
     athletesBoyOrGirl
   );

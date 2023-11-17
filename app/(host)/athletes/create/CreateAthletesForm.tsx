@@ -7,7 +7,7 @@ import axios, { AxiosError } from "axios";
 import getURL from "@/lib/getURL";
 import * as yup from "yup";
 import toast from "react-hot-toast";
-import { useRouter, redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { BoyOrGirl } from "@prisma/client";
 
 type Props = {

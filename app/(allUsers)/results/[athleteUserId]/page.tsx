@@ -77,7 +77,7 @@ const AthleteResultsPage = async ({
     redirect(getURL("/dashboard"));
   }
 
-  const results = await getAthleteResults(params.athleteUserId, hostId);
+  const results = await getAthleteResults(params.athleteUserId, hostId!);
 
   console.log(results);
 

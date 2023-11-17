@@ -1,12 +1,11 @@
 import { FieldAttributes, useField } from "formik";
 import React, { FC } from "react";
-import { RiErrorWarningLine } from "react-icons/ri";
-import { IconType } from "react-icons";
+import { LucideIcon, AlertCircleIcon } from "lucide-react";
 
 type MyInputProps = {
   placeholder?: string;
   label: string;
-  Icon?: IconType;
+  Icon?: LucideIcon;
   onIconClick?: () => void;
 } & FieldAttributes<{}>;
 
@@ -27,7 +26,7 @@ const FormikInput: FC<MyInputProps> = ({
         </label>
         {meta.touched && meta.error && (
           <div className="flex items-center text-xs text-brg">
-            <RiErrorWarningLine className="peer h-5 w-5 pr-1" />
+            <AlertCircleIcon className="peer h-5 w-5 pr-1" />
             <p className="hidden hover:flex peer-hover:flex">{meta.error}</p>
           </div>
         )}

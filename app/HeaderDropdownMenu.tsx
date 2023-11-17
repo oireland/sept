@@ -10,11 +10,15 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { UserRole } from "@prisma/client";
 
-const HeaderDropdownMenu: FC = () => {
-  const session = useSession();
-  const userRole = session.data?.user.role;
-
+const HeaderDropdownMenu = ({
+  userId,
+  userRole,
+}: {
+  userId: string;
+  userRole: UserRole;
+}) => {
   return (
     <div className="h-full  ">
       <DropdownMenu>
@@ -40,6 +44,16 @@ const HeaderDropdownMenu: FC = () => {
               <DropdownMenuItem className="p-0">
                 <Link href="/staff" className="h-full  w-full px-2 py-1.5 ">
                   Staff
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem className="p-0">
+                <Link href="/groups" className="h-full  w-full px-2 py-1.5 ">
+                  Groups
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem className="p-0">
+                <Link href="/teams" className="h-full  w-full px-2 py-1.5 ">
+                  Teams
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem className="p-0">
@@ -79,7 +93,7 @@ const HeaderDropdownMenu: FC = () => {
               <>
                 <DropdownMenuItem className="p-0">
                   <Link
-                    href={`/athletes/${session.data!.user.userId}`}
+                    href={`/athletes/${userId}`}
                     className="h-full  w-full px-2 py-1.5 "
                   >
                     My Events

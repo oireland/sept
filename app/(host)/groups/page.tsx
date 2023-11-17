@@ -1,14 +1,17 @@
 import Banner from "@/components/banner";
 import React from "react";
-import GroupForm from "./GroupForm";
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { getHostId } from "@/lib/dbHelpers";
 import { redirect } from "next/navigation";
-import { GroupDataTable } from "./GroupDataTable";
+import dynamic from "next/dynamic";
 
-export const getGroups = async (hostId: string) => {
+// client components
+const GroupForm = dynamic(() => import("./GroupForm"));
+const GroupDataTable = dynamic(() => import("./GroupDataTable"));
+
+async function getGroups(hostId: string) {
   try {
     const { groups } = await prisma.host.findUniqueOrThrow({
       where: {
@@ -28,7 +31,7 @@ export const getGroups = async (hostId: string) => {
   } catch (e) {
     return [];
   }
-};
+}
 
 const Groups = async () => {
   const session = await getServerSession(authOptions);
@@ -36,7 +39,7 @@ const Groups = async () => {
   if (!hostId) {
     redirect("/");
   }
-  const groups = await getGroups(hostId);
+  const groups = await getGroups(hostId!);
   return (
     <div>
       <Banner text="Groups" />

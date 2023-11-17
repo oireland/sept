@@ -85,7 +85,6 @@ const EventForm: FC<Props> = ({ groups, locations }) => {
       validationSchema={EventValidationSchema}
       onSubmit={(values: FormData) => {
         handleFormSubmit(values);
-        // console.log(values);
       }}
     >
       <Form className="p-4">

@@ -12,6 +12,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import getURL from "@/lib/getURL";
 import Link from "next/link";
+import { AtSign } from "lucide-react";
 
 interface FormData {
   email: string;
@@ -75,7 +76,7 @@ const LoginForm: FC = () => {
           type="input"
           label="Email address"
           placeholder="example@email.com"
-          Icon={HiAtSymbol}
+          Icon={AtSign}
         />
         <PasswordField name="password" label="Password" />
         <div className="flex items-baseline justify-between">

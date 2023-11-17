@@ -1,34 +1,14 @@
 import Banner from "@/components/banner";
 import React from "react";
-import LocationForm from "./LocationForm";
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { getHostId } from "@/lib/dbHelpers";
+import { getHostId, getLocations } from "@/lib/dbHelpers";
 import { redirect } from "next/navigation";
-import { LocationDataTable } from "./LocationDataTable";
+import dynamic from "next/dynamic";
 
-export const getLocations = async (hostId: string) => {
-  try {
-    const { locations } = await prisma.host.findUniqueOrThrow({
-      where: {
-        hostId,
-      },
-      select: {
-        locations: {
-          select: {
-            events: true,
-            locationName: true,
-          },
-        },
-      },
-    });
-
-    return locations;
-  } catch (e) {
-    return [];
-  }
-};
+const LocationForm = dynamic(() => import("./LocationForm"));
+const LocationDataTable = dynamic(() => import("./LocationDataTable"));
 
 const Locations = async () => {
   const session = await getServerSession(authOptions);
@@ -36,7 +16,7 @@ const Locations = async () => {
   if (!hostId) {
     redirect("/");
   }
-  const locations = await getLocations(hostId);
+  const locations = await getLocations(hostId!);
   console.log(locations);
   return (
     <div>

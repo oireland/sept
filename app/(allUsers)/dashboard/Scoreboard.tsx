@@ -11,7 +11,7 @@ import {
 
 export type ScoreboardData = { teamName: string; points: number }[];
 
-export function Scoreboard({ data }: { data: ScoreboardData }) {
+export default function Scoreboard({ data }: { data: ScoreboardData }) {
   return (
     <ResponsiveContainer width="100%" height="100%">
       <BarChart data={data}>

@@ -35,7 +35,7 @@ const removeGroups = async (groups: GroupsTableData[]) => {
   }
 };
 
-export const GroupDataTable = ({ data }: { data: GroupsTableData[] }) => {
+export default function GroupDataTable ({ data }: { data: GroupsTableData[] })  {
   return (
     <div>
       <DataTable

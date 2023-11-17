@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import axios from "axios";
 import getURL from "@/lib/getURL";
 import { toast } from "react-hot-toast";
+import { AtSign, Library } from "lucide-react";
 
 interface FormData {
   name: string;
@@ -83,14 +84,14 @@ const AccountForm: FC<Props> = ({ initialValues }) => {
           name="name"
           type="input"
           label="Your Name"
-          Icon={HiOutlineLibrary}
+          Icon={Library}
         />
         <FormikInput
           name="email"
           type="input"
           label="Email address"
           placeholder="example@email.com"
-          Icon={HiAtSymbol}
+          Icon={AtSign}
         />
         <PasswordField name="oldPassword" label="Old Password" />
 

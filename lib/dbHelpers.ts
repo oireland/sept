@@ -1,5 +1,6 @@
 import { UserRole } from "@prisma/client";
 import { prisma } from "./prisma";
+import { EventTableData } from "@/app/(hostAndStaff)/events/columns";
 
 export async function getHostId(userId: string, userRole: UserRole) {
   try {
@@ -37,5 +38,98 @@ export async function getHostId(userId: string, userRole: UserRole) {
     return null;
   } catch (error) {
     return null;
+  }
+}
+
+export async function getLocations(hostId: string) {
+  try {
+    const { locations } = await prisma.host.findUniqueOrThrow({
+      where: {
+        hostId,
+      },
+      select: {
+        locations: {
+          select: {
+            events: true,
+            locationName: true,
+          },
+        },
+      },
+    });
+
+    return locations;
+  } catch (e) {
+    return [];
+  }
+}
+
+export async function getEventData(userId: string, role: UserRole) {
+  try {
+    const hostId = await getHostId(userId, role);
+
+    if (hostId === null) {
+      return [];
+    }
+
+    const events = await prisma.event.findMany({
+      where: {
+        hostId,
+      },
+      select: {
+        eventId: true,
+        eventType: true,
+        athletesBoyOrGirl: true,
+        athletesCompeting: true,
+        name: true,
+        group: true,
+        staffMember: {
+          select: {
+            user: {
+              select: {
+                userId: true,
+                name: true,
+              },
+            },
+          },
+        },
+        maxNumberOfAthletes: true,
+        location: {
+          select: {
+            locationName: true,
+          },
+        },
+        date: true,
+      },
+    });
+
+    const data: EventTableData[] = events.map(
+      ({
+        name,
+        eventId,
+        athletesBoyOrGirl,
+        athletesCompeting,
+        eventType,
+        group,
+        staffMember,
+        maxNumberOfAthletes,
+        location,
+        date,
+      }) => ({
+        name,
+        eventId,
+        boyOrGirl: athletesBoyOrGirl,
+        numberOfAthletes: athletesCompeting.length,
+        eventType,
+        groupName: group.groupName,
+        staffName: staffMember?.user.name,
+        maxNumberOfAthletes,
+        locationName: location.locationName,
+        date,
+      })
+    );
+
+    return data;
+  } catch (error) {
+    return [];
   }
 }

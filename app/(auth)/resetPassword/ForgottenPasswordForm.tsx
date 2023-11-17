@@ -9,6 +9,7 @@ import { toast } from "react-hot-toast";
 import { Button } from "@/components/ui/button";
 import getURL from "@/lib/getURL";
 import axios from "axios";
+import { AtSign } from "lucide-react";
 
 interface FormData {
   email: string;
@@ -59,7 +60,7 @@ const ForgottenPasswordForm: FC<Props> = ({ setIsSent }) => {
           type="input"
           label="Email address"
           placeholder="example@email.com"
-          Icon={HiAtSymbol}
+          Icon={AtSign}
         />
         <div className="flex justify-end">
           <Button variant={"form"} type="submit" className="mt-2">

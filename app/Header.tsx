@@ -7,7 +7,6 @@ import HeaderDropdownMenu from "./HeaderDropdownMenu";
 
 const Header: FC = () => {
   const session = useSession();
-  const userRole = session.data?.user.role;
 
   return (
     <header className="sticky top-0 z-50 flex items-center justify-between bg-white py-2 shadow-md">
@@ -19,7 +18,10 @@ const Header: FC = () => {
 
       {session.status === "authenticated" ? (
         <div className="">
-          <HeaderDropdownMenu />
+          <HeaderDropdownMenu
+            userId={session.data.user.userId}
+            userRole={session.data.user.role}
+          />
         </div>
       ) : session.status === "loading" ? (
         <div></div>

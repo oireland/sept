@@ -12,6 +12,7 @@ import axios from "axios";
 import { signIn } from "next-auth/react";
 import getURL from "@/lib/getURL";
 import { toast } from "react-hot-toast";
+import { AtSign, Library } from "lucide-react";
 
 interface FormData {
   name: string;
@@ -81,7 +82,7 @@ const SignUpForm = () => {
           name="name"
           type="input"
           label="School Name"
-          Icon={HiOutlineLibrary}
+          Icon={Library}
           placeholder="e.g. Blue Finch School"
         />
         <FormikInput
@@ -89,7 +90,7 @@ const SignUpForm = () => {
           type="input"
           label="Email address"
           placeholder="example@email.com"
-          Icon={HiAtSymbol}
+          Icon={AtSign}
         />
         <PasswordField name="password" label="Password" />
         <PasswordField name="passwordRepeat" label="Confirm Password" />

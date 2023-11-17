@@ -1,13 +1,13 @@
 import FloatingContainer from "@/components/FloatingContainer";
+import { Button } from "@/components/ui/button";
 import { authOptions } from "@/lib/auth";
+import getURL from "@/lib/getURL";
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
-import React from "react";
-import EventForm from "./EventForm";
-import { redirect } from "next/navigation";
-import getURL from "@/lib/getURL";
-import { Button } from "@/components/ui/button";
+import dynamic from "next/dynamic";
 import Link from "next/link";
+
+const EventForm = dynamic(() => import("./EventForm"))
 
 async function getGroupsAndLocations(userId: string) {
   try {

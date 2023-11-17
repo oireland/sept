@@ -8,7 +8,7 @@ import { getHostId } from "@/lib/dbHelpers";
 import { redirect } from "next/navigation";
 import { TeamDataTable } from "./TeamDataTable";
 
-export const getTeams = async (hostId: string) => {
+async function getTeams(hostId: string) {
   try {
     const { teams } = await prisma.host.findUniqueOrThrow({
       where: {
@@ -28,7 +28,7 @@ export const getTeams = async (hostId: string) => {
   } catch (e) {
     return [];
   }
-};
+}
 
 const TeamsPage = async () => {
   const session = await getServerSession(authOptions);
@@ -36,7 +36,7 @@ const TeamsPage = async () => {
   if (!hostId) {
     redirect("/");
   }
-  const teams = await getTeams(hostId);
+  const teams = await getTeams(hostId!);
   return (
     <div>
       <Banner text="Teams" />

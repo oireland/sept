@@ -6,13 +6,20 @@ import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import React from "react";
 import Banner from "../../../../components/banner";
-import { getEventData } from "@/app/(hostAndStaff)/events/page";
+import { getEventData } from "@/lib/dbHelpers";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import AddEventsToStaffDataTable from "./AddEventsToStaffDataTable";
-import RemoveEventsFromStaffDataTable from "./RemoveEventsFromStaffDataTable";
 import BackButton from "@/components/BackButton";
 import { EventTableData } from "@/app/(hostAndStaff)/events/columns";
+import dynamic from "next/dynamic";
+
+// client components
+const AddEventsToStaffDataTable = dynamic(
+  () => import("./AddEventsToStaffDataTable")
+);
+const RemoveEventsFromStaffDataTable = dynamic(
+  () => import("./RemoveEventsFromStaffDataTable")
+);
 
 const getStaffData = async (staffUserId: string, hostId: string) => {
   try {
@@ -76,7 +83,7 @@ const EditStaffPage = async ({
     redirect(getURL("/"));
   }
 
-  const staffData = await getStaffData(staffUserId, hostId);
+  const staffData = await getStaffData(staffUserId, hostId!);
 
   if (staffData === null) {
     redirect(getURL("/staff"));
@@ -87,9 +94,9 @@ const EditStaffPage = async ({
     session!.user.role
   );
 
-  console.log(staffData.events);
+  console.log(staffData!.events);
 
-  const staffsEventsTableData: EventTableData[] = staffData.events.map(
+  const staffsEventsTableData: EventTableData[] = staffData!.events.map(
     ({
       name,
       athletesBoyOrGirl,
@@ -107,7 +114,7 @@ const EditStaffPage = async ({
       groupName: group.groupName,
       name,
       numberOfAthletes: athletesCompeting.length,
-      staffName: staffData.user.name,
+      staffName: staffData!.user.name,
       maxNumberOfAthletes,
       date,
       locationName: location.locationName,
@@ -115,7 +122,7 @@ const EditStaffPage = async ({
     })
   );
 
-  const staffsEventsIds: string[] = staffData.events.map(
+  const staffsEventsIds: string[] = staffData!.events.map(
     ({ eventId }) => eventId
   );
 
@@ -125,7 +132,7 @@ const EditStaffPage = async ({
 
   return (
     <div className="max-w-full overflow-x-hidden">
-      <Banner text={staffData.user.name} />
+      <Banner text={staffData!.user.name} />
 
       <div className="container mx-auto mt-2 ">
         <h2 className="text-2xl font-semibold">Events Staffing</h2>

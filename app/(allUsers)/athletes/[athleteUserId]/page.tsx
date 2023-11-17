@@ -5,22 +5,21 @@ import { redirect } from "next/navigation";
 import getURL from "@/lib/getURL";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
+
 import { getHostId } from "@/lib/dbHelpers";
 import { BoyOrGirl } from "@prisma/client";
 import { EventTableData } from "../../../(hostAndStaff)/events/columns";
-import RemoveEventsFromAthlete from "./RemoveEventsFromAthleteDataTable";
-import AddEventsToAthleteDataTable from "./AddEventsToAthleteDataTable";
+
 import BackButton from "@/components/BackButton";
-import {
-  Table,
-  TableHead,
-  TableHeader,
-  TableRow,
-  TableBody,
-  TableCell,
-} from "@/components/ui/table";
+import dynamic from "next/dynamic";
+
+// client components
+const RemoveEventsFromAthlete = dynamic(
+  () => import("./RemoveEventsFromAthleteDataTable")
+);
+const AddEventsToAthleteDataTable = dynamic(
+  () => import("./AddEventsToAthleteDataTable")
+);
 
 async function getEventsData(
   hostId: string,
@@ -136,7 +135,7 @@ const EditAthlete = async ({
     redirect(getURL("/"));
   }
 
-  const athlete = await getAthleteData(params.athleteUserId, hostId);
+  const athlete = await getAthleteData(params.athleteUserId, hostId!);
 
   if (athlete === null) {
     redirect(getURL("/athletes"));
@@ -148,10 +147,10 @@ const EditAthlete = async ({
     boyOrGirl,
     events: athleteEvents,
     groupName,
-  } = athlete;
+  } = athlete!;
   const name = user.name;
 
-  const allEvents = await getEventsData(hostId, groupName, boyOrGirl);
+  const allEvents = await getEventsData(hostId!, groupName, boyOrGirl);
 
   const competingEventsTableData: EventTableData[] = athleteEvents.map(
     ({
