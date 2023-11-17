@@ -9,6 +9,10 @@ import getURL from "@/lib/getURL";
 const Header: FC = () => {
   const session = useSession();
 
+  let baseUrl = "https://sept-git-main-oireland.vercel.app/";
+
+  let A = new URL("/", baseUrl);
+
   return (
     <header className="sticky top-0 z-50 flex items-center justify-between bg-white py-2 shadow-md">
       <Link href="/" className="ml-3">
