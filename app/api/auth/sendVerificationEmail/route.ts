@@ -32,7 +32,7 @@ export async function POST(req: Request) {
     });
     const url = getURL(`/confirm/${emailToken}`);
 
-    transporter.sendMail({
+    await transporter.sendMail({
       to: tokenData.email,
       subject: "Confirm Email",
       html: `Please click below to confirm your email: <a href="${url}">Click Here!<a/>`,
@@ -41,7 +41,7 @@ export async function POST(req: Request) {
   } catch (e) {
     return NextResponse.json(
       { message: "Something went wrong" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

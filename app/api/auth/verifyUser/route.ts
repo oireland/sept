@@ -14,8 +14,10 @@ export async function PATCH(req: Request) {
   try {
     const { userId, email } = jwt.verify(
       token,
-      process.env.EMAIL_SECRET!
+      process.env.EMAIL_SECRET!,
     ) as VerificationToken;
+
+    console.log(userId, email);
 
     await prisma.user.update({
       where: { userId },
@@ -24,9 +26,10 @@ export async function PATCH(req: Request) {
 
     return NextResponse.json(
       { userId, email },
-      { status: 200, statusText: `Your email ${email} has been verified.` }
+      { status: 200, statusText: `Your email ${email} has been verified.` },
     );
   } catch (e) {
+    console.log(e);
     return NextResponse.json(e, {
       status: 400,
       statusText: "Failed to confirm the email address.",

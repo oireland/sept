@@ -24,6 +24,7 @@ const Confirm = async ({ params }: { params: { token: string } }) => {
       </FloatingContainer>
     );
   } catch (e) {
+    console.log(e);
     return (
       <FloatingContainer className="text-center">
         <BiErrorCircle className="mx-auto h-12 w-12 text-red-600" />

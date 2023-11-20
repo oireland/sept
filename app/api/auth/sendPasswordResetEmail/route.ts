@@ -25,7 +25,7 @@ export async function POST(req: Request) {
     });
     const url = getURL(`/resetPassword/${emailToken}`);
 
-    transporter.sendMail({
+    await transporter.sendMail({
       to: email,
       subject: "Reset Password",
       html: `Please click below to reset your password: <a href="${url}">Click Here!<a/>`,
@@ -35,7 +35,7 @@ export async function POST(req: Request) {
     console.log(e);
     return NextResponse.json(
       { message: "Something went wrong" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
