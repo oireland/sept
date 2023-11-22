@@ -31,7 +31,6 @@ const SingleCsvForm = ({
           return true;
         }
 
-        // if file size is less than 10MB - arbitrary size at the moment research size of a fairly large csv file
         if (fileRef.current.files[0].size / 1024 / 1024 < 10) {
           return true;
         }

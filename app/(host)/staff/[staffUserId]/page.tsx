@@ -15,10 +15,10 @@ import dynamic from "next/dynamic";
 
 // client components
 const AddEventsToStaffDataTable = dynamic(
-  () => import("./AddEventsToStaffDataTable")
+  () => import("./AddEventsToStaffDataTable"),
 );
 const RemoveEventsFromStaffDataTable = dynamic(
-  () => import("./RemoveEventsFromStaffDataTable")
+  () => import("./RemoveEventsFromStaffDataTable"),
 );
 
 const getStaffData = async (staffUserId: string, hostId: string) => {
@@ -42,8 +42,13 @@ const getStaffData = async (staffUserId: string, hostId: string) => {
               },
             },
             eventId: true,
-            maxNumberOfAthletes: true,
+            maxNumberOfAthletesPerTeam: true,
             date: true,
+            host: {
+              select: {
+                teams: true,
+              },
+            },
             location: {
               select: {
                 locationName: true,
@@ -91,7 +96,7 @@ const EditStaffPage = async ({
 
   const allEventsData = await getEventData(
     session!.user.userId,
-    session!.user.role
+    session!.user.role,
   );
 
   console.log(staffData!.events);
@@ -104,7 +109,8 @@ const EditStaffPage = async ({
       group,
       eventId,
       athletesCompeting,
-      maxNumberOfAthletes,
+      maxNumberOfAthletesPerTeam,
+      host,
       date,
       location,
     }) => ({
@@ -115,19 +121,20 @@ const EditStaffPage = async ({
       name,
       numberOfAthletes: athletesCompeting.length,
       staffName: staffData!.user.name,
-      maxNumberOfAthletes,
+      maxNumberOfAthletes: maxNumberOfAthletesPerTeam * host.teams.length,
       date,
       locationName: location.locationName,
       staffUserId,
-    })
+    }),
   );
 
   const staffsEventsIds: string[] = staffData!.events.map(
-    ({ eventId }) => eventId
+    ({ eventId }) => eventId,
   );
 
   const availableEventsTableData: EventTableData[] = allEventsData.filter(
-    ({ eventId, staffName }) => !staffsEventsIds.includes(eventId) && !staffName
+    ({ eventId, staffName }) =>
+      !staffsEventsIds.includes(eventId) && !staffName,
   );
 
   return (

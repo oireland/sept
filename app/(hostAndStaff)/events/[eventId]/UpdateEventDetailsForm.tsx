@@ -10,6 +10,7 @@ import toast from "react-hot-toast";
 import axios, { AxiosError } from "axios";
 import getURL from "@/lib/getURL";
 import FormikInput from "@/components/FormikInput";
+import { FormikCombobox } from "@/components/FormikCombobox";
 
 type FormData = {
   date: string;
@@ -78,7 +79,7 @@ const UpdateEventDetailsForm: FC<Props> = ({
       .test(
         "futureDate",
         "Date must be in the future",
-        (date) => new Date() < date
+        (date) => new Date() < date,
       ),
     locationName: yup.string().required(),
     staffId: yup.string(),
@@ -95,25 +96,29 @@ const UpdateEventDetailsForm: FC<Props> = ({
       <Form>
         <FormikInput type="datetime-local" name="date" label="Date" />
 
-        <FormikSelect
-          items={locationNames.map((locationName) => ({
-            content: locationName,
-            value: locationName,
-          }))}
-          name="locationName"
-          label="Location"
-        />
+        <div className="flex space-x-4 w-full ">
+          <FormikCombobox
+            items={locationNames.map((locationName) => ({
+              label: locationName,
+              value: locationName,
+            }))}
+            name="locationName"
+            label="Location"
+            className="w-full"
+          />
 
-        <FormikSelect
-          items={staff.map(({ staffId, staffName }) => ({
-            content: staffName,
-            value: staffId,
-          }))}
-          name="staffId"
-          label="Staff"
-        />
+          <FormikCombobox
+            items={staff.map(({ staffId, staffName }) => ({
+              label: staffName,
+              value: staffId,
+            }))}
+            name="staffId"
+            label="Staff"
+            className="w-full"
+          />
+        </div>
 
-        <div className="flex items-center justify-end">
+        <div className="flex items-center justify-end mt-1">
           <Button type="submit" variant={"outline"}>
             Save
           </Button>

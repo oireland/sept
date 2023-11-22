@@ -9,7 +9,7 @@ import { DataTable } from "@/components/ui/data-table";
 import { columns } from "./columns";
 
 const getStaffEventsTableData = async (
-  staffUserId: string
+  staffUserId: string,
 ): Promise<EventTableData[]> => {
   try {
     const hostId = await getHostId(staffUserId, "STAFF");
@@ -43,7 +43,12 @@ const getStaffEventsTableData = async (
             },
           },
         },
-        maxNumberOfAthletes: true,
+        maxNumberOfAthletesPerTeam: true,
+        host: {
+          select: {
+            teams: true,
+          },
+        },
         locationName: true,
         date: true,
       },
@@ -58,7 +63,8 @@ const getStaffEventsTableData = async (
         eventId,
         staffMember,
         athletesCompeting,
-        maxNumberOfAthletes,
+        maxNumberOfAthletesPerTeam,
+        host,
         locationName,
         date,
       }) => ({
@@ -69,10 +75,10 @@ const getStaffEventsTableData = async (
         groupName,
         numberOfAthletes: athletesCompeting.length,
         staffName: staffMember?.user.name,
-        maxNumberOfAthletes,
+        maxNumberOfAthletes: maxNumberOfAthletesPerTeam * host.teams.length,
         locationName,
         date,
-      })
+      }),
     );
   } catch (e) {
     return [];
@@ -83,7 +89,7 @@ const StaffEventsPage = async () => {
   const session = await getServerSession(authOptions);
 
   const StaffEventsTableData = await getStaffEventsTableData(
-    session!.user.userId
+    session!.user.userId,
   );
 
   return (

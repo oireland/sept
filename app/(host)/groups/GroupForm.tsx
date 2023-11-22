@@ -44,7 +44,12 @@ const GroupForm: FC = () => {
     <Formik
       initialValues={initialValues}
       validationSchema={validationSchema}
-      onSubmit={(data) => {
+      onSubmit={(data, { resetForm }) => {
+        resetForm({
+          values: { groupName: "" },
+          touched: { groupName: false },
+          errors: { groupName: undefined },
+        });
         handleFormSubmit(data);
       }}
     >

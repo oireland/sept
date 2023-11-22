@@ -40,14 +40,6 @@ const descriptionCardData: descriptionCardData[] = [
       "With SEPT, staff have their own accounts, to which events are allocated. They enter the times, distances or whatever it may be for every student, and placements and points are automatically allocated. In addition, no results need to be collected in because they are added to the overall results as soon as results are saved.",
     imageUrl: staff,
   },
-  {
-    title: "Provide a Great Experience for All",
-    mainPoint:
-      "A lot of parents enjoy coming to Sports Day, to cheer on and support their children. However, this tends to be as involved as parents can get. Most of the time no overall score is available until the end of the day, when they'll hear it from their youngen in the car on the way home.",
-    description:
-      "With SEPT, spectators and athletes can have access to a real time leaderboard, organised by the teams/houses you have created. This makes the day more competitive for athletes who can 'have something to fight for' if their house is traiing behind or needing to maintain its lead, and parents can feel more included, even those who aren't able to attend in person.",
-    imageUrl: spectator,
-  },
 ];
 
 const Carousel: FC = () => {
@@ -78,13 +70,15 @@ const Carousel: FC = () => {
           How does <span className="text-brg">SEPT</span> help?
         </h2>
       </div>
-      <div className="mt-3 flex justify-center sm:mt-5 md:mt-7 lg:mt-9 xl:mt-11">
-        <HiChevronLeft
+      <div className="mt-3 table h-fit items-center justify-center sm:mt-5 md:mt-7 lg:mt-9 xl:mt-11 ">
+        <div
           onClick={goToPrevious}
-          className="mx-auto my-auto h-8 w-8 cursor-pointer rounded-full opacity-50 transition duration-150 hover:opacity-100"
-        />
+          className=" table-cell cursor-pointer rounded-full opacity-50 transition duration-150 hover:opacity-100 align-middle"
+        >
+          <HiChevronLeft className="mx-auto h-8 w-8 " />
+        </div>
 
-        <div className="mx-auto block w-3/4 rounded-md border py-1 shadow-md transition duration-150 hover:shadow-xl md:flex md:py-2">
+        <div className="mx-auto  w-3/4 rounded-md border py-1 shadow-md transition duration-150 hover:shadow-xl md:flex md:py-2 table-cell">
           <div className="hidden md:block">
             <div className="relative flex h-48 w-48 lg:h-60 lg:w-60 xl:h-72 xl:w-72 ">
               <Image
@@ -107,10 +101,12 @@ const Carousel: FC = () => {
             </p>
           </div>
         </div>
-        <HiChevronRight
+        <div
           onClick={goToNext}
-          className="mx-auto my-auto h-8 w-8 cursor-pointer opacity-50 transition duration-150 hover:opacity-100"
-        />
+          className=" h-full table-cell cursor-pointer opacity-50 transition duration-150 hover:opacity-100 align-middle"
+        >
+          <HiChevronRight className="mx-auto h-8 w-8 " />
+        </div>
       </div>
     </section>
   );

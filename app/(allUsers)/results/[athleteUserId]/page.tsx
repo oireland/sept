@@ -1,3 +1,4 @@
+import BackButton from "@/components/BackButton";
 import Banner from "@/components/banner";
 import {
   Table,
@@ -48,8 +49,6 @@ async function getAthleteResults(athleteUserId: string, hostId: string) {
       },
     });
 
-    console.log(results);
-
     return results;
   } catch (e) {
     return [];
@@ -67,7 +66,7 @@ const AthleteResultsPage = async ({
     session?.user.role === "ATHLETE" &&
     session.user.userId !== params.athleteUserId
   ) {
-    // user is an athlete but this is not the page for editing their events.
+    // user is an athlete but this is not the page for viewing their results
     redirect(getURL("/dashboard"));
   }
 
@@ -78,8 +77,6 @@ const AthleteResultsPage = async ({
   }
 
   const results = await getAthleteResults(params.athleteUserId, hostId!);
-
-  console.log(results);
 
   return (
     <div>
@@ -119,6 +116,10 @@ const AthleteResultsPage = async ({
             })}
           </TableBody>
         </Table>
+        <hr className="my-2 p-0" />
+        <div className="flex justify-end">
+          <BackButton />
+        </div>
       </div>
     </div>
   );

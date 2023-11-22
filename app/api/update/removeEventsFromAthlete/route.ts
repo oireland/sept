@@ -7,7 +7,7 @@ import { NextResponse } from "next/server";
 import * as yup from "yup";
 
 const requestSchema = yup.object({
-  selectedRowData: yup.array().of(EventTableDataSchema).required(),
+  eventIds: yup.array().of(yup.string().required()).required(),
   athleteUserId: yup.string().required(),
 });
 
@@ -15,8 +15,9 @@ export async function PATCH(req: Request) {
   try {
     const session = await getServerSession(authOptions);
 
-    const { selectedRowData: events, athleteUserId } =
-      await requestSchema.validate(await req.json());
+    const { eventIds, athleteUserId } = await requestSchema.validate(
+      await req.json(),
+    );
 
     if (
       !session ||
@@ -56,34 +57,24 @@ export async function PATCH(req: Request) {
       return NextResponse.json("Invalid request", { status: 400 });
     }
 
+    // get ids of valid events of the host that were in the request
     const eventsOfHost = await prisma.event.findMany({
       where: {
         hostId,
         groupName: athleteGroupName,
         athletesBoyOrGirl: athleteBoyOrGirl,
+        eventId: {
+          in: eventIds,
+        },
       },
       select: {
         eventId: true,
       },
     });
-    // filter the events from the request to only include those with a valid ID, group and boyOrGirl
-
-    const validEventIds: string[] = eventsOfHost.map(({ eventId }) => eventId);
-
-    const filteredEvents = events?.filter(
-      ({ group, boyOrGirl, eventId }) =>
-        group === athleteGroupName &&
-        boyOrGirl === athleteBoyOrGirl &&
-        validEventIds.includes(eventId)
-    );
-
-    if (filteredEvents.length === 0) {
-      return NextResponse.json("Invalid request", { status: 400 });
-    }
 
     // update each event to have the athlete competing
     await Promise.all(
-      filteredEvents?.map(
+      eventsOfHost?.map(
         async ({ eventId }) =>
           await prisma.event.update({
             where: {
@@ -96,8 +87,8 @@ export async function PATCH(req: Request) {
                 },
               },
             },
-          })
-      )
+          }),
+      ),
     );
 
     return NextResponse.json("Successfully added events to athlete", {

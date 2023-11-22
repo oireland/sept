@@ -8,7 +8,7 @@ const requestSchema = yup.object({
   password: yup
     .string()
     .matches(
-      /(?=^.{6,20}$)((?=.*\w)(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[|!"$%&\/\(\)\?\^\'\\\+\-\*]))^.*/
+      /(?=^.{6,20}$)((?=.*\w)(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[|!"$%&\/\(\)\?\^\'\\\+\-\*]))^.*/,
     )
     .required(),
   token: yup.string().required(),
@@ -33,6 +33,7 @@ export async function PATCH(req: Request) {
       },
       data: {
         password: hashedPassword,
+        emailVerified: new Date(),
       },
     });
 

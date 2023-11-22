@@ -92,10 +92,15 @@ export async function getEventData(userId: string, role: UserRole) {
             },
           },
         },
-        maxNumberOfAthletes: true,
+        maxNumberOfAthletesPerTeam: true,
         location: {
           select: {
             locationName: true,
+          },
+        },
+        host: {
+          select: {
+            teams: true,
           },
         },
         date: true,
@@ -111,9 +116,10 @@ export async function getEventData(userId: string, role: UserRole) {
         eventType,
         group,
         staffMember,
-        maxNumberOfAthletes,
+        maxNumberOfAthletesPerTeam,
         location,
         date,
+        host,
       }) => ({
         name,
         eventId,
@@ -122,10 +128,10 @@ export async function getEventData(userId: string, role: UserRole) {
         eventType,
         groupName: group.groupName,
         staffName: staffMember?.user.name,
-        maxNumberOfAthletes,
+        maxNumberOfAthletes: host.teams.length * maxNumberOfAthletesPerTeam,
         locationName: location.locationName,
         date,
-      })
+      }),
     );
 
     return data;

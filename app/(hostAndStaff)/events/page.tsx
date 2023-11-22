@@ -17,8 +17,6 @@ const Events = async () => {
 
   const data: EventTableData[] = await getEventData(session!.user.userId, role);
 
-  console.log("event table data", data);
-
   return (
     <div>
       <Banner text="Events" />

@@ -1,11 +1,12 @@
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 
 export async function DELETE(
   req: Request,
-  { params }: { params: { commaSeperatedNames: string } }
+  { params }: { params: { commaSeperatedNames: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -16,7 +17,7 @@ export async function DELETE(
     if (session?.user.role !== "HOST") {
       return NextResponse.json(
         { message: "Unauthorised request" },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -35,9 +36,11 @@ export async function DELETE(
 
     return NextResponse.json({ message: "Success" });
   } catch (e) {
-    return NextResponse.json(
-      { message: "Something went wrong" },
-      { status: 500 }
-    );
+    if (e instanceof PrismaClientKnownRequestError) {
+      return NextResponse.json("You cannot delete a group that has athletes.", {
+        status: 400,
+      });
+    }
+    return NextResponse.json("Something went wrong", { status: 500 });
   }
 }

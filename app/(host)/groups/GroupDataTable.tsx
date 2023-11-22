@@ -15,11 +15,11 @@ const removeGroups = async (groups: GroupsTableData[]) => {
     // to remove the comma from the end
     commaSeperatedNames = commaSeperatedNames.substring(
       0,
-      commaSeperatedNames.length - 1
+      commaSeperatedNames.length - 1,
     );
 
     await axios.delete(
-      getURL(`/api/delete/deleteManyGroups/${commaSeperatedNames}`)
+      getURL(`/api/delete/deleteManyGroups/${commaSeperatedNames}`),
     );
 
     toast.dismiss(toastId);
@@ -27,7 +27,9 @@ const removeGroups = async (groups: GroupsTableData[]) => {
     window.location.reload();
   } catch (e) {
     toast.dismiss(toastId);
-    if (e instanceof Error || e instanceof AxiosError) {
+    if (e instanceof AxiosError) {
+      toast.error(e.response?.data);
+    } else if (e instanceof Error) {
       toast.error(e.message);
     } else {
       toast.error("Something went wrong");
@@ -35,7 +37,7 @@ const removeGroups = async (groups: GroupsTableData[]) => {
   }
 };
 
-export default function GroupDataTable ({ data }: { data: GroupsTableData[] })  {
+export default function GroupDataTable({ data }: { data: GroupsTableData[] }) {
   return (
     <div>
       <DataTable
@@ -46,4 +48,4 @@ export default function GroupDataTable ({ data }: { data: GroupsTableData[] })  
       />
     </div>
   );
-};
+}

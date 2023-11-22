@@ -9,6 +9,7 @@ import React, { FC, useEffect, useState } from "react";
 import { FaPaperPlane } from "react-icons/fa";
 import toast from "react-hot-toast";
 import ConfirmSkeleton from "./ConfirmSkeleton";
+import getURL from "@/lib/getURL";
 
 const Confirm: FC = () => {
   const [lastSend, setLastSend] = useState(new Date());
@@ -25,8 +26,9 @@ const Confirm: FC = () => {
     if (session.data?.user.emailVerified) redirect("/dashboard");
   }, [session]);
 
-  const email = session.data?.user.email;
-  const userId = session.data?.user.email;
+  const email = session.data?.user.email || null;
+  const userId = session.data?.user.email || null;
+  const userRole = session.data?.user.role || null;
 
   const canSendEmail = () => {
     const difference = new Date().getTime() - lastSend.getTime();
@@ -37,8 +39,20 @@ const Confirm: FC = () => {
     if (canSendEmail()) {
       let toastId = toast.loading("Resending email...");
       try {
-        const tokenData: VerificationToken = { email: email!, userId: userId! };
-        await axios.post("/api/auth/sendVerificationEmail", tokenData);
+        if (userRole === "HOST") {
+          const tokenData: VerificationToken = {
+            email: email!,
+            userId: userId!,
+          };
+          await axios.post(
+            getURL("/api/auth/sendVerificationEmail"),
+            tokenData,
+          );
+        } else {
+          await axios.post(getURL("/api/auth/sendPasswordResetEmail"), {
+            email,
+          });
+        }
         toast.dismiss(toastId);
         toastId = toast.success("Email has been sent");
         setLastSend(new Date());

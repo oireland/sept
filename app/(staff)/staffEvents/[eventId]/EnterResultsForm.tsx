@@ -71,22 +71,24 @@ const EnterResultsForm: FC<Props> = ({
         handleFormSubmit(values);
       }}
     >
-      <Form className="p-4">
+      <Form className="p-2 sm:p-4 md:p-6">
         <div className="mb-2 grid grid-cols-3">
-          <h3 className="text-lg font-semibold">Name</h3>
-          <h3 className="text-lg font-semibold">
+          <h3 className="text-base font-semibold">Name</h3>
+          <h3 className="text-base font-semibold">
             {eventType === "TRACK" ? "Times" : "Distances"}
           </h3>
         </div>
         <div className="space-y-2">
           {athletes.map(({ name }, index) => (
-            <ScoreInput
-              numberOfAttempts={numberOfAttempts}
-              index={index}
-              key={index}
-              label={name}
-              name="results"
-            />
+            <div key={index}>
+              <ScoreInput
+                numberOfAttempts={numberOfAttempts}
+                index={index}
+                label={name}
+                name="results"
+              />
+              <hr className="mt-1" />
+            </div>
           ))}
         </div>
 
@@ -127,12 +129,10 @@ const ScoreInput: FC<ScoreInputProps> = ({
   const { setValue } = helpers;
 
   return (
-    <div className="grid grid-cols-3">
-      <label className="text-base" htmlFor={props.id}>
-        {label}
-      </label>
+    <div className="grid grid-cols-4">
+      <label className="text-sm md:text-base overflow-x-clip">{label}</label>
 
-      <div className="col-span-2 flex space-x-1">
+      <div className="col-span-3 flex space-x-1">
         {Array.from(Array(numberOfAttempts)).map((a, j) => (
           <div key={j} className="input_group w-full">
             <input

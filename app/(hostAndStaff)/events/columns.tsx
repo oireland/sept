@@ -49,7 +49,7 @@ export const columns: ColumnDef<EventTableData>[] = [
       return (
         <Button
           variant="ghost"
-          className="p-0 text-sm"
+          className="p-0 text-sm text-black"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
           Name
@@ -64,7 +64,7 @@ export const columns: ColumnDef<EventTableData>[] = [
       return (
         <Button
           variant="ghost"
-          className="p-0 text-sm"
+          className="p-0 text-sm text-black"
           onClick={() => {
             column.toggleSorting(column.getIsSorted() === "asc");
           }}
@@ -89,6 +89,13 @@ export const columns: ColumnDef<EventTableData>[] = [
     accessorKey: "numberOfAthletes",
     id: "Number of Athletes",
     header: () => <div># Athletes</div>,
+    cell({ row }) {
+      return (
+        <div>
+          {row.original.numberOfAthletes}/{row.original.maxNumberOfAthletes}
+        </div>
+      );
+    },
   },
   {
     accessorKey: "locationName",

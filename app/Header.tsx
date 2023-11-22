@@ -1,24 +1,22 @@
 "use client";
-import { FC } from "react";
-import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { Trophy } from "lucide-react";
 import { useSession } from "next-auth/react";
+import Link from "next/link";
+import { FC } from "react";
 import HeaderDropdownMenu from "./HeaderDropdownMenu";
-import getURL from "@/lib/getURL";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const Header: FC = () => {
   const session = useSession();
 
-  let baseUrl = "https://sept-git-main-oireland.vercel.app/";
-
-  let A = new URL("/", baseUrl);
-
   return (
     <header className="sticky top-0 z-50 flex items-center justify-between bg-white py-2 shadow-md">
       <Link href="/" className="ml-3">
-        <h1 className="cursor-pointer text-xl font-semibold md:text-2xl lg:text-3xl xl:text-4xl">
-          <span className="text-brg">7 </span> | SEPT
-        </h1>
+        <div className="cursor-pointer flex space-x-1 items-center text-xl font-semibold md:text-2xl lg:text-3xl xl:text-4xl">
+          <span className="text-black">SEPT | </span>
+          <Trophy className="text-brg h-9 w-auto" />
+        </div>
       </Link>
 
       {session.status === "authenticated" ? (
@@ -29,7 +27,7 @@ const Header: FC = () => {
           />
         </div>
       ) : session.status === "loading" ? (
-        <div></div>
+        <Skeleton className="w-20 h-8" />
       ) : (
         <div className="pr-3">
           <Link href="/signin">

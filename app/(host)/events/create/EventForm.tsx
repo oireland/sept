@@ -20,7 +20,7 @@ type FormData = {
   trackOrField: EventType;
   boyOrGirl: BoyOrGirl[];
   groupNames: string[];
-  maxNumberOfAthletes: number;
+  maxNumberOfAthletesPerTeam: number;
   numberOfAttempts: number;
   date: string;
   locationName: string;
@@ -32,7 +32,7 @@ const handleFormSubmit = async ({
   eventName,
   groupNames,
   locationName,
-  maxNumberOfAthletes,
+  maxNumberOfAthletesPerTeam,
   numberOfAttempts,
   trackOrField,
 }: FormData) => {
@@ -42,7 +42,7 @@ const handleFormSubmit = async ({
       boyOrGirl,
       eventName,
       groupNames,
-      maxNumberOfAthletes,
+      maxNumberOfAthletesPerTeam,
       numberOfAttempts,
       trackOrField,
       date: new Date(Date.parse(date)),
@@ -74,11 +74,12 @@ const EventForm: FC<Props> = ({ groups, locations }) => {
     boyOrGirl: [],
     groupNames: [],
     trackOrField: "TRACK",
-    maxNumberOfAthletes: 8,
+    maxNumberOfAthletesPerTeam: 2,
     numberOfAttempts: 1,
     date: "",
     locationName: locations[0],
   };
+  console.log(new Date().toISOString().slice(0, -8));
   return (
     <Formik
       initialValues={initialValues}
@@ -134,8 +135,8 @@ const EventForm: FC<Props> = ({ groups, locations }) => {
         />
 
         <FormikIntegerInput
-          label="Max Number of Athletes"
-          name="maxNumberOfAthletes"
+          label="Max Number of Athletes Per Team"
+          name="maxNumberOfAthletesPerTeam"
         />
 
         <FormikIntegerInput

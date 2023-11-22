@@ -19,6 +19,7 @@ async function getTeams(hostId: string) {
           select: {
             athletes: true,
             teamName: true,
+            hexColour: true,
           },
         },
       },
@@ -49,9 +50,10 @@ const TeamsPage = async () => {
         <h2 className="mb-2 text-xl font-semibold">Your Teams</h2>
 
         <TeamDataTable
-          data={teams.map(({ athletes, teamName }) => ({
+          data={teams.map(({ athletes, teamName, hexColour }) => ({
             teamName,
             numberOfAthletes: athletes.length,
+            teamColour: hexColour,
           }))}
         />
       </div>

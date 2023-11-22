@@ -7,6 +7,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 export type TeamsTableData = {
   teamName: string;
   numberOfAthletes: number;
+  teamColour: string;
 };
 
 export const columns: ColumnDef<TeamsTableData>[] = [
@@ -33,6 +34,17 @@ export const columns: ColumnDef<TeamsTableData>[] = [
     accessorKey: "teamName",
     id: "Team",
     header: () => <div className="text-left">Team</div>,
+    cell({ row }) {
+      return (
+        <div className="flex space-x-2 items-center">
+          <div
+            className="h-6 w-6 rounded-md border-2"
+            style={{ backgroundColor: row.original.teamColour }}
+          ></div>
+          <span>{row.original.teamName}</span>{" "}
+        </div>
+      );
+    },
   },
   {
     accessorKey: "numberOfAthletes",

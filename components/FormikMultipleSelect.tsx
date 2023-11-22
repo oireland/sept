@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { X } from "lucide-react";
+import { AlertCircle, X } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Command, CommandGroup, CommandItem } from "@/components/ui/command";
@@ -30,12 +30,17 @@ export function FormikMultipleSelect({
   const [open, setOpen] = React.useState(false);
   const [selected, setSelected] = React.useState<Item[]>([]);
 
-  const handleUnselect = React.useCallback((item: Item) => {
-    setSelected((prev) => prev?.filter((s) => s.value !== item.value));
-    setValue(
-      selected.filter((s) => s.value !== item.value).map(({ value }) => value)
-    );
-  }, []);
+  const handleUnselect = React.useCallback(
+    (item: Item) => {
+      setSelected((prev) => prev?.filter((s) => s.value !== item.value));
+      setValue(
+        selected
+          .filter((s) => s.value !== item.value)
+          .map(({ value }) => value),
+      );
+    },
+    [selected, setValue],
+  );
 
   const selectables = items.filter((item) => !selected?.includes(item));
 
@@ -47,7 +52,7 @@ export function FormikMultipleSelect({
         </label>
         {meta.touched && meta.error && (
           <div className="flex items-center text-xs text-brg">
-            <RiErrorWarningLine className="peer h-5 w-5 pr-1" />
+            <AlertCircle className="peer h-5 w-5 pr-1" />
             <p className="hidden hover:flex peer-hover:flex">{meta.error}</p>
           </div>
         )}

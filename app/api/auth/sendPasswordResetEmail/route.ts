@@ -24,6 +24,7 @@ export async function POST(req: Request) {
       expiresIn: "1d",
     });
     const url = getURL(`/resetPassword/${emailToken}`);
+    console.log(url);
 
     await transporter.sendMail({
       to: email,

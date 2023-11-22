@@ -28,56 +28,56 @@ const InfoDialog = () => {
           <HiOutlineInformationCircle className="h-6 w-6 text-brg" />
         </Button>
       </AlertDialogTrigger>
-      <AlertDialogContent className="max-w-xl">
+      <AlertDialogContent className="w-full max-w-xl overflow-x-scroll">
         <AlertDialogHeader>
-          <AlertDialogTitle className="text-3xl font-semibold">
+          <AlertDialogTitle className="text-xl font-semibold">
             How to sign up athletes
           </AlertDialogTitle>
-          <AlertDialogDescription className="text-left">
+          <AlertDialogDescription className="text-left text-xs">
             Your athlete's data should be in rows in a spreadsheet with the
             columns in the exact order: Name, Email, Year Group, Team, BOY/GIRL.
             <br />
             For example:
           </AlertDialogDescription>
-          <Table className="mx-auto max-w-fit text-xs sm:text-sm">
+          <Table className="mx-auto max-w-fit overflow-x-scroll text-xs">
             <TableHeader>
               <TableRow>
-                <TableHead>Name</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Year Group</TableHead>
-                <TableHead>Team</TableHead>
-                <TableHead>BOY/GIRL</TableHead>
+                <TableHead className="px-2">Name</TableHead>
+                <TableHead className="px-2">Email</TableHead>
+                <TableHead className="px-2">Year Group</TableHead>
+                <TableHead className="px-2">Team</TableHead>
+                <TableHead className="px-2">BOY/GIRL</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               <TableRow>
-                <TableCell>John Smith</TableCell>
-                <TableCell>12jsmith@school.co.uk</TableCell>
-                <TableCell>Sixth Form</TableCell>
-                <TableCell>Red</TableCell>
-                <TableCell>BOY</TableCell>
+                <TableCell className="px-1">John Smith</TableCell>
+                <TableCell className="px-1">12jsmith@school.co.uk</TableCell>
+                <TableCell className="px-1">Sixth Form</TableCell>
+                <TableCell className="px-1">Red</TableCell>
+                <TableCell className="px-1">BOY</TableCell>
               </TableRow>
               <TableRow>
-                <TableCell>Julia Andrews</TableCell>
-                <TableCell>17jsmith@school.co.uk</TableCell>
-                <TableCell>Year 7</TableCell>
-                <TableCell>Blue</TableCell>
-                <TableCell>GIRL</TableCell>
+                <TableCell className="px-1">Julia Andrews</TableCell>
+                <TableCell className="px-1">17jsmith@school.co.uk</TableCell>
+                <TableCell className="px-1">Year 7</TableCell>
+                <TableCell className="px-1">Blue</TableCell>
+                <TableCell className="px-1">GIRL</TableCell>
               </TableRow>
               <TableRow>
-                <TableCell>Michael Williams</TableCell>
-                <TableCell>14mwilliams@school.co.uk</TableCell>
-                <TableCell>Year 10</TableCell>
-                <TableCell>Yellow</TableCell>
-                <TableCell>BOY</TableCell>
+                <TableCell className="px-1">Michael Williams</TableCell>
+                <TableCell className="px-1">14mwilliams@school.co.uk</TableCell>
+                <TableCell className="px-1">Year 10</TableCell>
+                <TableCell className="px-1">Yellow</TableCell>
+                <TableCell className="px-1">BOY</TableCell>
               </TableRow>
             </TableBody>
           </Table>
-          <AlertDialogDescription className="text-left">
+          <AlertDialogDescription className="text-left text-xs">
             The groups and teams must match one of the groups/teams you have
             added.
           </AlertDialogDescription>
-          <AlertDialogDescription className="text-left">
+          <AlertDialogDescription className="text-left text-xs">
             Export the spreadsheet to a{" "}
             <a
               className="font-semibold underline"

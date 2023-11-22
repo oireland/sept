@@ -6,13 +6,20 @@ import * as yup from "yup";
 
 const validationSchema = yup.object().shape({
   teamName: yup.string().required("Required"),
+  teamColour: yup
+    .string()
+    .matches(
+      /^#([0-9a-f]{3}|[0-9a-f]{6})$/i,
+      "Team colour must be a valid hex code",
+    )
+    .required("Required"),
 });
 
 export async function POST(req: Request) {
   try {
     const data = await req.json();
 
-    const { teamName } = await validationSchema.validate(data);
+    const { teamName, teamColour } = await validationSchema.validate(data);
 
     const session = await getServerSession(authOptions);
 
@@ -20,10 +27,11 @@ export async function POST(req: Request) {
       return NextResponse.json("Unauthorised Request", { status: 401 });
     }
 
-    // add team to the host's list of locations
+    // create team with user's hostId
     await prisma.team.create({
       data: {
         teamName,
+        hexColour: teamColour,
         host: {
           connect: {
             userId: session.user.userId,

@@ -55,7 +55,16 @@ async function getEventData(eventId: string, hostId: string) {
         name: true,
         groupName: true,
         numberOfAttempts: true,
-        maxNumberOfAthletes: true,
+        maxNumberOfAthletesPerTeam: true,
+        host: {
+          select: {
+            teams: {
+              select: {
+                teamName: true,
+              },
+            },
+          },
+        },
         results: {
           select: {
             athleteId: true,
@@ -75,6 +84,30 @@ async function getEventData(eventId: string, hostId: string) {
   } catch (e) {
     return null;
   }
+}
+
+export function getTeamsBeingExceeded(
+  maxPerTeam: number,
+  athletesTeams: { teamName: string }[],
+  hostsTeams: { teamName: string }[],
+) {
+  const numberOfAthletesInTeamsMap = new Map(); // [teamName: numberOfAthletesInTheTeamCompeting]
+
+  hostsTeams.forEach(({ teamName }) => {
+    numberOfAthletesInTeamsMap.set(teamName, 0);
+  });
+
+  let teamsBeingExceeded = new Set<string>();
+
+  athletesTeams.forEach(({ teamName }) => {
+    let current = numberOfAthletesInTeamsMap.get(teamName);
+    numberOfAthletesInTeamsMap.set(teamName, current + 1);
+    if (current + 1 > maxPerTeam) {
+      teamsBeingExceeded.add(teamName);
+    }
+  });
+
+  return Array.from(teamsBeingExceeded);
 }
 
 const EnterEventResults = async ({
@@ -105,25 +138,37 @@ const EnterEventResults = async ({
     eventType,
     numberOfAttempts,
     results: eventResults,
-    maxNumberOfAthletes,
+    maxNumberOfAthletesPerTeam,
+    host,
   } = eventData!;
 
   const titleText = `${groupName} ${
     athletesBoyOrGirl === "BOY" ? "Boy's" : "Girl's"
   } ${name}`;
 
-  if (athletesCompeting.length > maxNumberOfAthletes) {
+  const teamsBeingExceeded = getTeamsBeingExceeded(
+    maxNumberOfAthletesPerTeam,
+    athletesCompeting.map(({ teamName }) => ({ teamName })),
+    host.teams,
+  );
+
+  if (teamsBeingExceeded.length > 0) {
+    // One or more teams have too many athletes competing
     return (
-      <FloatingContainer className="space-y-3 p-4">
-        <h2 className="mt-2 text-center text-xl font-semibold text-brg sm:text-2xl">
-          There are too many athletes signed up for this event!
+      <FloatingContainer className="space-y-3 p-4 text-center">
+        <h2 className="mt-2  text-xl font-semibold text-brg sm:text-2xl">
+          {teamsBeingExceeded.length} teams have too many athletes signed up for
+          this event!
         </h2>
-        <p className="text-center">
-          There are {athletesCompeting.length} athletes registered for this
-          event, but the maximum number of athletes is {maxNumberOfAthletes}.
-          Please remove at least{" "}
-          {athletesCompeting.length - maxNumberOfAthletes} athletes before
-          entering the results.
+        <p>The following teams have too many athletes in this event:</p>
+        {teamsBeingExceeded.map((teamName) => (
+          <p className="p-1 rounded-sm bg-muted w-fit mx-auto" key={teamName}>
+            {teamName}
+          </p>
+        ))}
+        <p>
+          The maximum number of athletes per team is{" "}
+          <b>{maxNumberOfAthletesPerTeam}</b>
         </p>
         <div className="flex justify-center">
           <Button variant={"outline"}>
@@ -155,17 +200,17 @@ const EnterEventResults = async ({
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Place</TableHead>
-                <TableHead>Athlete</TableHead>
-                <TableHead>Points</TableHead>
-                <TableHead>Score(s)</TableHead>
+                <TableHead className="px-1">Place</TableHead>
+                <TableHead className="px-1">Athlete</TableHead>
+                <TableHead className="px-1">Points</TableHead>
+                <TableHead className="px-1">Score(s)</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {eventResults.map(
                 ({ place, points, scores, athleteId: eventAthleteId }) => {
                   let athleteName = athletesCompeting.filter(
-                    ({ athleteId }) => athleteId === eventAthleteId
+                    ({ athleteId }) => athleteId === eventAthleteId,
                   )[0].user.name;
                   return (
                     <TableRow key={eventAthleteId}>
@@ -180,12 +225,14 @@ const EnterEventResults = async ({
                           <span className="ml-1">{place}</span>
                         )}
                       </TableCell>
-                      <TableCell>{athleteName}</TableCell>
-                      <TableCell>{points}</TableCell>
-                      <TableCell>{scores.toString()}</TableCell>
+                      <TableCell className="px-1">{athleteName}</TableCell>
+                      <TableCell className="px-1">{points}</TableCell>
+                      <TableCell className="px-1">
+                        {scores.toString()}
+                      </TableCell>
                     </TableRow>
                   );
-                }
+                },
               )}
             </TableBody>
           </Table>
@@ -202,7 +249,7 @@ const EnterEventResults = async ({
 
   return (
     <div>
-      <FloatingContainer>
+      <FloatingContainer className="w-full py-2 px-1">
         <h2 className="text-center text-xl font-semibold text-brg">
           {titleText}
         </h2>

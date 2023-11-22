@@ -10,12 +10,14 @@ import { getHostId, getLocations } from "@/lib/dbHelpers";
 import BackButton from "@/components/BackButton";
 import UpdateEventDetailsForm from "./UpdateEventDetailsForm";
 import dynamic from "next/dynamic";
+import { AlertCircle } from "lucide-react";
+import { getTeamsBeingExceeded } from "@/app/(staff)/staffEvents/[eventId]/page";
 
 const AddAthletesToEventDataTable = dynamic(
-  () => import("./AddAthletesToEventDataTable")
+  () => import("./AddAthletesToEventDataTable"),
 );
 const RemoveAthletesFromEventDataTable = dynamic(
-  () => import("./RemoveAthletesFromEventDataTable")
+  () => import("./RemoveAthletesFromEventDataTable"),
 );
 
 async function getEventData(eventId: string, hostId: string) {
@@ -54,9 +56,14 @@ async function getEventData(eventId: string, hostId: string) {
             },
           },
         },
+        host: {
+          select: {
+            teams: true,
+          },
+        },
         name: true,
         groupName: true,
-        maxNumberOfAthletes: true,
+        maxNumberOfAthletesPerTeam: true,
         locationName: true,
         date: true,
       },
@@ -75,7 +82,7 @@ async function getEventData(eventId: string, hostId: string) {
 async function getAthleteData(
   hostId: string,
   groupName: string,
-  boyOrGirl: BoyOrGirl
+  boyOrGirl: BoyOrGirl,
 ) {
   try {
     const data = await prisma.athlete.findMany({
@@ -111,7 +118,7 @@ async function getAthleteData(
         userId,
         email: user.email,
         numberOfEvents: events.length,
-      })
+      }),
     );
 
     return athletes;
@@ -167,11 +174,18 @@ const EditEvent = async ({ params }: { params: { eventId: string } }) => {
     groupName,
     athletesBoyOrGirl,
     athletesCompeting,
-    maxNumberOfAthletes,
+    maxNumberOfAthletesPerTeam,
     locationName: currentLocationName,
     staffMember: currentStaff,
     date: eventDate,
+    host: eventHost,
   } = eventData!;
+
+  const teamsBeingExceeded = getTeamsBeingExceeded(
+    maxNumberOfAthletesPerTeam,
+    athletesCompeting.map(({ teamName }) => ({ teamName })),
+    eventHost.teams,
+  );
 
   const allLocations = await getLocations(hostId!);
   const allStaff = await getStaffData(hostId!);
@@ -185,21 +199,21 @@ const EditEvent = async ({ params }: { params: { eventId: string } }) => {
       email: user.email,
       groupName,
       teamName,
-    })
+    }),
   );
 
   const competingAthletesIds = competingAthletesTableData.map(
-    ({ userId }) => userId
+    ({ userId }) => userId,
   );
 
   const allAthletesData: AthleteTableData[] = await getAthleteData(
     hostId!,
     groupName,
-    athletesBoyOrGirl
+    athletesBoyOrGirl,
   );
 
   const availableAthletesData = allAthletesData.filter(
-    ({ userId }) => !competingAthletesIds.includes(userId)
+    ({ userId }) => !competingAthletesIds.includes(userId),
   );
 
   const bannerText = `${groupName} ${
@@ -216,7 +230,7 @@ const EditEvent = async ({ params }: { params: { eventId: string } }) => {
             <h2 className="text-xl font-semibold">Event Details</h2>
             <UpdateEventDetailsForm
               locationNames={allLocations.map(
-                ({ locationName }) => locationName
+                ({ locationName }) => locationName,
               )}
               currentLocationName={currentLocationName}
               eventId={params.eventId}
@@ -238,8 +252,21 @@ const EditEvent = async ({ params }: { params: { eventId: string } }) => {
         )}
 
         <div>
-          <h2 className="text-xl font-semibold">
-            Competing Athletes - Maximum {maxNumberOfAthletes}
+          <h2 className="text-xl font-semibold block">
+            <span>Athletes Competing</span>
+            {teamsBeingExceeded.length > 0 && (
+              <div className="flex text-sm space-x-2 items-center">
+                <AlertCircle className="text-red-500 h-6 w-6 ml-2" />
+                <span>
+                  The following teams have too many athletes competing:
+                </span>
+                {teamsBeingExceeded.map((teamName) => (
+                  <span key={teamName} className="p-1 rounded-sm bg-muted">
+                    {teamName}
+                  </span>
+                ))}
+              </div>
+            )}
           </h2>
           <RemoveAthletesFromEventDataTable
             eventId={params.eventId}

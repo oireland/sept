@@ -10,7 +10,7 @@ type SingleEvent = {
   eventType: EventType;
   athletesBoyOrGirl: BoyOrGirl;
   groupName: string;
-  maxNumberOfAthletes: number;
+  maxNumberOfAthletesPerTeam: number;
   numberOfAttempts: number;
   locationName: string;
   date: Date;
@@ -69,7 +69,7 @@ export async function POST(req: Request) {
           athletesBoyOrGirl: boyOrGirl,
           groupName,
           eventType: eventsData.trackOrField,
-          maxNumberOfAthletes: eventsData.maxNumberOfAthletes,
+          maxNumberOfAthletesPerTeam: eventsData.maxNumberOfAthletesPerTeam,
           numberOfAttempts: eventsData.numberOfAttempts,
           date: eventsData.date,
           locationName: eventsData.locationName,
@@ -84,12 +84,8 @@ export async function POST(req: Request) {
       data: eventsToBeCreated,
     });
 
-    return NextResponse.json(
-      { message: "Athletes successfully created" },
-      { status: 200 }
-    );
+    return NextResponse.json("Athletes successfully created", { status: 200 });
   } catch (e) {
-    console.log(e);
-    return NextResponse.json(e, { status: 500 });
+    return NextResponse.json("Something went wrong", { status: 500 });
   }
 }

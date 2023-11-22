@@ -25,9 +25,9 @@ const CreateAthletesForm = ({ allowedGroups, allowedTeams }: Props) => {
         .string()
         .required("2nd colummn (email) is required")
         .email(
-          "At least one of the email addresses in the 2nd column is not valid."
+          "At least one of the email addresses in the 2nd column is not valid.",
         ),
-      group: yup
+      groupName: yup
         .string()
         .required("3rd column (group) is required")
         .test(
@@ -35,9 +35,9 @@ const CreateAthletesForm = ({ allowedGroups, allowedTeams }: Props) => {
           "At least one of the groups in your file (3rd column) isn't a group you've added.",
           (group) => {
             return allowedGroups.includes(group);
-          }
+          },
         ),
-      team: yup
+      teamName: yup
         .string()
         .required("4th column (team) is required")
         .test(
@@ -45,13 +45,13 @@ const CreateAthletesForm = ({ allowedGroups, allowedTeams }: Props) => {
           "At least one of the teams in your file (4th column) isn't a team you've added.",
           (team) => {
             return allowedTeams.includes(team);
-          }
+          },
         ),
       boyOrGirl: yup
         .mixed<BoyOrGirl>()
         .oneOf(
           Object.values(BoyOrGirl),
-          "5th column values must be BOY or GIRL"
+          "5th column values must be BOY or GIRL",
         )
         .required("5th column (BOY or GIRL) is required"),
     })
@@ -76,8 +76,8 @@ const CreateAthletesForm = ({ allowedGroups, allowedTeams }: Props) => {
         unvalidatedAthleteObjectArray.push({
           name: athleteSplit[0],
           email: athleteSplit[1],
-          group: athleteSplit[2],
-          team: athleteSplit[3],
+          groupName: athleteSplit[2],
+          teamName: athleteSplit[3],
           boyOrGirl: athleteSplit[4],
         });
       });
@@ -110,6 +110,7 @@ const CreateAthletesForm = ({ allowedGroups, allowedTeams }: Props) => {
       if (!athletes) {
         throw new Error("Please upload a valid file");
       }
+
       await axios.post(getURL("/api/create/createManyAthletes"), {
         athletes,
       });

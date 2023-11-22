@@ -7,7 +7,7 @@ import { NextResponse } from "next/server";
 import * as yup from "yup";
 
 const requestSchema = yup.object({
-  selectedRowData: yup.array().of(EventTableDataSchema).required(),
+  eventIds: yup.array().of(yup.string()).required(),
   athleteUserId: yup.string().required(),
 });
 
@@ -15,8 +15,9 @@ export async function PATCH(req: Request) {
   try {
     const session = await getServerSession(authOptions);
 
-    const { selectedRowData: events, athleteUserId } =
-      await requestSchema.validate(await req.json());
+    const { eventIds, athleteUserId } = await requestSchema.validate(
+      await req.json(),
+    );
 
     if (
       !session ||
@@ -34,6 +35,7 @@ export async function PATCH(req: Request) {
       groupName: athleteGroupName,
       boyOrGirl: athleteBoyOrGirl,
       hostId: athleteHostId,
+      host: athleteHost,
     } = await prisma.athlete.findUniqueOrThrow({
       where: {
         userId: athleteUserId,
@@ -42,6 +44,11 @@ export async function PATCH(req: Request) {
         groupName: true,
         boyOrGirl: true,
         hostId: true,
+        host: {
+          select: {
+            allowAthleteEventSignUp: true,
+          },
+        },
       },
     });
 
@@ -57,38 +64,23 @@ export async function PATCH(req: Request) {
       return NextResponse.json("Invalid request", { status: 400 });
     }
 
-    const eventsOfHost = await prisma.event.findMany({
-      where: {
-        hostId,
-        groupName: athleteGroupName,
-        athletesBoyOrGirl: athleteBoyOrGirl,
-      },
-      select: {
-        eventId: true,
-      },
-    });
-    // filter the events from the request to only include those with a valid ID, group and boyOrGirl
-
-    const validEventIds: string[] = eventsOfHost.map(({ eventId }) => eventId);
-
-    const filteredEvents = events?.filter(
-      ({ group, boyOrGirl, eventId }) =>
-        group === athleteGroupName &&
-        boyOrGirl === athleteBoyOrGirl &&
-        validEventIds.includes(eventId)
-    );
-
-    if (filteredEvents.length === 0) {
-      return NextResponse.json("Invalid request", { status: 400 });
+    if (!athleteHost.allowAthleteEventSignUp) {
+      return NextResponse.json(
+        "Host isn't letting athletes sign themselves up currently",
+        { status: 400 },
+      );
     }
 
-    // update each event to have the athlete competing
+    // update each event to have the athlete competing but only if the max number of athletes will not be exceeded
     await Promise.all(
-      filteredEvents?.map(
-        async ({ eventId }) =>
+      eventIds.map(
+        async (eventId) =>
           await prisma.event.update({
             where: {
               eventId,
+              hostId,
+              groupName: athleteGroupName,
+              athletesBoyOrGirl: athleteBoyOrGirl,
             },
             data: {
               athletesCompeting: {
@@ -97,8 +89,8 @@ export async function PATCH(req: Request) {
                 },
               },
             },
-          })
-      )
+          }),
+      ),
     );
 
     return NextResponse.json("Successfully added events to athlete", {

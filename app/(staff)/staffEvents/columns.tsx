@@ -24,7 +24,7 @@ export const columns: ColumnDef<EventTableData>[] = [
       return (
         <Button
           variant="ghost"
-          className="p-0 text-sm"
+          className="p-0 text-sm text-black"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
           Name
@@ -34,12 +34,12 @@ export const columns: ColumnDef<EventTableData>[] = [
     },
   },
   {
-    accessorKey: "group",
+    accessorKey: "groupName",
     header: ({ column }) => {
       return (
         <Button
           variant="ghost"
-          className="p-0 text-sm"
+          className="p-0 text-sm text-black"
           onClick={() => {
             column.toggleSorting(column.getIsSorted() === "asc");
           }}
@@ -95,7 +95,7 @@ export const columns: ColumnDef<EventTableData>[] = [
                 className="h-full  w-full px-2 py-1.5 "
                 href={getURL(`/staffEvents/${eventId}`)}
               >
-                Results
+                View/Enter Results
               </Link>
             </DropdownMenuItem>
           </DropdownMenuContent>

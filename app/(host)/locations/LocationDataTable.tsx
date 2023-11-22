@@ -15,11 +15,11 @@ const removeLocations = async (locations: LocationsTableData[]) => {
     // to remove the comma from the end
     commaSeperatedNames = commaSeperatedNames.substring(
       0,
-      commaSeperatedNames.length - 1
+      commaSeperatedNames.length - 1,
     );
 
     await axios.delete(
-      getURL(`/api/delete/deleteManyLocations/${commaSeperatedNames}`)
+      getURL(`/api/delete/deleteManyLocations/${commaSeperatedNames}`),
     );
 
     toast.dismiss(toastId);
@@ -27,7 +27,9 @@ const removeLocations = async (locations: LocationsTableData[]) => {
     window.location.reload();
   } catch (e) {
     toast.dismiss(toastId);
-    if (e instanceof Error || e instanceof AxiosError) {
+    if (e instanceof AxiosError) {
+      toast.error(e.response?.data);
+    } else if (e instanceof Error) {
       toast.error(e.message);
     } else {
       toast.error("Something went wrong");
@@ -35,7 +37,11 @@ const removeLocations = async (locations: LocationsTableData[]) => {
   }
 };
 
-export default function LocationDataTable  ({ data }: { data: LocationsTableData[] })  {
+export default function LocationDataTable({
+  data,
+}: {
+  data: LocationsTableData[];
+}) {
   return (
     <div>
       <DataTable
@@ -46,4 +52,4 @@ export default function LocationDataTable  ({ data }: { data: LocationsTableData
       />
     </div>
   );
-};
+}

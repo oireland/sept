@@ -29,9 +29,10 @@ export async function POST(req: Request) {
     const {
       hostId: eventHostId,
       eventType,
-      maxNumberOfAthletes,
+      maxNumberOfAthletesPerTeam,
       staffMember,
       numberOfAttempts,
+      host,
     } = await prisma.event.update({
       where: {
         eventId,
@@ -39,7 +40,12 @@ export async function POST(req: Request) {
       select: {
         hostId: true,
         eventType: true,
-        maxNumberOfAthletes: true,
+        maxNumberOfAthletesPerTeam: true,
+        host: {
+          select: {
+            teams: true,
+          },
+        },
         staffMember: {
           select: {
             userId: true,
@@ -53,6 +59,7 @@ export async function POST(req: Request) {
         },
       },
     });
+    const maxNumberOfAthletes = maxNumberOfAthletesPerTeam * host.teams.length;
 
     if (staffMember?.userId !== session.user.userId) {
       return NextResponse.json("Unauthorised Request", { status: 401 });
@@ -89,15 +96,61 @@ export async function POST(req: Request) {
     results = results.filter(
       ({ scores }) =>
         scores.length === numberOfAttempts &&
-        scores[eventType === "TRACK" ? numberOfAttempts - 1 : 0] !== 0
+        scores[eventType === "TRACK" ? numberOfAttempts - 1 : 0] !== 0,
     );
+
+    console.log("results before sort", results);
 
     // sort athletes best to worst based on their best attempt
     if (eventType === "TRACK") {
-      results = results.sort((a, b) => a.scores[0] - b.scores[0]); // low-high
+      results = results.sort((a, b) => {
+        if (a.scores[0] < b.scores[0]) {
+          // a is a better score so don't swap
+          return -1;
+        }
+        if (a.scores[0] > b.scores[0]) {
+          // b is a better score so swap
+          return 1;
+        }
+        // best attempts are the same
+        if (numberOfAttempts === 1 || a.scores[1] === b.scores[1]) {
+          // this will end up being a draw, just maintain the order and the draw will be sorted later
+          return 0;
+        }
+
+        if (a.scores[1] < b.scores[1]) {
+          // a has better second best attempt so don't swap
+          return -1;
+        }
+        // b has better second attempt so swap
+        return 1;
+      }); // low-high
     } else {
-      results = results.sort((a, b) => b.scores[0] - a.scores[0]); // high-low
+      results = results.sort((a, b) => {
+        if (a.scores[0] > b.scores[0]) {
+          // a is a better score so don't swap
+          return -1;
+        }
+        if (a.scores[0] < b.scores[0]) {
+          // b is a better score so swap
+          return 1;
+        }
+        // best attempts are the same
+        if (numberOfAttempts === 1 || a.scores[1] === b.scores[1]) {
+          // this will end up being a draw, just maintain the order and the draw will be sorted later
+          return 0;
+        }
+
+        if (a.scores[1] > b.scores[1]) {
+          // a has better second best attempt so don't swap
+          return -1;
+        }
+        // b has better second attempt so swap
+        return 1;
+      });
     }
+
+    console.log("results after sort", results);
 
     const resultsToBeCreated: {
       athleteId: string;
@@ -109,7 +162,7 @@ export async function POST(req: Request) {
 
     let currentIndex = 0;
     let placeAdjustment = 0;
-    // used to give same place and points in the case of a draw. It is incremented when ther is a draw, and because it is subtracted from the place and added to the points when adding to the array, the two athletes that draw receieve the same.
+    // used to give same place and points in the case of a draw. It is incremented when there is a draw, and because it is subtracted from the place and added to the points when adding to the array, the athletes that draw receieve the same.
 
     while (currentIndex < results.length - 1) {
       const current = results[currentIndex];
@@ -125,8 +178,7 @@ export async function POST(req: Request) {
           scores: current.scores,
         });
         currentIndex++;
-        placeAdjustment > 0 && placeAdjustment--; // decrement unless it would make it negative
-
+        placeAdjustment = 0; // end of "draw streak" so reset
         continue;
       }
       // a draw if only 1 attempt or second attempt the same
@@ -140,66 +192,21 @@ export async function POST(req: Request) {
         });
         currentIndex++;
         placeAdjustment++;
+
         continue;
       }
 
-      if (current.scores[1] < next.scores[1]) {
-        if (eventType === "TRACK") {
-          // current is the better score
-          resultsToBeCreated.push({
-            athleteId: current.athleteId,
-            eventId,
-            place: currentIndex + 1 - placeAdjustment,
-            points: maxNumberOfAthletes - currentIndex + placeAdjustment,
-            scores: current.scores,
-          });
-          currentIndex++;
-          placeAdjustment > 0 && placeAdjustment--;
-          continue;
-        } else {
-          // current is the worse score, so swap and then add next to the array
-          results[currentIndex] = next;
-          results[currentIndex + 1] = current;
-          resultsToBeCreated.push({
-            athleteId: next.athleteId,
-            eventId,
-            place: currentIndex + 1 - placeAdjustment,
-            points: maxNumberOfAthletes - currentIndex + placeAdjustment,
-            scores: next.scores,
-          });
-          currentIndex++;
-          placeAdjustment > 0 && placeAdjustment--;
-          continue;
-        }
-      } else {
-        if (eventType === "FIELD") {
-          // current is the better score
-          resultsToBeCreated.push({
-            athleteId: current.athleteId,
-            eventId,
-            place: currentIndex + 1 - placeAdjustment,
-            points: maxNumberOfAthletes - currentIndex + placeAdjustment,
-            scores: current.scores,
-          });
-          currentIndex++;
-          placeAdjustment > 0 && placeAdjustment--;
-          continue;
-        } else {
-          // current is the worse score
-          results[currentIndex] = next;
-          results[currentIndex + 1] = current;
-          resultsToBeCreated.push({
-            athleteId: next.athleteId,
-            eventId,
-            place: currentIndex + 1 - placeAdjustment,
-            points: maxNumberOfAthletes - currentIndex + placeAdjustment,
-            scores: next.scores,
-          });
-          currentIndex++;
-          placeAdjustment > 0 && placeAdjustment--;
-          continue;
-        }
-      }
+      // current athlete did better
+      resultsToBeCreated.push({
+        athleteId: current.athleteId,
+        eventId,
+        place: currentIndex + 1 - placeAdjustment,
+        points: maxNumberOfAthletes - currentIndex + placeAdjustment,
+        scores: current.scores,
+      });
+      currentIndex++;
+      placeAdjustment = 0; // end of "draw streak" so reset
+      continue;
     }
 
     // if there is still an athlete to make results for
@@ -214,6 +221,7 @@ export async function POST(req: Request) {
         points: maxNumberOfAthletes - currentIndex + placeAdjustment,
       });
     }
+    console.log("resultsToBeCreated", resultsToBeCreated);
 
     // create results for athletes who competed
     await prisma.result.createMany({
@@ -232,11 +240,11 @@ export async function POST(req: Request) {
               },
             },
           },
-        })
-      )
+        }),
+      ),
     );
 
-    return NextResponse.json(resultsToBeCreated, { status: 200 });
+    return NextResponse.json("Results created successfully", { status: 200 });
   } catch (e) {
     console.log(e);
     return NextResponse.json("Something went wrong", { status: 500 });

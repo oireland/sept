@@ -39,7 +39,7 @@ export const EventValidationSchema = yup.object({
     .of(yup.string().required())
     .min(1, "You must choose at least 1 group")
     .required("Required"),
-  maxNumberOfAthletes: yup
+  maxNumberOfAthletesPerTeam: yup
     .number()
     .integer()
     .min(2, "Must be at least 2")
@@ -57,14 +57,14 @@ export const EventValidationSchema = yup.object({
     .test(
       "futureDate",
       "Date must be in the future",
-      (date) => new Date() < date
+      (date) => new Date() < date,
     ),
   locationName: yup.string().required("Required"),
 });
 
 export const EventTableDataSchema = yup.object({
   name: yup.string().required(),
-  group: yup.string().required(),
+  groupName: yup.string().required(),
   boyOrGirl: yup.mixed<BoyOrGirl>().oneOf(Object.values(BoyOrGirl)),
   eventType: yup
     .mixed<EventType>()
@@ -72,7 +72,7 @@ export const EventTableDataSchema = yup.object({
     .required("Required"),
   eventId: yup.string().required(),
   numberOfAthletes: yup.number().required(),
-  maxNumberOfAthletes: yup.number().min(2).required("Required"),
+  maxNumberOfAthletesPerTeam: yup.number().min(2).required("Required"),
 });
 
 export const ResultSchema = yup.object({

@@ -19,5 +19,3 @@ export default async function UserLayout({
 
   return <main>{children}</main>;
 }
-
-// NOTE: Update Protecting Pages in the Complex Code section of document when changes are made to this.

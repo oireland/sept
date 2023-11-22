@@ -26,9 +26,6 @@ model User {
   staff         Staff?     @relation("User - Staff")
 }
 
-
-
-
 model Host {
   hostId         String      @id @default(cuid())
   user       User        @relation("User - Host", fields: [userId], references: [userId], onDelete: Cascade)
@@ -39,6 +36,7 @@ model Host {
   groups     Group[] @relation("Host - Groups")
   teams      Team[] @relation("Host - Teams")
   locations Location[] @relation("Host - Locations")
+  allowAthleteEventSignUp Boolean @default(true)
 }
 
 enum BoyOrGirl {
@@ -60,6 +58,7 @@ model Team {
   athletes Athlete[] @relation("Team - Athletes")
   host Host @relation("Host - Teams", fields: [hostId], references: [hostId])
   hostId String
+  hexColour String
   @@id([teamName, hostId])
 }
 
@@ -95,8 +94,6 @@ model Staff {
   events Event[] @relation("StaffMember - Events")
 }
 
-
-
 enum EventType {
   TRACK
   FIELD
@@ -112,7 +109,7 @@ model Event {
   host                Host      @relation("Host - Events", fields: [hostId], references: [hostId], onDelete: Cascade)
   hostId              String
   athletesCompeting   Athlete[] @relation("Athletes - Events")
-  maxNumberOfAthletes Int
+  maxNumberOfAthletesPerTeam Int
   numberOfAttempts Int @default(1)
   date DateTime
   location Location @relation("Location - Events", fields: [locationName, hostId], references: [locationName, hostId])

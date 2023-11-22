@@ -9,13 +9,21 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import getURL from "@/lib/getURL";
 import { Users2Icon } from "lucide-react";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 type FormData = {
   teamName: string;
+  teamColour: string;
 };
 
 const validationSchema: yup.ObjectSchema<FormData> = yup.object().shape({
   teamName: yup.string().required("Required"),
+  teamColour: yup
+    .string()
+    .matches(
+      /^#([0-9a-f]{3}|[0-9a-f]{6})$/i,
+      "Team colour must be a valid hex code",
+    )
+    .required("Required"),
 });
 
 const TeamForm: FC = () => {
@@ -29,8 +37,8 @@ const TeamForm: FC = () => {
       router.refresh();
     } catch (e) {
       toast.dismiss(toastId);
-      if (e instanceof Error) {
-        toast.error(e.message);
+      if (e instanceof AxiosError) {
+        toast.error(e.response?.data);
       } else {
         toast.error("Something went wrong");
       }
@@ -39,12 +47,18 @@ const TeamForm: FC = () => {
 
   const initialValues: FormData = {
     teamName: "",
+    teamColour: "#000000",
   };
   return (
     <Formik
       initialValues={initialValues}
       validationSchema={validationSchema}
-      onSubmit={(data) => {
+      onSubmit={(data, { resetForm }) => {
+        resetForm({
+          values: { teamName: "", teamColour: "#000000" },
+          touched: { teamName: false, teamColour: false },
+          errors: { teamName: undefined, teamColour: undefined },
+        });
         handleFormSubmit(data);
       }}
     >
@@ -57,6 +71,8 @@ const TeamForm: FC = () => {
             placeholder="E.g. Red Team"
             Icon={Users2Icon}
           />
+
+          <FormikInput name="teamColour" type="color" label="Team Colour" />
 
           <Button variant={"outline"} type="submit" className="mt-4">
             Add

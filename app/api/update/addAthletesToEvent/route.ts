@@ -24,17 +24,17 @@ export async function PATCH(req: Request) {
 
     const body = await req.json();
 
-    const { eventId, selectedRowData: athletes } = await requestSchema.validate(
-      body
-    );
+    const { eventId, selectedRowData: athletes } =
+      await requestSchema.validate(body);
 
     // get the group and gender of the event for filtering the athletes later
     const {
       groupName: eventGroupName,
       athletesBoyOrGirl,
       hostId: eventHostId,
-      maxNumberOfAthletes,
+      maxNumberOfAthletesPerTeam,
       athletesCompeting,
+      host: eventHost,
     } = await prisma.event.findUniqueOrThrow({
       where: {
         eventId,
@@ -43,10 +43,21 @@ export async function PATCH(req: Request) {
         groupName: true,
         athletesBoyOrGirl: true,
         hostId: true,
-        maxNumberOfAthletes: true,
-        athletesCompeting: true,
+        maxNumberOfAthletesPerTeam: true,
+        athletesCompeting: {
+          select: {
+            teamName: true,
+          },
+        },
+        host: {
+          select: {
+            teams: true,
+          },
+        },
       },
     });
+
+    console.log("maxNumberOfAthletesPerTeam", maxNumberOfAthletesPerTeam);
 
     // to be used to check that athletes from the request belong to the host
     const hostId = await getHostId(session.user.userId, session.user.role);
@@ -64,32 +75,58 @@ export async function PATCH(req: Request) {
       },
       select: {
         userId: true,
+        teamName: true,
       },
     });
     // filter the athletes from the request to only include those with a valid ID, group and boyOrGirl
 
     const validAthleteIds: string[] = athletesOfHost.map(
-      (athlete) => athlete.userId
+      (athlete) => athlete.userId,
     );
 
     const filteredAthletes = athletes?.filter(
       ({ groupName, boyOrGirl, userId }) =>
         groupName === eventGroupName &&
         boyOrGirl === athletesBoyOrGirl &&
-        validAthleteIds.includes(userId)
+        validAthleteIds.includes(userId),
     );
 
     if (filteredAthletes.length === 0) {
       return NextResponse.json("Invalid request", { status: 400 });
     }
 
-    if (
-      filteredAthletes.length + athletesCompeting.length >
-      maxNumberOfAthletes
-    ) {
-      return NextResponse.json("Max number of athletes will be exceeded", {
-        status: 400,
-      });
+    const numberOfAthletesInTeamsMap = new Map(); // [teamName: numberOfAthletesInTheTeamCompeting]
+
+    eventHost.teams.forEach(({ teamName }) => {
+      numberOfAthletesInTeamsMap.set(teamName, 0);
+    });
+
+    athletesCompeting.forEach(({ teamName }) => {
+      let current = numberOfAthletesInTeamsMap.get(teamName);
+      console.log(teamName, current);
+      numberOfAthletesInTeamsMap.set(teamName, current + 1);
+    });
+
+    let teamsBeingExceeded = new Set<string>();
+
+    athletes.forEach(({ teamName }) => {
+      let current = numberOfAthletesInTeamsMap.get(teamName);
+      numberOfAthletesInTeamsMap.set(teamName, current + 1);
+      if (current + 1 > maxNumberOfAthletesPerTeam) {
+        // adding this athlete would exceed the max number of athletes per team
+        teamsBeingExceeded.add(teamName);
+      }
+    });
+
+    const teamsBeingExceededArray = Array.from(teamsBeingExceeded);
+    if (teamsBeingExceededArray.length > 0) {
+      let teamsString = "";
+      teamsBeingExceededArray.forEach((team) => (teamsString += team + ", "));
+      teamsString = teamsString.slice(0, -2);
+      return NextResponse.json(
+        `The max number of athletes in: ${teamsString} will be exceeded.`,
+        { status: 400 },
+      );
     }
 
     // update each athlete to be competing in the event
@@ -107,8 +144,8 @@ export async function PATCH(req: Request) {
                 },
               },
             },
-          })
-      )
+          }),
+      ),
     );
 
     return NextResponse.json("Successfully added athletes to event", {

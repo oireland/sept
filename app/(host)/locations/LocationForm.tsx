@@ -46,7 +46,12 @@ const LocationForm: FC = () => {
     <Formik
       initialValues={initialValues}
       validationSchema={validationSchema}
-      onSubmit={(data) => {
+      onSubmit={(data, { resetForm }) => {
+        resetForm({
+          values: { locationName: "" },
+          touched: { locationName: false },
+          errors: { locationName: undefined },
+        });
         handleFormSubmit(data);
       }}
     >

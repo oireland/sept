@@ -12,19 +12,21 @@ import { EventTableData } from "../../../(hostAndStaff)/events/columns";
 
 import BackButton from "@/components/BackButton";
 import dynamic from "next/dynamic";
+import { Skeleton } from "@/components/ui/skeleton";
 
 // client components
 const RemoveEventsFromAthlete = dynamic(
-  () => import("./RemoveEventsFromAthleteDataTable")
+  () => import("./RemoveEventsFromAthleteDataTable"),
 );
 const AddEventsToAthleteDataTable = dynamic(
-  () => import("./AddEventsToAthleteDataTable")
+  () => import("./AddEventsToAthleteDataTable"),
 );
 
 async function getEventsData(
   hostId: string,
   groupName: string,
-  boyOrGirl: BoyOrGirl
+  boyOrGirl: BoyOrGirl,
+  numberOfTeams: number,
 ) {
   try {
     const events = await prisma.event.findMany({
@@ -38,7 +40,7 @@ async function getEventsData(
         athletesCompeting: true,
         name: true,
         eventId: true,
-        maxNumberOfAthletes: true,
+        maxNumberOfAthletesPerTeam: true,
         locationName: true,
         date: true,
       },
@@ -50,7 +52,7 @@ async function getEventsData(
         athletesCompeting,
         eventType,
         eventId,
-        maxNumberOfAthletes,
+        maxNumberOfAthletesPerTeam,
         locationName,
         date,
       }) => ({
@@ -60,10 +62,10 @@ async function getEventsData(
         groupName,
         eventType,
         eventId,
-        maxNumberOfAthletes,
+        maxNumberOfAthletes: maxNumberOfAthletesPerTeam * numberOfTeams,
         locationName,
         date,
-      })
+      }),
     );
 
     return eventsTableData;
@@ -89,6 +91,7 @@ async function getAthleteData(athleteUserId: string, hostId: string) {
         },
         groupName: true,
         teamName: true,
+
         boyOrGirl: true,
         events: {
           select: {
@@ -98,17 +101,24 @@ async function getAthleteData(athleteUserId: string, hostId: string) {
             athletesCompeting: true,
             groupName: true,
             eventType: true,
-            maxNumberOfAthletes: true,
+            maxNumberOfAthletesPerTeam: true,
             locationName: true,
             date: true,
           },
         },
         hostId: true,
+        host: {
+          select: {
+            teams: true,
+            allowAthleteEventSignUp: true,
+          },
+        },
       },
     });
 
     return athlete;
   } catch (error) {
+    console.log(error);
     return null;
   }
 }
@@ -134,7 +144,6 @@ const EditAthlete = async ({
   if (hostId === null) {
     redirect(getURL("/"));
   }
-
   const athlete = await getAthleteData(params.athleteUserId, hostId!);
 
   if (athlete === null) {
@@ -147,10 +156,17 @@ const EditAthlete = async ({
     boyOrGirl,
     events: athleteEvents,
     groupName,
+    host,
   } = athlete!;
   const name = user.name;
+  const numberOfTeams = host.teams.length;
 
-  const allEvents = await getEventsData(hostId!, groupName, boyOrGirl);
+  const allEvents = await getEventsData(
+    hostId!,
+    groupName,
+    boyOrGirl,
+    numberOfTeams,
+  );
 
   const competingEventsTableData: EventTableData[] = athleteEvents.map(
     ({
@@ -160,7 +176,8 @@ const EditAthlete = async ({
       athletesBoyOrGirl,
       groupName,
       athletesCompeting,
-      maxNumberOfAthletes,
+      maxNumberOfAthletesPerTeam,
+
       date,
       locationName,
     }) => ({
@@ -170,16 +187,16 @@ const EditAthlete = async ({
       boyOrGirl: athletesBoyOrGirl,
       groupName,
       numberOfAthletes: athletesCompeting.length,
-      maxNumberOfAthletes,
+      maxNumberOfAthletes: maxNumberOfAthletesPerTeam * numberOfTeams,
       locationName,
       date,
-    })
+    }),
   );
 
   const competingEventsIds = athleteEvents.map(({ eventId }) => eventId);
 
-  const availableEventsTableData = allEvents.filter(
-    ({ eventId }) => !competingEventsIds.includes(eventId)
+  const availableEventsTableData: EventTableData[] = allEvents.filter(
+    ({ eventId }) => !competingEventsIds.includes(eventId),
   );
 
   return (
@@ -195,10 +212,25 @@ const EditAthlete = async ({
         <hr className="my-5" />
 
         <h2 className="text-2xl font-semibold">Available Events</h2>
-        <AddEventsToAthleteDataTable
-          data={availableEventsTableData}
-          athleteUserId={params.athleteUserId}
-        />
+        {session?.user.role === "ATHLETE" &&
+        !athlete.host.allowAthleteEventSignUp ? (
+          <Skeleton className="w-full  h-[100px] md:h-[200px] lg:h-[300px] xl:h-[400px] justify-center text-lg md:text-xl lg:text-2xl font-semibold align-middle flex items-center">
+            <div className="text-center">
+              <p>
+                Your host isn't letting athletes sign themselves up at the
+                moment.
+              </p>
+              <p className="text-base md:text-lg lg:text-xl">
+                Ask a member of staff if you want to sign up
+              </p>
+            </div>
+          </Skeleton>
+        ) : (
+          <AddEventsToAthleteDataTable
+            data={availableEventsTableData}
+            athleteUserId={params.athleteUserId}
+          />
+        )}
 
         <hr className="my-5" />
         <div className="flex justify-end">

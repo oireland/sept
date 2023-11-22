@@ -24,7 +24,7 @@ const RemoveEventsFromAthlete = ({
     let toastId = toast.loading("Removing events from the athlete...");
     try {
       await axios.patch(getURL("/api/update/removeEventsFromAthlete"), {
-        selectedRowData,
+        eventIds: selectedRowData.map(({ eventId }) => eventId),
         athleteUserId,
       });
       toast.dismiss(toastId);

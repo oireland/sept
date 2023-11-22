@@ -26,7 +26,7 @@ const AddEventsToAthleteDataTable = ({
     try {
       console.log("selectedRowdata", selectedRowData);
       await axios.patch(getURL("/api/update/addEventsToAthlete"), {
-        selectedRowData,
+        eventIds: selectedRowData.map(({ eventId }) => eventId),
         athleteUserId,
       });
       toast.dismiss(toastId);

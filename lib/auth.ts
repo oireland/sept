@@ -38,14 +38,20 @@ export const authOptions: NextAuthOptions = {
           }
 
           if (!user.emailVerified) {
-            const tokenData: VerificationToken = {
-              email: user.email!,
-              userId: user.userId,
-            };
-            await axios.post(
-              getURL("/api/auth/sendVerificationEmail"),
-              tokenData
-            );
+            if (user.role === "HOST") {
+              const tokenData: VerificationToken = {
+                email: user.email!,
+                userId: user.userId,
+              };
+              await axios.post(
+                getURL("/api/auth/sendVerificationEmail"),
+                tokenData,
+              );
+            } else {
+              await axios.post(getURL("/api/auth/sendPasswordResetEmail"), {
+                email,
+              });
+            }
           }
           return {
             id: user.userId,
