@@ -10,7 +10,7 @@ import toast from "react-hot-toast";
 import axios, { AxiosError } from "axios";
 import BackButton from "@/components/BackButton";
 import getURL from "@/lib/getURL";
-import { ResultsInputSchema } from "@/lib/yupSchemas";
+import { TrackOrFieldResultsInputSchema } from "@/lib/yupSchemas";
 import { useRouter } from "next/navigation";
 
 type FormData = {
@@ -27,7 +27,7 @@ type Props = {
   numberOfAttempts: number;
 };
 
-const EnterResultsForm: FC<Props> = ({
+const TrackOrFieldResultsForm: FC<Props> = ({
   athletes,
   eventId,
   eventType,
@@ -38,7 +38,7 @@ const EnterResultsForm: FC<Props> = ({
   const handleFormSubmit = async (data: FormData) => {
     let toastId = toast.loading("Saving...");
     try {
-      await axios.post(getURL("/api/create/createResults"), {
+      await axios.post(getURL("/api/create/createTrackOrFieldResults"), {
         results: data.results,
         eventId,
       });
@@ -66,7 +66,7 @@ const EnterResultsForm: FC<Props> = ({
   return (
     <Formik
       initialValues={initialValues}
-      validationSchema={ResultsInputSchema}
+      validationSchema={TrackOrFieldResultsInputSchema}
       onSubmit={(values: FormData) => {
         handleFormSubmit(values);
       }}
@@ -103,7 +103,7 @@ const EnterResultsForm: FC<Props> = ({
   );
 };
 
-export default EnterResultsForm;
+export default TrackOrFieldResultsForm;
 
 type ScoreInputProps = {
   label: string;

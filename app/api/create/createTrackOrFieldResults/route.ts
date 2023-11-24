@@ -1,13 +1,13 @@
 import { authOptions } from "@/lib/auth";
 import { getHostId } from "@/lib/dbHelpers";
 import { prisma } from "@/lib/prisma";
-import { ResultSchema } from "@/lib/yupSchemas";
+import { TrackOrFieldResultSchema } from "@/lib/yupSchemas";
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 import * as yup from "yup";
 
 const requestSchema = yup.object({
-  results: yup.array().of(ResultSchema).required(),
+  results: yup.array().of(TrackOrFieldResultSchema).required(),
   eventId: yup.string().required(),
 });
 
@@ -209,7 +209,7 @@ export async function POST(req: Request) {
       continue;
     }
 
-    // if there is still an athlete to make results for
+    // add the last athlete
     if (results[currentIndex]) {
       // add the last athlete to the list
       let lastAthlete = results[currentIndex];

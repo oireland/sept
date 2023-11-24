@@ -45,6 +45,7 @@ export const columns: ColumnDef<EventTableData>[] = [
   },
   {
     accessorKey: "name",
+    id: "Name",
     header: ({ column }) => {
       return (
         <Button
@@ -60,6 +61,7 @@ export const columns: ColumnDef<EventTableData>[] = [
   },
   {
     accessorKey: "groupName",
+    id: "Group",
     header: ({ column }) => {
       return (
         <Button
@@ -82,8 +84,8 @@ export const columns: ColumnDef<EventTableData>[] = [
   },
   {
     accessorKey: "eventType",
-    id: "Track/Field",
-    header: () => <div>Track/Field</div>,
+    id: "Event Type",
+    header: () => <div>Event Type</div>,
   },
   {
     accessorKey: "numberOfAthletes",

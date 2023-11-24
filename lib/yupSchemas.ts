@@ -25,7 +25,7 @@ export const StaffTableDataSchema = yup.object({
 
 export const EventValidationSchema = yup.object({
   eventName: yup.string().max(30, "Max 30 characters").required("Required"),
-  trackOrField: yup
+  eventType: yup
     .mixed<EventType>()
     .oneOf(Object.values(EventType))
     .required("Required"),
@@ -63,19 +63,19 @@ export const EventValidationSchema = yup.object({
 });
 
 export const EventTableDataSchema = yup.object({
-  name: yup.string().required(),
-  groupName: yup.string().required(),
+  name: yup.string().required("Name is required"),
+  groupName: yup.string().required("Group name is required"),
   boyOrGirl: yup.mixed<BoyOrGirl>().oneOf(Object.values(BoyOrGirl)),
   eventType: yup
     .mixed<EventType>()
     .oneOf(Object.values(EventType))
-    .required("Required"),
+    .required("Event type is required"),
   eventId: yup.string().required(),
   numberOfAthletes: yup.number().required(),
-  maxNumberOfAthletesPerTeam: yup.number().min(2).required("Required"),
+  maxNumberOfAthletes: yup.number().min(2).required("Max number of athletes"),
 });
 
-export const ResultSchema = yup.object({
+export const TrackOrFieldResultSchema = yup.object({
   athleteId: yup.string().required(),
   scores: yup
     .array()
@@ -83,6 +83,33 @@ export const ResultSchema = yup.object({
     .required(),
 });
 
-export const ResultsInputSchema = yup.object({
-  results: yup.array().of(ResultSchema).required(),
+export const TrackOrFieldResultsInputSchema = yup.object({
+  results: yup.array().of(TrackOrFieldResultSchema).required(),
+});
+
+export enum AttemptOptions {
+  CLEARED = "CLEARED",
+  PASSED = "PASSED",
+  FAILED = "FAILED",
+}
+
+export const HighJumpResultSchema = yup.object({
+  athleteId: yup.string().required(),
+
+  attemptsAtEachHeight: yup
+    .array()
+    .of(
+      yup
+        .array()
+        .of(yup.mixed<AttemptOptions>().oneOf(Object.values(AttemptOptions))),
+    )
+    .required(),
+});
+
+export const HighJumpResultsInputSchema = yup.object({
+  results: yup
+    .array()
+    .of(HighJumpResultSchema)
+    .required("results are required"),
+  heights: yup.array().of(yup.number().required().min(0)).required(),
 });

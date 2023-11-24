@@ -17,7 +17,7 @@ import { RiErrorWarningLine } from "react-icons/ri";
 
 type FormData = {
   eventName: string;
-  trackOrField: EventType;
+  eventType: EventType;
   boyOrGirl: BoyOrGirl[];
   groupNames: string[];
   maxNumberOfAthletesPerTeam: number;
@@ -34,7 +34,7 @@ const handleFormSubmit = async ({
   locationName,
   maxNumberOfAthletesPerTeam,
   numberOfAttempts,
-  trackOrField,
+  eventType,
 }: FormData) => {
   let toastId = toast.loading("Creating event...");
   try {
@@ -43,8 +43,8 @@ const handleFormSubmit = async ({
       eventName,
       groupNames,
       maxNumberOfAthletesPerTeam,
-      numberOfAttempts,
-      trackOrField,
+      numberOfAttempts: eventType === "FIELD" ? numberOfAttempts : 1, // enforce 1 attempt for track and high jump
+      eventType,
       date: new Date(Date.parse(date)),
       locationName,
     };
@@ -73,9 +73,9 @@ const EventForm: FC<Props> = ({ groups, locations }) => {
     eventName: "",
     boyOrGirl: [],
     groupNames: [],
-    trackOrField: "TRACK",
+    eventType: "TRACK",
     maxNumberOfAthletesPerTeam: 2,
-    numberOfAttempts: 1,
+    numberOfAttempts: 3,
     date: "",
     locationName: locations[0],
   };
@@ -88,69 +88,74 @@ const EventForm: FC<Props> = ({ groups, locations }) => {
         handleFormSubmit(values);
       }}
     >
-      <Form className="p-4">
-        <FormikInput
-          label="Event Name"
-          name="eventName"
-          placeholder="E.g Javelin"
-          type="input"
-        />
+      {({ values }) => (
+        <Form className="p-4">
+          <FormikInput
+            label="Event Name"
+            name="eventName"
+            placeholder="E.g Javelin"
+            type="input"
+          />
 
-        <FormikSelect
-          items={[
-            { value: "TRACK", content: "Track" },
-            { value: "FIELD", content: "Field" },
-          ]}
-          label="Track / Field"
-          name="trackOrField"
-        />
+          <FormikSelect
+            items={[
+              { value: "TRACK", content: "Track" },
+              { value: "FIELD", content: "Field" },
+              { value: "HIGHJUMP", content: "High Jump" },
+            ]}
+            label="Event Category"
+            name="eventType"
+          />
 
-        <FormikInput type="datetime-local" name="date" label="Date" />
+          <FormikInput type="datetime-local" name="date" label="Date" />
 
-        <FormikSelect
-          items={locations.map((location) => ({
-            content: location,
-            value: location,
-          }))}
-          label="Location"
-          name="locationName"
-        />
+          <FormikSelect
+            items={locations.map((location) => ({
+              content: location,
+              value: location,
+            }))}
+            label="Location"
+            name="locationName"
+          />
 
-        <FormikMultipleSelect
-          name="groupNames"
-          label="Groups"
-          items={groups.map((group) => ({
-            value: group,
-            label: group,
-          }))}
-        />
+          <FormikMultipleSelect
+            name="groupNames"
+            label="Groups"
+            items={groups.map((group) => ({
+              value: group,
+              label: group,
+            }))}
+          />
 
-        <FormikMultipleSelect
-          name="boyOrGirl"
-          label="Boy/Girl"
-          items={[
-            { value: "BOY", label: "Boy" },
-            { value: "GIRL", label: "Girl" },
-          ]}
-        />
+          <FormikMultipleSelect
+            name="boyOrGirl"
+            label="Boy/Girl"
+            items={[
+              { value: "BOY", label: "Boy" },
+              { value: "GIRL", label: "Girl" },
+            ]}
+          />
 
-        <FormikIntegerInput
-          label="Max Number of Athletes Per Team"
-          name="maxNumberOfAthletesPerTeam"
-        />
+          <FormikIntegerInput
+            label="Max Number of Athletes Per Team"
+            name="maxNumberOfAthletesPerTeam"
+          />
 
-        <FormikIntegerInput
-          label="Number of Attempts"
-          name="numberOfAttempts"
-        />
+          {values.eventType === "FIELD" ? (
+            <FormikIntegerInput
+              label="Number of Attempts"
+              name="numberOfAttempts"
+            />
+          ) : null}
 
-        <div className="flex justify-between">
-          <BackButton />
-          <Button type="submit" variant={"form"}>
-            Submit
-          </Button>
-        </div>
-      </Form>
+          <div className="flex justify-between">
+            <BackButton />
+            <Button type="submit" variant={"form"}>
+              Submit
+            </Button>
+          </div>
+        </Form>
+      )}
     </Formik>
   );
 };
@@ -183,10 +188,11 @@ const FormikIntegerInput: FC<IntegerInputProps> = ({ label, ...props }) => {
           name={field.name}
           onBlur={field.onBlur}
           onChange={(e) => helpers.setValue(parseInt(e.currentTarget.value))}
-          className="input_text h-10"
+          className="input_text h-10 disabled:cursor-not-allowed"
           step={1}
           min={1}
           value={parseInt(field.value.toString()).toString()}
+          disabled={props.disabled}
         />
       </div>
     </div>

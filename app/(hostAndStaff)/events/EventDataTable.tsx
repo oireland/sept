@@ -10,29 +10,21 @@ import getURL from "@/lib/getURL";
 import toast from "react-hot-toast";
 import { UserRole } from "@prisma/client";
 
-const removeSelectedEvents = async (selectedRowData: EventTableData[]) => {
+const removeSelectedEvents = async (events: EventTableData[]) => {
   let toastId = toast.loading("Deleting events...");
   try {
-    const validatedData = await yup
-      .array(EventTableDataSchema)
-      .validate(selectedRowData);
-
-    if (!validatedData) {
-      throw new Error("Invalid Selection");
-    }
-
     let commaSeperatedIds = "";
-    validatedData.forEach(({ eventId }) => {
+    events.forEach(({ eventId }) => {
       commaSeperatedIds = commaSeperatedIds.concat(eventId + ",");
     });
     // to remove the comma from the end
     commaSeperatedIds = commaSeperatedIds.substring(
       0,
-      commaSeperatedIds.length - 1
+      commaSeperatedIds.length - 1,
     );
 
     await axios.delete(
-      getURL(`/api/delete/deleteManyEvents/${commaSeperatedIds}`)
+      getURL(`/api/delete/deleteManyEvents/${commaSeperatedIds}`),
     );
 
     toast.dismiss(toastId);

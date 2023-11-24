@@ -18,10 +18,13 @@ import BackButton from "@/components/BackButton";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import dynamic from "next/dynamic";
+import HighJumpResultsForm from "./HighJumpResultsForm";
 
 // client components
 const ClearResultsButton = dynamic(() => import("./ClearResultsButton"));
-const EnterResultsForm = dynamic(() => import("./EnterResultsForm"));
+const TrackOrFieldResultsForm = dynamic(
+  () => import("./TrackOrFieldResultsForm"),
+);
 
 async function getEventData(eventId: string, hostId: string) {
   try {
@@ -142,6 +145,9 @@ const EnterEventResults = async ({
     host,
   } = eventData!;
 
+  const maxNumberOfAthletesTotal =
+    maxNumberOfAthletesPerTeam * host.teams.length;
+
   const titleText = `${groupName} ${
     athletesBoyOrGirl === "BOY" ? "Boy's" : "Girl's"
   } ${name}`;
@@ -249,23 +255,34 @@ const EnterEventResults = async ({
 
   return (
     <div>
-      <FloatingContainer className="w-full py-2 px-1">
+      <FloatingContainer className="w-full py-2 px-1 max-w-5xl">
         <h2 className="text-center text-xl font-semibold text-brg">
           {titleText}
         </h2>
 
-        <EnterResultsForm
-          athletes={athletesCompeting.map(({ results, athleteId, user }) => ({
-            athleteId,
-            name: user.name,
-            scores:
-              results[0]?.scores ||
-              Array.from(Array(numberOfAttempts), () => 0),
-          }))}
-          eventId={params.eventId}
-          eventType={eventType}
-          numberOfAttempts={numberOfAttempts}
-        />
+        {eventType === "HIGHJUMP" ? (
+          <HighJumpResultsForm
+            eventId={params.eventId}
+            athletes={athletesCompeting.map(({ athleteId, user }) => ({
+              athleteId,
+              name: user.name,
+            }))}
+            maxNumberOfAthletesTotal={maxNumberOfAthletesTotal}
+          />
+        ) : (
+          <TrackOrFieldResultsForm
+            athletes={athletesCompeting.map(({ results, athleteId, user }) => ({
+              athleteId,
+              name: user.name,
+              scores:
+                results[0]?.scores ||
+                Array.from(Array(numberOfAttempts), () => 0),
+            }))}
+            eventId={params.eventId}
+            eventType={eventType}
+            numberOfAttempts={numberOfAttempts}
+          />
+        )}
       </FloatingContainer>
     </div>
   );

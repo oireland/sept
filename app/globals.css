@@ -31,7 +31,9 @@
   .input_text:-webkit-autofill:active {
     -webkit-transition: "color 9999s ease-out, background-color 9999s ease-out";
     -webkit-transition-delay: 9999s;
-    transition: color 9999s ease-out, background-color 9999s ease-out;
+    transition:
+      color 9999s ease-out,
+      background-color 9999s ease-out;
     transition-delay: 9999s;
   }
 
@@ -62,7 +64,8 @@
     --input: 214.3 31.8% 91.4%;
 
     --primary: 0 0% 100%;
-    --primary-foreground: 154, 100%, 13%;
+    /* --primary-foreground: 154, 100%, 13%; */
+    --primary-foreground: 0, 0%, 0%;
 
     --secondary: 40, 5%, 89%;
     --secondary-foreground: 0 0% 100%;

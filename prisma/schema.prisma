@@ -97,6 +97,7 @@ model Staff {
 enum EventType {
   TRACK
   FIELD
+  HIGHJUMP
 }
 
 model Event {

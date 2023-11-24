@@ -68,7 +68,7 @@ export async function POST(req: Request) {
           name: eventsData.eventName,
           athletesBoyOrGirl: boyOrGirl,
           groupName,
-          eventType: eventsData.trackOrField,
+          eventType: eventsData.eventType,
           maxNumberOfAthletesPerTeam: eventsData.maxNumberOfAthletesPerTeam,
           numberOfAttempts: eventsData.numberOfAttempts,
           date: eventsData.date,
