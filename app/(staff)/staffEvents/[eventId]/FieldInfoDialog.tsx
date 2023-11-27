@@ -20,7 +20,7 @@ import {
 import { HiOutlineInformationCircle } from "react-icons/hi2";
 import { Button } from "@/components/ui/button";
 
-const InfoDialog = () => {
+const FieldInfoDialog = () => {
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
@@ -31,7 +31,7 @@ const InfoDialog = () => {
       <AlertDialogContent className="max-w-xl">
         <AlertDialogHeader>
           <AlertDialogTitle className="text-2xl font-semibold">
-            Please Note:
+            Please note:
           </AlertDialogTitle>
           <AlertDialogDescription className="text-left">
             If all of an athlete's attempts are <b>0</b>, they will not have a
@@ -39,9 +39,9 @@ const InfoDialog = () => {
           </AlertDialogDescription>
           <AlertDialogDescription className="text-left">
             If athletes have the same best attempt, there 2nd best attempts will
-            be compared. If these are the same or if the event only has 1
-            attempt, it is a draw! They will receieve the same place and number
-            of points.
+            be compared to resolve a tie. Then if needed their 3rd best
+            attempts. If the tie is not resolved by this then the athletes will
+            be awarded the same place and number of points.
           </AlertDialogDescription>
           <AlertDialogDescription className="text-left">
             When you press save, any previous results will be deleted before the
@@ -56,4 +56,4 @@ const InfoDialog = () => {
   );
 };
 
-export default InfoDialog;
+export default FieldInfoDialog;

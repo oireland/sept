@@ -11,7 +11,6 @@ type SingleEvent = {
   athletesBoyOrGirl: BoyOrGirl;
   groupName: string;
   maxNumberOfAthletesPerTeam: number;
-  numberOfAttempts: number;
   locationName: string;
   date: Date;
   hostId: string;
@@ -70,7 +69,6 @@ export async function POST(req: Request) {
           groupName,
           eventType: eventsData.eventType,
           maxNumberOfAthletesPerTeam: eventsData.maxNumberOfAthletesPerTeam,
-          numberOfAttempts: eventsData.numberOfAttempts,
           date: eventsData.date,
           locationName: eventsData.locationName,
           hostId,

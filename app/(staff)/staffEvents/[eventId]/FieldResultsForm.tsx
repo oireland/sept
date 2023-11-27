@@ -3,42 +3,33 @@
 import { FC } from "react";
 import { Formik, Form, FieldAttributes, useField } from "formik";
 
-import { EventType } from "@prisma/client";
-
 import { Button } from "@/components/ui/button";
 import toast from "react-hot-toast";
 import axios, { AxiosError } from "axios";
 import BackButton from "@/components/BackButton";
 import getURL from "@/lib/getURL";
-import { TrackOrFieldResultsInputSchema } from "@/lib/yupSchemas";
+import { FieldResultsInputSchema } from "@/lib/yupSchemas";
 import { useRouter } from "next/navigation";
 
 type FormData = {
   results: {
     athleteId: string;
-    scores: number[];
+    distances: number[];
   }[];
 };
 
 type Props = {
-  athletes: { athleteId: string; name: string; scores: number[] }[];
+  athletes: { athleteId: string; name: string; distances: number[] }[];
   eventId: string;
-  eventType: EventType;
-  numberOfAttempts: number;
 };
 
-const TrackOrFieldResultsForm: FC<Props> = ({
-  athletes,
-  eventId,
-  eventType,
-  numberOfAttempts,
-}) => {
+const FieldResultForm: FC<Props> = ({ athletes, eventId }) => {
   const router = useRouter();
 
   const handleFormSubmit = async (data: FormData) => {
     let toastId = toast.loading("Saving...");
     try {
-      await axios.post(getURL("/api/create/createTrackOrFieldResults"), {
+      await axios.post(getURL("/api/create/createFieldResults"), {
         results: data.results,
         eventId,
       });
@@ -57,16 +48,16 @@ const TrackOrFieldResultsForm: FC<Props> = ({
   };
 
   const initialValues: FormData = {
-    results: athletes.map(({ athleteId, scores }) => ({
+    results: athletes.map(({ athleteId, distances }) => ({
       athleteId,
-      scores,
+      distances,
     })),
   };
 
   return (
     <Formik
       initialValues={initialValues}
-      validationSchema={TrackOrFieldResultsInputSchema}
+      validationSchema={FieldResultsInputSchema}
       onSubmit={(values: FormData) => {
         handleFormSubmit(values);
       }}
@@ -74,19 +65,12 @@ const TrackOrFieldResultsForm: FC<Props> = ({
       <Form className="p-2 sm:p-4 md:p-6">
         <div className="mb-2 grid grid-cols-3">
           <h3 className="text-base font-semibold">Name</h3>
-          <h3 className="text-base font-semibold">
-            {eventType === "TRACK" ? "Times" : "Distances"}
-          </h3>
+          <h3 className="text-base font-semibold">Distance</h3>
         </div>
         <div className="space-y-2">
           {athletes.map(({ name }, index) => (
             <div key={index}>
-              <ScoreInput
-                numberOfAttempts={numberOfAttempts}
-                index={index}
-                label={name}
-                name="results"
-              />
+              <FieldScoreInput index={index} label={name} name="results" />
               <hr className="mt-1" />
             </div>
           ))}
@@ -103,25 +87,23 @@ const TrackOrFieldResultsForm: FC<Props> = ({
   );
 };
 
-export default TrackOrFieldResultsForm;
+export default FieldResultForm;
 
-type ScoreInputProps = {
+type FieldScoreInputProps = {
   label: string;
   index: number;
-  numberOfAttempts: number;
 } & FieldAttributes<{}>;
 
-const ScoreInput: FC<ScoreInputProps> = ({
+const FieldScoreInput: FC<FieldScoreInputProps> = ({
   placeholder,
   label,
   index,
-  numberOfAttempts,
   ...props
 }) => {
   const [field, meta, helpers] = useField<
     {
       athleteUserId: string;
-      scores: number[];
+      distances: number[];
     }[]
   >(props.name);
 
@@ -133,7 +115,7 @@ const ScoreInput: FC<ScoreInputProps> = ({
       <label className="text-sm md:text-base overflow-x-clip">{label}</label>
 
       <div className="col-span-3 flex space-x-1">
-        {Array.from(Array(numberOfAttempts)).map((a, j) => (
+        {Array.from(Array(3)).map((a, j) => (
           <div key={j} className="input_group w-full">
             <input
               type="number"
@@ -143,11 +125,11 @@ const ScoreInput: FC<ScoreInputProps> = ({
               onBlur={field.onBlur}
               onChange={(e) => {
                 let newValue = value;
-                newValue[index].scores[j] = Number(e.currentTarget.value);
+                newValue[index].distances[j] = Number(e.currentTarget.value);
                 setValue(newValue);
               }}
               className="input_text h-10"
-              value={Number(value[index].scores[j]).toString()}
+              value={Number(value[index].distances[j]).toString()}
             />
           </div>
         ))}

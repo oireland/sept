@@ -81,10 +81,10 @@ const HighJumpResultsForm: FC<Props> = ({
     }
   };
 
+  // Changes the place and points of every athlete in the jump off apart from the winner to 2nd place and the corresponding number of points.
   const selectWinner = (winnerId: string) => {
     let resultsToBeCreated: CalculatedResult[] = calculatedResults.map(
       (athlete) => {
-        // if the athlete was in the jump off but didn't win
         if (
           athletesInJumpOffIds.includes(athlete.athleteId) &&
           athlete.athleteId !== winnerId
@@ -104,7 +104,7 @@ const HighJumpResultsForm: FC<Props> = ({
     finalResultSubmission(resultsToBeCreated);
   };
 
-  // The JUMP OFF "SCREEN"
+  // The "JUMP OFF" - displays a button for each athlete in the jump off for the staff member to select who won. Or they can choose to share the gold.
   if (athletesInJumpOffIds.length > 0) {
     return (
       <div className="p-2 sm:p-4 md:p-6">
@@ -195,7 +195,7 @@ const HighJumpResultsForm: FC<Props> = ({
             <div></div>
             <header className="col-span-3 border  flex items-center justify-between rounded-t-md px-2 font-semibold  bg-muted">
               <div className="text-center w-full text-sm lg:text-base py-2 ">
-                Heights
+                Heights (m)
               </div>
               <PlusCircle
                 className="w-5 h-5 cursor-pointer"
@@ -230,12 +230,14 @@ const HighJumpResultsForm: FC<Props> = ({
             </div>
 
             <div className="col-span-3 overflow-x-scroll overflow-y-hidden">
+              {/* Display an input fopr every height added, which update's that height's value */}
               <div className="flex h-10">
                 {values.heights.map((height, index) => (
                   <HeightInput key={index} index={index} name="heights" />
                 ))}
               </div>
 
+              {/* Display a result input "row" for each athlete */}
               <div>
                 {athletes.map(({ name, athleteId }, index) => (
                   <AthleteResultsInput
@@ -276,8 +278,8 @@ const HeightInput: FC<HeightInputProps> = ({ index, ...props }) => {
   return (
     <input
       type="number"
-      step={0.005}
-      min={0}
+      step={0.01}
+      min={index === 0 ? 0 : value[index - 1] + 0.01} // height must be greater than or equal to the previous height
       name={field.name}
       onBlur={field.onBlur}
       onChange={(e) => {

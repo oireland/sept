@@ -45,12 +45,6 @@ export const EventValidationSchema = yup.object({
     .min(2, "Must be at least 2")
     .integer("Must be a whole number")
     .required("Required"),
-  numberOfAttempts: yup
-    .number()
-    .integer()
-    .min(1, "Must be at least 1")
-    .integer("Must be a whole number")
-    .required("Required"),
   date: yup
     .date()
     .required()
@@ -75,16 +69,30 @@ export const EventTableDataSchema = yup.object({
   maxNumberOfAthletes: yup.number().min(2).required("Max number of athletes"),
 });
 
-export const TrackOrFieldResultSchema = yup.object({
-  athleteId: yup.string().required(),
-  scores: yup
-    .array()
-    .of(yup.number().required().min(0, "Scores must not be negative"))
-    .required(),
+export const TrackResultSchema = yup
+  .object({
+    athleteId: yup.string().required(),
+    time: yup.number().required().min(0, "Scores must not be negative"),
+  })
+  .required();
+
+export const FieldResultSchema = yup
+  .object({
+    athleteId: yup.string().required(),
+    distances: yup
+      .array()
+      .of(yup.number().required().min(0, "Scores must not be negative"))
+      .required()
+      .test("lengthIs3", (arr) => arr.length === 3),
+  })
+  .required();
+
+export const TrackResultsInputSchema = yup.object({
+  results: yup.array().of(TrackResultSchema).required(),
 });
 
-export const TrackOrFieldResultsInputSchema = yup.object({
-  results: yup.array().of(TrackOrFieldResultSchema).required(),
+export const FieldResultsInputSchema = yup.object({
+  results: yup.array().of(FieldResultSchema).required(),
 });
 
 export enum AttemptOptions {

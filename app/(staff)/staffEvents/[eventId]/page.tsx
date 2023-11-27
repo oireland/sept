@@ -19,12 +19,14 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import HighJumpResultsForm from "./HighJumpResultsForm";
+import HighJumpInfoDialog from "./HighJumpInfoDialog";
+import TrackInfoDialog from "./TrackInfoDialog";
+import FieldInfoDialog from "./FieldInfoDialog";
 
 // client components
 const ClearResultsButton = dynamic(() => import("./ClearResultsButton"));
-const TrackOrFieldResultsForm = dynamic(
-  () => import("./TrackOrFieldResultsForm"),
-);
+const FieldResultsForm = dynamic(() => import("./FieldResultsForm"));
+const TrackResultsForm = dynamic(() => import("./TrackResultsForm"));
 
 async function getEventData(eventId: string, hostId: string) {
   try {
@@ -57,7 +59,6 @@ async function getEventData(eventId: string, hostId: string) {
         },
         name: true,
         groupName: true,
-        numberOfAttempts: true,
         maxNumberOfAthletesPerTeam: true,
         host: {
           select: {
@@ -139,7 +140,6 @@ const EnterEventResults = async ({
     athletesBoyOrGirl,
     athletesCompeting,
     eventType,
-    numberOfAttempts,
     results: eventResults,
     maxNumberOfAthletesPerTeam,
     host,
@@ -187,7 +187,7 @@ const EnterEventResults = async ({
     );
   }
 
-  // if there is no result on the event with the athlete's id, then results need to be entered.
+  // check whether every athlete in the event has a result or not
   let haveAthletesCompeted = true;
   const eventResultAThleteIds = eventResults.map(({ athleteId }) => athleteId);
   athletesCompeting.forEach(({ athleteId }) => {
@@ -197,6 +197,7 @@ const EnterEventResults = async ({
     }
   });
 
+  // Display a table with the results in.
   if (haveAthletesCompeted) {
     return (
       <FloatingContainer>
@@ -256,9 +257,21 @@ const EnterEventResults = async ({
   return (
     <div>
       <FloatingContainer className="w-full py-2 px-1 max-w-5xl">
-        <h2 className="text-center text-xl font-semibold text-brg">
-          {titleText}
-        </h2>
+        <div className="flex items-center justify-between">
+          <div></div>
+          <h2 className="text-center text-xl font-semibold text-brg">
+            {titleText}
+          </h2>
+          <div className="justify-end">
+            {eventType === "HIGHJUMP" ? (
+              <HighJumpInfoDialog />
+            ) : eventType === "TRACK" ? (
+              <TrackInfoDialog />
+            ) : (
+              <FieldInfoDialog />
+            )}
+          </div>
+        </div>
 
         {eventType === "HIGHJUMP" ? (
           <HighJumpResultsForm
@@ -269,18 +282,24 @@ const EnterEventResults = async ({
             }))}
             maxNumberOfAthletesTotal={maxNumberOfAthletesTotal}
           />
-        ) : (
-          <TrackOrFieldResultsForm
+        ) : eventType === "TRACK" ? (
+          <TrackResultsForm
             athletes={athletesCompeting.map(({ results, athleteId, user }) => ({
               athleteId,
               name: user.name,
-              scores:
-                results[0]?.scores ||
-                Array.from(Array(numberOfAttempts), () => 0),
+              time: 0,
             }))}
             eventId={params.eventId}
-            eventType={eventType}
-            numberOfAttempts={numberOfAttempts}
+          />
+        ) : (
+          <FieldResultsForm
+            athletes={athletesCompeting.map(({ results, athleteId, user }) => ({
+              athleteId,
+              name: user.name,
+              distances:
+                results[0]?.scores || Array.from(Array(3)).map(() => 0),
+            }))}
+            eventId={params.eventId}
           />
         )}
       </FloatingContainer>

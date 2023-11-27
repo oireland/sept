@@ -21,7 +21,6 @@ type FormData = {
   boyOrGirl: BoyOrGirl[];
   groupNames: string[];
   maxNumberOfAthletesPerTeam: number;
-  numberOfAttempts: number;
   date: string;
   locationName: string;
 };
@@ -33,7 +32,6 @@ const handleFormSubmit = async ({
   groupNames,
   locationName,
   maxNumberOfAthletesPerTeam,
-  numberOfAttempts,
   eventType,
 }: FormData) => {
   let toastId = toast.loading("Creating event...");
@@ -43,7 +41,6 @@ const handleFormSubmit = async ({
       eventName,
       groupNames,
       maxNumberOfAthletesPerTeam,
-      numberOfAttempts: eventType === "FIELD" ? numberOfAttempts : 1, // enforce 1 attempt for track and high jump
       eventType,
       date: new Date(Date.parse(date)),
       locationName,
@@ -75,11 +72,9 @@ const EventForm: FC<Props> = ({ groups, locations }) => {
     groupNames: [],
     eventType: "TRACK",
     maxNumberOfAthletesPerTeam: 2,
-    numberOfAttempts: 3,
     date: "",
     locationName: locations[0],
   };
-  console.log(new Date().toISOString().slice(0, -8));
   return (
     <Formik
       initialValues={initialValues}
@@ -88,74 +83,65 @@ const EventForm: FC<Props> = ({ groups, locations }) => {
         handleFormSubmit(values);
       }}
     >
-      {({ values }) => (
-        <Form className="p-4">
-          <FormikInput
-            label="Event Name"
-            name="eventName"
-            placeholder="E.g Javelin"
-            type="input"
-          />
+      <Form className="p-4">
+        <FormikInput
+          label="Event Name"
+          name="eventName"
+          placeholder="E.g Javelin"
+          type="input"
+        />
 
-          <FormikSelect
-            items={[
-              { value: "TRACK", content: "Track" },
-              { value: "FIELD", content: "Field" },
-              { value: "HIGHJUMP", content: "High Jump" },
-            ]}
-            label="Event Category"
-            name="eventType"
-          />
+        <FormikSelect
+          items={[
+            { value: "TRACK", content: "Track" },
+            { value: "FIELD", content: "Long Jump or Throw" },
+            { value: "HIGHJUMP", content: "High Jump or Pole Vault" },
+          ]}
+          label="Event Category"
+          name="eventType"
+        />
 
-          <FormikInput type="datetime-local" name="date" label="Date" />
+        <FormikInput type="datetime-local" name="date" label="Date" />
 
-          <FormikSelect
-            items={locations.map((location) => ({
-              content: location,
-              value: location,
-            }))}
-            label="Location"
-            name="locationName"
-          />
+        <FormikSelect
+          items={locations.map((location) => ({
+            content: location,
+            value: location,
+          }))}
+          label="Location"
+          name="locationName"
+        />
 
-          <FormikMultipleSelect
-            name="groupNames"
-            label="Groups"
-            items={groups.map((group) => ({
-              value: group,
-              label: group,
-            }))}
-          />
+        <FormikMultipleSelect
+          name="groupNames"
+          label="Groups"
+          items={groups.map((group) => ({
+            value: group,
+            label: group,
+          }))}
+        />
 
-          <FormikMultipleSelect
-            name="boyOrGirl"
-            label="Boy/Girl"
-            items={[
-              { value: "BOY", label: "Boy" },
-              { value: "GIRL", label: "Girl" },
-            ]}
-          />
+        <FormikMultipleSelect
+          name="boyOrGirl"
+          label="Boy/Girl"
+          items={[
+            { value: "BOY", label: "Boy" },
+            { value: "GIRL", label: "Girl" },
+          ]}
+        />
 
-          <FormikIntegerInput
-            label="Max Number of Athletes Per Team"
-            name="maxNumberOfAthletesPerTeam"
-          />
+        <FormikIntegerInput
+          label="Max Number of Athletes Per Team"
+          name="maxNumberOfAthletesPerTeam"
+        />
 
-          {values.eventType === "FIELD" ? (
-            <FormikIntegerInput
-              label="Number of Attempts"
-              name="numberOfAttempts"
-            />
-          ) : null}
-
-          <div className="flex justify-between">
-            <BackButton />
-            <Button type="submit" variant={"form"}>
-              Submit
-            </Button>
-          </div>
-        </Form>
-      )}
+        <div className="flex justify-between">
+          <BackButton />
+          <Button type="submit" variant={"form"}>
+            Submit
+          </Button>
+        </div>
+      </Form>
     </Formik>
   );
 };

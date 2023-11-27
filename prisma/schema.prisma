@@ -111,7 +111,6 @@ model Event {
   hostId              String
   athletesCompeting   Athlete[] @relation("Athletes - Events")
   maxNumberOfAthletesPerTeam Int
-  numberOfAttempts Int @default(1)
   date DateTime
   location Location @relation("Location - Events", fields: [locationName, hostId], references: [locationName, hostId])
   locationName String
