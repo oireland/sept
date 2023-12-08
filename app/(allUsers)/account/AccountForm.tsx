@@ -32,7 +32,7 @@ const validationSchema: yup.ObjectSchema<FormData> = yup.object().shape({
     .string()
     .matches(
       /(?=^.{6,20}$)((?=.*\w)(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[|!"$%&\/\(\)\?\^\'\\\+\-\*]))^.*/,
-      "At least one: uppercase, lowercase, number and symbol. 6-20 characters."
+      "At least one: uppercase, lowercase, number and symbol. 6-20 characters.",
     )
     .required("Password is required")
     .test(
@@ -40,7 +40,7 @@ const validationSchema: yup.ObjectSchema<FormData> = yup.object().shape({
       "The new password must be different to your old password",
       function (value) {
         return this.parent.oldPassword !== value;
-      }
+      },
     ),
   newPasswordRepeat: yup
     .string()

@@ -96,7 +96,7 @@ const Dashboard = async () => {
 
   return (
     <div>
-      <Banner text="Dashboard" />
+      <Banner text="Dashboard" showBackButton={false} />
 
       <div className="container mt-2 space-y-2">
         <h2 className="text-xl font-semibold md:text-2xl lg:text-3xl">
