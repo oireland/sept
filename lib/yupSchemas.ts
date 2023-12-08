@@ -13,7 +13,7 @@ export const AthleteTableDataSchema = yup.object({
 
 export const StaffSchema = yup.object({
   name: yup.string().required(),
-  email: yup.string().required().email(),
+  email: yup.string().required().email("Email is invalid"),
 });
 
 export const StaffTableDataSchema = yup.object({
@@ -60,10 +60,6 @@ export const EventTableDataSchema = yup.object({
   eventFullName: yup.string().required("Name is required"),
   groupName: yup.string().required("Group name is required"),
   boyOrGirl: yup.mixed<BoyOrGirl>().oneOf(Object.values(BoyOrGirl)),
-  // eventType: yup
-  //   .mixed<EventType>()
-  //   .oneOf(Object.values(EventType))
-  //   .required("Event type is required"),
   eventId: yup.string().required(),
   numberOfAthletes: yup.number().required(),
   maxNumberOfAthletes: yup

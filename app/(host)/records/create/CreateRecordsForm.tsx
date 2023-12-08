@@ -95,6 +95,7 @@ const CreateRecordsForm = ({ allowedEventIds }: Props) => {
       });
       toast.dismiss(toastId);
       toastId = toast.success("Records created successfully");
+      router.push("/events");
     } catch (e) {
       toast.dismiss(toastId);
       if (e instanceof Error || e instanceof AxiosError) {

@@ -1,25 +1,21 @@
 "use client";
 
-import { authOptions } from "@/lib/auth";
-import { getServerSession } from "next-auth";
-import React from "react";
-import Banner from "../../../components/banner";
-import AccountForm from "./AccountForm";
-import { Button, buttonVariants } from "@/components/ui/button";
+import LoadingSkeleton from "@/components/LoadingSkeleton";
 import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
-  AlertDialogTrigger,
-  AlertDialogDescription,
   AlertDialogTitle,
+  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { useSession } from "next-auth/react";
-import LoadingSkeleton from "@/components/LoadingSkeleton";
+import { buttonVariants } from "@/components/ui/button";
+import getURL from "@/lib/getURL";
 import { cn } from "@/lib/utils";
 import axios from "axios";
-import getURL from "@/lib/getURL";
+import { useSession } from "next-auth/react";
+import Banner from "../../../components/banner";
+import AccountForm from "./AccountForm";
 
 const AccountPage = () => {
   const session = useSession({ required: true });

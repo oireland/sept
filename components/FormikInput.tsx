@@ -26,8 +26,8 @@ const FormikInput: FC<MyInputProps> = ({
         </label>
         {meta.touched && meta.error && (
           <div className="flex items-center text-xs text-brg">
-            <AlertCircleIcon className="peer h-5 w-5 pr-1" />
-            <p className="hidden hover:flex peer-hover:flex">{meta.error}</p>
+            <AlertCircleIcon className=" h-5 w-5 pr-1" />
+            <p className="flex">{meta.error}</p>
           </div>
         )}
       </div>

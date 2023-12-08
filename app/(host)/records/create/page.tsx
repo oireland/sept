@@ -15,6 +15,7 @@ import {
 import CreateRecordsForm from "./CreateRecordsForm";
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
+import { AlertCircleIcon } from "lucide-react";
 
 const getEventData = async (userId: string) => {
   try {
@@ -63,9 +64,12 @@ const getEventData = async (userId: string) => {
 const CreateRecordsPage = async () => {
   const session = await getServerSession();
 
-  const eventData = await getEventData(session!.user.userId);
+  const allEventsData = await getEventData(session!.user.userId);
 
-  const csvData = json2csv.parse(eventData);
+  const eventsWithNoRecords = allEventsData.filter(
+    ({ recordHolderName, recordScore, yearRecordSet }) =>
+      !recordHolderName || !recordScore || !yearRecordSet,
+  );
 
   return (
     <FloatingContainer className="space-y-4 p-4">
@@ -74,25 +78,45 @@ const CreateRecordsPage = async () => {
       </h2>
       <div className="w-full space-y-2">
         <h3 className="text-left text-lg">
-          Firstly, download the template CSV file below:
+          Firstly, download one of the template files below:
         </h3>
-        <div className="flex items-center justify-center w-full">
+        <div className="space-y-1 w-full">
           <Button variant={"outline"} asChild className="w-full">
             <a
-              href={`data:text/csv;charset=utf-8,${csvData}`}
+              href={`data:text/csv;charset=utf-8,${json2csv.parse(
+                allEventsData,
+              )}`}
               download="recordsTemplate"
             >
-              Download Template CSV
+              Update all event records
+            </a>
+          </Button>
+          <div className="flex justify-evenly items-center w-full space-x-2">
+            <hr className="w-full h-1" />
+            <span>or</span>
+            <hr className="w-full h-1" />
+          </div>
+          <Button variant={"outline"} asChild className="w-full">
+            <a
+              href={`data:text/csv;charset=utf-8,${json2csv.parse(
+                eventsWithNoRecords,
+              )}`}
+              download="recordsTemplate"
+            >
+              Only update events that have no record
             </a>
           </Button>
         </div>
       </div>
       <div className="w-full space-y-2">
-        Enter the name of the record holder, and the year in which the record
-        was set for each event.
+        Enter the name of the record holder, the year in which the record was
+        set, and the record score for each event.
         <br />
-        The format of the file should be the following (The first two columns
-        are pre-filled):
+        The format of the file should be the following:
+        <div className="flex space-x-2 items-center">
+          <AlertCircleIcon className="text-red-600 h-5 w-5" />
+          <span className="">Do not edit the first two columns</span>
+        </div>
         <Table className="mx-auto overflow-x-scroll text-xs">
           <TableHeader>
             <TableRow>
@@ -133,7 +157,7 @@ const CreateRecordsPage = async () => {
           Finally, upload the completed CSV file below:
         </h3>
         <CreateRecordsForm
-          allowedEventIds={eventData.map(({ eventId }) => eventId)}
+          allowedEventIds={allEventsData.map(({ eventId }) => eventId)}
         />
       </div>
     </FloatingContainer>
