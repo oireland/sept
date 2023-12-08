@@ -1,18 +1,16 @@
 "use client";
 
-import { FC } from "react";
-import { Formik, Form } from "formik";
+import { Form, Formik } from "formik";
 import * as Yup from "yup";
 import FormikInput from "../../../components/FormikInput";
 
-import PasswordField from "../../../components/FormikPasswordField";
-import { HiOutlineLibrary, HiAtSymbol } from "react-icons/hi";
 import { Button } from "@/components/ui/button";
-import axios from "axios";
-import { signIn } from "next-auth/react";
 import getURL from "@/lib/getURL";
-import { toast } from "react-hot-toast";
+import axios from "axios";
 import { AtSign, Library } from "lucide-react";
+import { signIn } from "next-auth/react";
+import { toast } from "react-hot-toast";
+import PasswordField from "../../../components/FormikPasswordField";
 
 interface FormData {
   name: string;
@@ -29,7 +27,7 @@ const validationSchema: Yup.ObjectSchema<FormData> = Yup.object().shape({
   password: Yup.string()
     .matches(
       /(?=^.{6,20}$)((?=.*\w)(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[|!"$%&\/\(\)\?\^\'\\\+\-\*]))^.*/,
-      "At least one: uppercase, lowercase, number and symbol. 6-20 characters."
+      "At least one: uppercase, lowercase, number and symbol. 6-20 characters.",
     )
     .required("Password is required"),
   passwordRepeat: Yup.string()

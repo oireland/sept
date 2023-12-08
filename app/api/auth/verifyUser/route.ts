@@ -17,8 +17,6 @@ export async function PATCH(req: Request) {
       process.env.EMAIL_SECRET!,
     ) as VerificationToken;
 
-    console.log(userId, email);
-
     await prisma.user.update({
       where: { userId },
       data: { emailVerified: new Date().toISOString() },

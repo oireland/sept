@@ -81,7 +81,7 @@ export async function getEventData(userId: string, role: UserRole) {
         athletesBoyOrGirl: true,
         athletesCompeting: true,
         name: true,
-        group: true,
+        groupName: true,
         staffMember: {
           select: {
             user: {
@@ -93,11 +93,10 @@ export async function getEventData(userId: string, role: UserRole) {
           },
         },
         maxNumberOfAthletesPerTeam: true,
-        location: {
-          select: {
-            locationName: true,
-          },
-        },
+        recordHolderName: true,
+        yearRecordSet: true,
+        recordScore: true,
+        locationName: true,
         host: {
           select: {
             teams: true,
@@ -114,23 +113,33 @@ export async function getEventData(userId: string, role: UserRole) {
         athletesBoyOrGirl,
         athletesCompeting,
         eventType,
-        group,
+        groupName,
         staffMember,
         maxNumberOfAthletesPerTeam,
-        location,
+        locationName,
         date,
         host,
+        recordHolderName,
+        recordScore,
+        yearRecordSet,
       }) => ({
-        name,
         eventId,
-        boyOrGirl: athletesBoyOrGirl,
+        eventFullName: `${groupName} ${
+          athletesBoyOrGirl === "BOY" ? "Boy's" : "Girl's"
+        } ${name}`,
         numberOfAthletes: athletesCompeting.length,
-        eventType,
-        groupName: group.groupName,
         staffName: staffMember?.user.name,
         maxNumberOfAthletes: host.teams.length * maxNumberOfAthletesPerTeam,
-        locationName: location.locationName,
+        locationName,
         date,
+        recordString:
+          !recordScore || !recordHolderName || !yearRecordSet
+            ? "No record set"
+            : `${
+                recordScore + (eventType === "TRACK" ? "s" : "m")
+              } - ${yearRecordSet} - ${recordHolderName}`,
+        groupName,
+        boyOrGirl: athletesBoyOrGirl,
       }),
     );
 

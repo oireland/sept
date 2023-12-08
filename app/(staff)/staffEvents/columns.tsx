@@ -19,51 +19,36 @@ import { EventTableData } from "../../(hostAndStaff)/events/columns";
 
 export const columns: ColumnDef<EventTableData>[] = [
   {
-    accessorKey: "name",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          className="p-0 text-sm text-black"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Name
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      );
+    accessorKey: "eventFullName",
+    id: "Event Name",
+    header() {
+      return <h2 className="text-sm">Event</h2>;
     },
-  },
-  {
-    accessorKey: "groupName",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          className="p-0 text-sm text-black"
-          onClick={() => {
-            column.toggleSorting(column.getIsSorted() === "asc");
-          }}
-        >
-          Group
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      );
-    },
-  },
-  {
-    accessorKey: "boyOrGirl",
-    id: "Boy/Girl",
-    header: () => <div className="text-left">Boy/Girl</div>,
-  },
-  {
-    accessorKey: "eventType",
-    id: "Track/Field",
-    header: () => <div className="text-left">Track/Field</div>,
   },
   {
     accessorKey: "numberOfAthletes",
     id: "Number of Athletes",
     header: () => <div className="text-left"># Athletes</div>,
+  },
+  {
+    accessorKey: "locationName",
+    id: "Location",
+    header: () => <div>Location</div>,
+  },
+  {
+    accessorKey: "date",
+    id: "Date",
+    header: () => <div>Date</div>,
+    cell: ({ row }) => {
+      let date = row.original.date;
+
+      return <div>{date.toLocaleDateString()}</div>;
+    },
+  },
+  {
+    accessorKey: "recordString",
+    id: "Record",
+    header: () => <div>Record</div>,
   },
   {
     id: "actions",

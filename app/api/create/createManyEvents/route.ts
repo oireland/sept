@@ -46,15 +46,17 @@ export async function POST(req: Request) {
     });
 
     const { groups: groupsObjects, hostId, locations: locationsObjects } = host;
-    const locations = locationsObjects.map(({ locationName }) => locationName);
-    const groups = groupsObjects.map(({ groupName }) => groupName);
+    const allowedLocations = locationsObjects.map(
+      ({ locationName }) => locationName,
+    );
+    const allowedGroups = groupsObjects.map(({ groupName }) => groupName);
 
-    if (!locations.includes(eventsData.locationName)) {
+    if (!allowedLocations.includes(eventsData.locationName)) {
       return NextResponse.json("Invalid Location", { status: 400 });
     }
 
     eventsData.groupNames.forEach((groupName) => {
-      if (!groups.includes(groupName)) {
+      if (!allowedGroups.includes(groupName)) {
         return NextResponse.json("Invalid Groups", { status: 400 });
       }
     });

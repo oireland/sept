@@ -56,15 +56,11 @@ const HighJumpInfoDialog = () => {
           <AlertDialogDescription className="text-left">
             If two or more jumpers tie for the top spot (all remaining athletes
             fail to clear a particular height), the factors which act as the
-            tie-breaker between them are as follows in order of priority:
-            <ol>
-              <li>
-                The fewest failed attempts at the height at which the tie
-                occurred
-              </li>
-              <li>The fewest failed attempts throughout the competition</li>
-            </ol>
-            If there's still no clear winner, a jump off takes place to
+            tie-breaker between them are as follows in order of priority: <br />
+            &emsp;1. The fewest failed attempts at the height at which the tie
+            occurred <br />
+            &emsp;2. The fewest failed attempts throughout the competition.{" "}
+            <br /> If there's still no clear winner, a jump off takes place to
             determine the winner, where jumpers get one opportunity to clear the
             next height mark. The crossbar is then alternately lowered and
             raised until only one jumper succeeds. In the event of a jump off

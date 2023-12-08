@@ -1,14 +1,11 @@
 "use client";
 
 import { DataTable } from "@/components/ui/data-table";
-import React from "react";
-import { EventTableData, columns } from "./columns";
-import * as yup from "yup";
-import { EventTableDataSchema } from "@/lib/yupSchemas";
-import axios, { AxiosError } from "axios";
 import getURL from "@/lib/getURL";
-import toast from "react-hot-toast";
 import { UserRole } from "@prisma/client";
+import axios, { AxiosError } from "axios";
+import toast from "react-hot-toast";
+import { EventTableData, columns } from "./columns";
 
 const removeSelectedEvents = async (events: EventTableData[]) => {
   let toastId = toast.loading("Deleting events...");

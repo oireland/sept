@@ -5,7 +5,7 @@ import { useState } from "react";
 
 type FileInputCsvProps = {
   fileRef: React.RefObject<HTMLInputElement>;
-  label: string;
+  label?: string;
   handleFileChange: (resultArray: string[]) => void;
 } & FieldAttributes<{}>;
 

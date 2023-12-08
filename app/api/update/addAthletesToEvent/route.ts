@@ -57,8 +57,6 @@ export async function PATCH(req: Request) {
       },
     });
 
-    console.log("maxNumberOfAthletesPerTeam", maxNumberOfAthletesPerTeam);
-
     // to be used to check that athletes from the request belong to the host
     const hostId = await getHostId(session.user.userId, session.user.role);
 
@@ -103,7 +101,6 @@ export async function PATCH(req: Request) {
 
     athletesCompeting.forEach(({ teamName }) => {
       let current = numberOfAthletesInTeamsMap.get(teamName);
-      console.log(teamName, current);
       numberOfAthletesInTeamsMap.set(teamName, current + 1);
     });
 
@@ -152,7 +149,6 @@ export async function PATCH(req: Request) {
       status: 200,
     });
   } catch (e) {
-    console.log(e);
     if (e instanceof Error) {
       return NextResponse.json(e.message, { status: 400 });
     } else {

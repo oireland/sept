@@ -1,7 +1,6 @@
 import { authOptions } from "@/lib/auth";
 import { getHostId } from "@/lib/dbHelpers";
 import { prisma } from "@/lib/prisma";
-import { EventTableDataSchema } from "@/lib/yupSchemas";
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 import * as yup from "yup";

@@ -32,6 +32,8 @@ export async function POST(req: Request) {
       maxNumberOfAthletesPerTeam,
       staffMember,
       host,
+      athletesCompeting,
+      recordScore,
     } = await prisma.event.update({
       where: {
         eventId,
@@ -45,11 +47,22 @@ export async function POST(req: Request) {
             teams: true,
           },
         },
+        athletesCompeting: {
+          select: {
+            user: {
+              select: {
+                name: true,
+              },
+            },
+            athleteId: true,
+          },
+        },
         staffMember: {
           select: {
             userId: true,
           },
         },
+        recordScore: true,
       },
       data: {
         results: {
@@ -57,6 +70,7 @@ export async function POST(req: Request) {
         },
       },
     });
+
     const maxNumberOfAthletes = maxNumberOfAthletesPerTeam * host.teams.length;
 
     if (eventType !== "TRACK") {
@@ -72,7 +86,7 @@ export async function POST(req: Request) {
     }
 
     // get athletes with 0 as their score to remove them from the event
-    const athletesWithAllZeroIds = results
+    const athletesWithZeroTimeIds = results
       .filter(({ time }) => {
         time === 0;
       })
@@ -136,7 +150,7 @@ export async function POST(req: Request) {
 
     // remove the event from athletes who didn't compete (all 0s)
     await Promise.all(
-      athletesWithAllZeroIds.map((athleteId) =>
+      athletesWithZeroTimeIds.map((athleteId) =>
         prisma.athlete.update({
           where: { athleteId },
           data: {
@@ -149,6 +163,24 @@ export async function POST(req: Request) {
         }),
       ),
     );
+
+    // check for record broken
+    if (recordScore === null || results[0].time < recordScore) {
+      const recordBreaker = results[0];
+      // update record
+      await prisma.event.update({
+        where: {
+          eventId,
+        },
+        data: {
+          recordScore: recordBreaker.time,
+          recordHolderName: athletesCompeting.filter(
+            ({ athleteId }) => athleteId === recordBreaker.athleteId,
+          )[0].user.name,
+          yearRecordSet: new Date().getFullYear(),
+        },
+      });
+    }
 
     return NextResponse.json("Results created successfully", { status: 200 });
   } catch (e) {

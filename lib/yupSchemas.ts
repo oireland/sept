@@ -42,7 +42,7 @@ export const EventValidationSchema = yup.object({
   maxNumberOfAthletesPerTeam: yup
     .number()
     .integer()
-    .min(2, "Must be at least 2")
+    .min(1, "Must be at least 1 ")
     .integer("Must be a whole number")
     .required("Required"),
   date: yup
@@ -57,16 +57,20 @@ export const EventValidationSchema = yup.object({
 });
 
 export const EventTableDataSchema = yup.object({
-  name: yup.string().required("Name is required"),
+  eventFullName: yup.string().required("Name is required"),
   groupName: yup.string().required("Group name is required"),
   boyOrGirl: yup.mixed<BoyOrGirl>().oneOf(Object.values(BoyOrGirl)),
-  eventType: yup
-    .mixed<EventType>()
-    .oneOf(Object.values(EventType))
-    .required("Event type is required"),
+  // eventType: yup
+  //   .mixed<EventType>()
+  //   .oneOf(Object.values(EventType))
+  //   .required("Event type is required"),
   eventId: yup.string().required(),
   numberOfAthletes: yup.number().required(),
-  maxNumberOfAthletes: yup.number().min(2).required("Max number of athletes"),
+  maxNumberOfAthletes: yup
+    .number()
+    .min(1)
+    .required("Max number of athletes required"),
+  recordString: yup.string().required(),
 });
 
 export const TrackResultSchema = yup

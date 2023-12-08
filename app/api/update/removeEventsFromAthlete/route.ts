@@ -1,7 +1,6 @@
 import { authOptions } from "@/lib/auth";
 import { getHostId } from "@/lib/dbHelpers";
 import { prisma } from "@/lib/prisma";
-import { EventTableDataSchema } from "@/lib/yupSchemas";
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 import * as yup from "yup";
@@ -57,28 +56,16 @@ export async function PATCH(req: Request) {
       return NextResponse.json("Invalid request", { status: 400 });
     }
 
-    // get ids of valid events of the host that were in the request
-    const eventsOfHost = await prisma.event.findMany({
-      where: {
-        hostId,
-        groupName: athleteGroupName,
-        athletesBoyOrGirl: athleteBoyOrGirl,
-        eventId: {
-          in: eventIds,
-        },
-      },
-      select: {
-        eventId: true,
-      },
-    });
-
-    // update each event to have the athlete competing
+    // update each valid event to have the athlete competing
     await Promise.all(
-      eventsOfHost?.map(
-        async ({ eventId }) =>
+      eventIds?.map(
+        async (eventId) =>
           await prisma.event.update({
             where: {
               eventId,
+              hostId,
+              groupName: athleteGroupName,
+              athletesBoyOrGirl: athleteBoyOrGirl,
             },
             data: {
               athletesCompeting: {

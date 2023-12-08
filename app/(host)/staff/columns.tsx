@@ -1,9 +1,10 @@
 "use client";
 
-import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
+import { ColumnDef } from "@tanstack/react-table";
 import { ArrowUpDown, MoreHorizontal } from "lucide-react";
 
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,10 +13,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import toast from "react-hot-toast";
-import axios from "axios";
-import getURL from "@/lib/getURL";
-import { Checkbox } from "@/components/ui/checkbox";
 import Link from "next/link";
 
 export type StaffTableData = {

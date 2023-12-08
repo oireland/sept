@@ -117,6 +117,9 @@ model Event {
   results             Result[]  @relation("Event - Results")
   staffMember         Staff?    @relation("StaffMember - Events", fields: [staffId], references: [staffId])
   staffId             String?
+  recordHolderName String?
+  yearRecordSet Int?
+  recordScore Float?
 }
 
 model Result {
@@ -129,4 +132,3 @@ model Result {
   scores Float[]
   @@id([eventId, athleteId])
 }
-

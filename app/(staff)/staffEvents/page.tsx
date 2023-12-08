@@ -43,6 +43,9 @@ const getStaffEventsTableData = async (
             },
           },
         },
+        recordHolderName: true,
+        recordScore: true,
+        yearRecordSet: true,
         maxNumberOfAthletesPerTeam: true,
         host: {
           select: {
@@ -56,28 +59,38 @@ const getStaffEventsTableData = async (
 
     return events.map(
       ({
-        athletesBoyOrGirl,
         name,
+        eventId,
+        athletesBoyOrGirl,
+        athletesCompeting,
         eventType,
         groupName,
-        eventId,
         staffMember,
-        athletesCompeting,
         maxNumberOfAthletesPerTeam,
-        host,
         locationName,
         date,
+        host,
+        recordHolderName,
+        recordScore,
+        yearRecordSet,
       }) => ({
         eventId,
-        name,
-        boyOrGirl: athletesBoyOrGirl,
-        eventType,
-        groupName,
+        eventFullName: `${groupName} ${
+          athletesBoyOrGirl === "BOY" ? "Boy's" : "Girl's"
+        } ${name}`,
         numberOfAthletes: athletesCompeting.length,
         staffName: staffMember?.user.name,
-        maxNumberOfAthletes: maxNumberOfAthletesPerTeam * host.teams.length,
+        maxNumberOfAthletes: host.teams.length * maxNumberOfAthletesPerTeam,
         locationName,
         date,
+        recordString:
+          !recordScore || !recordHolderName || !yearRecordSet
+            ? "No record set"
+            : `${
+                recordScore + (eventType === "TRACK" ? "s" : "m")
+              } - ${yearRecordSet} - ${recordHolderName}`,
+        groupName,
+        boyOrGirl: athletesBoyOrGirl,
       }),
     );
   } catch (e) {

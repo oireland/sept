@@ -60,15 +60,7 @@ async function getEventData(eventId: string, hostId: string) {
         name: true,
         groupName: true,
         maxNumberOfAthletesPerTeam: true,
-        host: {
-          select: {
-            teams: {
-              select: {
-                teamName: true,
-              },
-            },
-          },
-        },
+        host: { select: { teams: { select: { teamName: true } } } },
         results: {
           select: {
             athleteId: true,
@@ -101,17 +93,19 @@ export function getTeamsBeingExceeded(
     numberOfAthletesInTeamsMap.set(teamName, 0);
   });
 
-  let teamsBeingExceeded = new Set<string>();
-
   athletesTeams.forEach(({ teamName }) => {
     let current = numberOfAthletesInTeamsMap.get(teamName);
     numberOfAthletesInTeamsMap.set(teamName, current + 1);
-    if (current + 1 > maxPerTeam) {
-      teamsBeingExceeded.add(teamName);
+  });
+
+  let teamsBeingExceeded: string[] = [];
+  numberOfAthletesInTeamsMap.forEach((numberOfAthletes, teamName) => {
+    if (numberOfAthletes > maxPerTeam) {
+      teamsBeingExceeded.push(teamName);
     }
   });
 
-  return Array.from(teamsBeingExceeded);
+  return teamsBeingExceeded;
 }
 
 const EnterEventResults = async ({
@@ -158,8 +152,8 @@ const EnterEventResults = async ({
     host.teams,
   );
 
+  // One or more teams have too many athletes competing
   if (teamsBeingExceeded.length > 0) {
-    // One or more teams have too many athletes competing
     return (
       <FloatingContainer className="space-y-3 p-4 text-center">
         <h2 className="mt-2  text-xl font-semibold text-brg sm:text-2xl">
@@ -189,9 +183,9 @@ const EnterEventResults = async ({
 
   // check whether every athlete in the event has a result or not
   let haveAthletesCompeted = true;
-  const eventResultAThleteIds = eventResults.map(({ athleteId }) => athleteId);
+  const eventResultAthleteIds = eventResults.map(({ athleteId }) => athleteId);
   athletesCompeting.forEach(({ athleteId }) => {
-    if (!eventResultAThleteIds.includes(athleteId)) {
+    if (!eventResultAthleteIds.includes(athleteId)) {
       // no result for this athlete for this event
       haveAthletesCompeted = false;
     }

@@ -15,6 +15,7 @@ const AddEventsToStaffDataTable = ({
   staffUserId: string;
 }) => {
   const addSelectedEvents = async (selectedRowData: EventTableData[]) => {
+    console.log(selectedRowData);
     let toastId = toast.loading("Adding events to the staff member...");
     try {
       await axios.patch(getURL("/api/update/addEventsToStaff"), {

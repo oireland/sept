@@ -32,6 +32,8 @@ export async function POST(req: Request) {
       maxNumberOfAthletesPerTeam,
       staffMember,
       host,
+      recordScore,
+      athletesCompeting,
     } = await prisma.event.update({
       where: {
         eventId,
@@ -45,11 +47,22 @@ export async function POST(req: Request) {
             teams: true,
           },
         },
+        athletesCompeting: {
+          select: {
+            user: {
+              select: {
+                name: true,
+              },
+            },
+            athleteId: true,
+          },
+        },
         staffMember: {
           select: {
             userId: true,
           },
         },
+        recordScore: true,
       },
       data: {
         results: {
@@ -76,17 +89,11 @@ export async function POST(req: Request) {
       distances.sort((a, b) => b - a); // high-low
     });
 
-    // get results with all attempts being 0.
+    // get results with all attempts being 0. If their highest attemot is zero they are all zero since it is sorted high to low
     // Need to remove them from the event so that all athletes competing have a result.
     const athletesWithAllZero = results
       .filter(({ distances }) => {
-        let areAllZero = true;
-        distances.forEach((distance) => {
-          if (distance !== 0) {
-            areAllZero = false;
-          }
-        });
-        return areAllZero;
+        distances.length !== 3 || distances[0] === 0;
       })
       .map(({ athleteId }) => athleteId);
 
@@ -95,7 +102,7 @@ export async function POST(req: Request) {
       ({ distances }) => distances.length === 3 && distances[0] !== 0,
     );
 
-    let drawPairsIds = new Map();
+    let drawPairsIds = new Map<string, string>();
     results.sort((a, b) => {
       for (let i = 0; i < 3; i++) {
         if (a.distances[i] > b.distances[i]) {
@@ -112,8 +119,6 @@ export async function POST(req: Request) {
 
       return 0;
     });
-
-    // remove duplicates
 
     const resultsToBeCreated: {
       athleteId: string;
@@ -139,7 +144,10 @@ export async function POST(req: Request) {
         scores: current.distances,
       });
 
-      if (drawPairsIds.get(current.athleteId) === next.athleteId) {
+      if (
+        drawPairsIds.get(current.athleteId) === next.athleteId ||
+        drawPairsIds.get(next.athleteId) === current.athleteId
+      ) {
         // if the current and next athlete drew
         placeAdjustment++;
       } else {
@@ -180,6 +188,24 @@ export async function POST(req: Request) {
         }),
       ),
     );
+
+    // check for record broken
+    if (recordScore === null || results[0].distances[0] > recordScore) {
+      const recordBreaker = results[0];
+      // update record
+      await prisma.event.update({
+        where: {
+          eventId,
+        },
+        data: {
+          recordScore: recordBreaker.distances[0],
+          recordHolderName: athletesCompeting.filter(
+            ({ athleteId }) => athleteId === recordBreaker.athleteId,
+          )[0].user.name,
+          yearRecordSet: new Date().getFullYear(),
+        },
+      });
+    }
 
     return NextResponse.json("Results created successfully", { status: 200 });
   } catch (e) {

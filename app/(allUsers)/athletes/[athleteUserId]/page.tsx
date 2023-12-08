@@ -43,6 +43,9 @@ async function getEventsData(
         maxNumberOfAthletesPerTeam: true,
         locationName: true,
         date: true,
+        recordHolderName: true,
+        recordScore: true,
+        yearRecordSet: true,
       },
     });
 
@@ -55,16 +58,23 @@ async function getEventsData(
         maxNumberOfAthletesPerTeam,
         locationName,
         date,
+        recordHolderName,
+        recordScore,
+        yearRecordSet,
       }) => ({
-        name,
+        eventFullName: `${groupName} ${
+          boyOrGirl === "BOY" ? "Boy's" : "Girl's"
+        } ${name}`,
         numberOfAthletes: athletesCompeting.length,
-        boyOrGirl,
-        groupName,
-        eventType,
         eventId,
         maxNumberOfAthletes: maxNumberOfAthletesPerTeam * numberOfTeams,
         locationName,
         date,
+        recordString: `${
+          recordScore + (eventType === "TRACK" ? "s" : "m")
+        } - ${yearRecordSet} - ${recordHolderName}`,
+        boyOrGirl,
+        groupName,
       }),
     );
 
@@ -104,6 +114,9 @@ async function getAthleteData(athleteUserId: string, hostId: string) {
             maxNumberOfAthletesPerTeam: true,
             locationName: true,
             date: true,
+            recordHolderName: true,
+            recordScore: true,
+            yearRecordSet: true,
           },
         },
         hostId: true,
@@ -150,14 +163,7 @@ const EditAthlete = async ({
     redirect(getURL("/athletes"));
   }
 
-  const {
-    user,
-    teamName,
-    boyOrGirl,
-    events: athleteEvents,
-    groupName,
-    host,
-  } = athlete!;
+  const { user, boyOrGirl, events: athleteEvents, groupName, host } = athlete!;
   const name = user.name;
   const numberOfTeams = host.teams.length;
 
@@ -180,16 +186,23 @@ const EditAthlete = async ({
 
       date,
       locationName,
+      recordHolderName,
+      recordScore,
+      yearRecordSet,
     }) => ({
-      name,
-      eventType,
+      eventFullName: `${groupName} ${
+        athletesBoyOrGirl === "BOY" ? "Boy's" : "Girl's"
+      } ${name}`,
       eventId,
-      boyOrGirl: athletesBoyOrGirl,
-      groupName,
       numberOfAthletes: athletesCompeting.length,
       maxNumberOfAthletes: maxNumberOfAthletesPerTeam * numberOfTeams,
       locationName,
       date,
+      recordString: `${
+        recordScore + (eventType === "TRACK" ? "s" : "m")
+      } - ${yearRecordSet} - ${recordHolderName}`,
+      boyOrGirl: athletesBoyOrGirl,
+      groupName,
     }),
   );
 

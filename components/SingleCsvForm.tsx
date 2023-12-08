@@ -9,7 +9,7 @@ import BackButton from "./BackButton";
 type SingleCsvFormProps = {
   onFileChange: (resultArray: string[]) => void;
   onSubmit: () => void;
-  inputLabel: string;
+  inputLabel?: string;
   inputName: string;
 };
 

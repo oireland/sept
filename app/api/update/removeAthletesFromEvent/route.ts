@@ -20,7 +20,7 @@ export async function PATCH(req: Request) {
     }
 
     const { eventId, selectedRowData: athletes } = await requestSchema.validate(
-      await req.json()
+      await req.json(),
     );
 
     // get the group and gender of the event for filtering the athletes later
@@ -51,40 +51,17 @@ export async function PATCH(req: Request) {
       return NextResponse.json("Invalid request", { status: 400 });
     }
 
-    const athletesOfHost = await prisma.athlete.findMany({
-      where: {
-        hostId,
-        groupName: eventGroupName,
-        boyOrGirl: athletesBoyOrGirl,
-      },
-      select: {
-        userId: true,
-      },
-    });
-    // filter the athletes from the request to only include those with a valid ID, group and boyOrGirl
-
-    const validAthleteIds: string[] = athletesOfHost.map(
-      (athlete) => athlete.userId
-    );
-
-    const filteredAthletes = athletes?.filter(
-      ({ groupName, boyOrGirl, userId }) =>
-        groupName === eventGroupName &&
-        boyOrGirl === athletesBoyOrGirl &&
-        validAthleteIds.includes(userId)
-    );
-
-    if (filteredAthletes.length === 0) {
-      return NextResponse.json("Invalid request", { status: 400 });
-    }
-
-    // disconnect the event from each athlete
+    // TODO: Update complex code about this if needed
+    // disconnect the event from each valid athlete
     await Promise.all(
-      filteredAthletes.map(
+      athletes.map(
         async ({ userId }) =>
           await prisma.athlete.update({
             where: {
               userId,
+              hostId,
+              groupName: eventGroupName,
+              boyOrGirl: athletesBoyOrGirl,
             },
             data: {
               events: {
@@ -93,8 +70,8 @@ export async function PATCH(req: Request) {
                 },
               },
             },
-          })
-      )
+          }),
+      ),
     );
 
     return NextResponse.json("Successfully removed athletes from event", {

@@ -46,6 +46,7 @@
     "eslint": "8.53.0",
     "eslint-config-next": "^14.0.3",
     "formik": "^2.4.5",
+    "json2csv": "^6.0.0-alpha.2",
     "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.292.0",
     "next": "^14.0.3",
@@ -70,6 +71,7 @@
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.10",
     "@types/bcrypt": "^5.0.2",
+    "@types/json2csv": "^5.0.7",
     "@types/jsonwebtoken": "^9.0.5",
     "@types/nodemailer": "^6.4.14",
     "prettier": "^3.1.0",

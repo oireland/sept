@@ -10,7 +10,7 @@ const requestSchema = yup.object({
   newPassword: yup
     .string()
     .matches(
-      /(?=^.{6,20}$)((?=.*\w)(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[|!"$%&\/\(\)\?\^\'\\\+\-\*]))^.*/
+      /(?=^.{6,20}$)((?=.*\w)(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[|!"$%&\/\(\)\?\^\'\\\+\-\*]))^.*/,
     )
     .required()
     .test("different-new-password", function (value) {
@@ -40,7 +40,7 @@ export async function PATCH(req: Request) {
       },
     });
 
-    const isOldPasswordCorrect = await bcrypt.compare(oldPassword, password!);
+    const isOldPasswordCorrect = await bcrypt.compare(oldPassword, password);
 
     if (!isOldPasswordCorrect) {
       return NextResponse.json("Invalid Request", { status: 400 });
@@ -49,6 +49,7 @@ export async function PATCH(req: Request) {
     const hashedNewPassword = await bcrypt.hash(newPassword, 10);
 
     if (email !== session.user.email) {
+      // the user is changing their email, so must verify it again
       await prisma.user.update({
         where: {
           userId: session.user.userId,

@@ -2,8 +2,7 @@
 
 import { BoyOrGirl, EventType } from "@prisma/client";
 import { ColumnDef } from "@tanstack/react-table";
-import { Button } from "@/components/ui/button";
-import { ArrowUpDown, Edit, X } from "lucide-react";
+import { Edit, X } from "lucide-react";
 
 import { Checkbox } from "@/components/ui/checkbox";
 
@@ -11,16 +10,16 @@ import getURL from "@/lib/getURL";
 import Link from "next/link";
 
 export type EventTableData = {
-  name: string;
-  groupName: string;
-  eventType: EventType;
-  boyOrGirl: BoyOrGirl;
+  eventFullName: string;
   eventId: string;
   numberOfAthletes: number;
   staffName?: string;
   maxNumberOfAthletes: number;
   locationName: string;
   date: Date;
+  recordString: string;
+  boyOrGirl: BoyOrGirl;
+  groupName: string;
 };
 
 export const columns: ColumnDef<EventTableData>[] = [
@@ -44,48 +43,11 @@ export const columns: ColumnDef<EventTableData>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: "name",
-    id: "Name",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          className="p-0 text-sm text-black"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Name
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      );
+    accessorKey: "eventFullName",
+    id: "Event Name",
+    header() {
+      return <h2 className="text-sm">Event</h2>;
     },
-  },
-  {
-    accessorKey: "groupName",
-    id: "Group",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          className="p-0 text-sm text-black"
-          onClick={() => {
-            column.toggleSorting(column.getIsSorted() === "asc");
-          }}
-        >
-          Group
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      );
-    },
-  },
-  {
-    accessorKey: "boyOrGirl",
-    id: "Boy/Girl",
-    header: () => <div>Boy/Girl</div>,
-  },
-  {
-    accessorKey: "eventType",
-    id: "Event Type",
-    header: () => <div>Event Type</div>,
   },
   {
     accessorKey: "numberOfAthletes",
@@ -136,6 +98,12 @@ export const columns: ColumnDef<EventTableData>[] = [
       }
     },
   },
+  {
+    accessorKey: "recordString",
+    id: "Record",
+    header: () => <div>Record</div>,
+  },
+
   {
     id: "actions",
 

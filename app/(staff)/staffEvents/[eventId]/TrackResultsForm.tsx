@@ -68,13 +68,12 @@ const TrackResultsForm: FC<Props> = ({ athletes, eventId }) => {
       <Form className="p-2 sm:p-4 md:p-6">
         <div className="mb-2 grid grid-cols-3">
           <h3 className="text-base font-semibold">Name</h3>
-          <h3 className="text-base font-semibold">Time</h3>
+          <h3 className="text-base font-semibold">Time (s)</h3>
         </div>
         <div className="space-y-2">
           {athletes.map(({ name }, index) => (
             <div key={index}>
               <TrackScoreInput index={index} label={name} name="results" />
-              <hr className="mt-1" />
             </div>
           ))}
         </div>

@@ -29,34 +29,15 @@ export async function PATCH(req: Request) {
     if (hostId === null || staffHostId === null || hostId !== staffHostId) {
       return NextResponse.json("Invalid request", { status: 400 });
     }
-
-    const eventsOfHost = await prisma.event.findMany({
-      where: {
-        hostId,
-      },
-      select: {
-        eventId: true,
-      },
-    });
-    // filter the events from the request to only include those with a valid ID
-
-    const validEventIds: string[] = eventsOfHost.map(({ eventId }) => eventId);
-
-    const filteredEvents = events?.filter(({ eventId }) =>
-      validEventIds.includes(eventId)
-    );
-
-    if (filteredEvents.length === 0) {
-      return NextResponse.json("Invalid request", { status: 400 });
-    }
-
+    // TODO: Might need to update document about this
     // update each event to have the staff member
     await Promise.all(
-      filteredEvents?.map(
+      events?.map(
         async ({ eventId }) =>
           await prisma.event.update({
             where: {
               eventId,
+              hostId,
             },
             data: {
               staffMember: {
@@ -65,8 +46,8 @@ export async function PATCH(req: Request) {
                 },
               },
             },
-          })
-      )
+          }),
+      ),
     );
 
     return NextResponse.json("Successfully added events to staff", {

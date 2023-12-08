@@ -63,15 +63,20 @@ const FieldResultForm: FC<Props> = ({ athletes, eventId }) => {
       }}
     >
       <Form className="p-2 sm:p-4 md:p-6">
-        <div className="mb-2 grid grid-cols-3">
+        <div className="mb-2 grid grid-cols-4">
           <h3 className="text-base font-semibold">Name</h3>
-          <h3 className="text-base font-semibold">Distance</h3>
+          <h3 className="text-base font-semibold text-left col-span-3">
+            Distances
+          </h3>
         </div>
         <div className="space-y-2">
           {athletes.map(({ name }, index) => (
             <div key={index}>
-              <FieldScoreInput index={index} label={name} name="results" />
-              <hr className="mt-1" />
+              <FieldScoreInput
+                athleteIndex={index}
+                label={name}
+                name="results"
+              />
             </div>
           ))}
         </div>
@@ -91,13 +96,13 @@ export default FieldResultForm;
 
 type FieldScoreInputProps = {
   label: string;
-  index: number;
+  athleteIndex: number;
 } & FieldAttributes<{}>;
 
 const FieldScoreInput: FC<FieldScoreInputProps> = ({
   placeholder,
   label,
-  index,
+  athleteIndex,
   ...props
 }) => {
   const [field, meta, helpers] = useField<
@@ -115,8 +120,8 @@ const FieldScoreInput: FC<FieldScoreInputProps> = ({
       <label className="text-sm md:text-base overflow-x-clip">{label}</label>
 
       <div className="col-span-3 flex space-x-1">
-        {Array.from(Array(3)).map((a, j) => (
-          <div key={j} className="input_group w-full">
+        {Array.from(Array(3)).map((a, attemptIndex) => (
+          <div key={attemptIndex} className="input_group w-full">
             <input
               type="number"
               step={0.01}
@@ -125,11 +130,15 @@ const FieldScoreInput: FC<FieldScoreInputProps> = ({
               onBlur={field.onBlur}
               onChange={(e) => {
                 let newValue = value;
-                newValue[index].distances[j] = Number(e.currentTarget.value);
+                newValue[athleteIndex].distances[attemptIndex] = Number(
+                  e.currentTarget.value,
+                );
                 setValue(newValue);
               }}
               className="input_text h-10"
-              value={Number(value[index].distances[j]).toString()}
+              value={Number(
+                value[athleteIndex].distances[attemptIndex],
+              ).toString()}
             />
           </div>
         ))}

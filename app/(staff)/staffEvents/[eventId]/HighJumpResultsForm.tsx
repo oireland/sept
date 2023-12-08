@@ -12,19 +12,18 @@ import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import getURL from "@/lib/getURL";
 
-type AttemptOptions = "CLEARED" | "PASSED" | "FAILED" | undefined;
-
-type Result = {
-  athleteId: string;
-
-  attemptsAtEachHeight: AttemptOptions[][];
-};
-
 type CalculatedResult = {
   athleteId: string;
   place: number;
   points: number;
   bestHeight: number;
+};
+
+type AttemptOptions = "CLEARED" | "PASSED" | "FAILED" | undefined;
+
+type Result = {
+  athleteId: string;
+  attemptsAtEachHeight: AttemptOptions[][];
 };
 
 type FormData = {
@@ -82,7 +81,7 @@ const HighJumpResultsForm: FC<Props> = ({
   };
 
   // Changes the place and points of every athlete in the jump off apart from the winner to 2nd place and the corresponding number of points.
-  const selectWinner = (winnerId: string) => {
+  const selectWinner = async (winnerId: string) => {
     let resultsToBeCreated: CalculatedResult[] = calculatedResults.map(
       (athlete) => {
         if (
@@ -101,11 +100,11 @@ const HighJumpResultsForm: FC<Props> = ({
       },
     );
 
-    finalResultSubmission(resultsToBeCreated);
+    await finalResultSubmission(resultsToBeCreated);
   };
 
   // The "JUMP OFF" - displays a button for each athlete in the jump off for the staff member to select who won. Or they can choose to share the gold.
-  if (athletesInJumpOffIds.length > 0) {
+  if (athletesInJumpOffIds.length > 1) {
     return (
       <div className="p-2 sm:p-4 md:p-6">
         <h3 className="text-base font-semibold text-center">
@@ -118,7 +117,7 @@ const HighJumpResultsForm: FC<Props> = ({
             return (
               <Button
                 onClick={async () => {
-                  selectWinner(id);
+                  await selectWinner(id);
                 }}
                 key={id}
                 variant="outline"
@@ -158,7 +157,7 @@ const HighJumpResultsForm: FC<Props> = ({
         data,
         maxNumberOfAthletesTotal,
       );
-      if (athletesInJumpOff.length > 0) {
+      if (athletesInJumpOff.length > 1) {
         setAthletesInJumpOffIds(athletesInJumpOff);
         setCalculatedResults(results);
       } else {
@@ -186,11 +185,11 @@ const HighJumpResultsForm: FC<Props> = ({
       validationSchema={HighJumpResultsInputSchema}
       onSubmit={(values: FormData) => {
         handleFormSubmit(values);
+        console.log(values);
       }}
     >
       {({ values, setValues }) => (
         <Form className="p-2 sm:p-4 md:p-6">
-          <div>{athletesInJumpOffIds}</div>
           <div className="grid grid-cols-4">
             <div></div>
             <header className="col-span-3 border  flex items-center justify-between rounded-t-md px-2 font-semibold  bg-muted">
@@ -230,7 +229,7 @@ const HighJumpResultsForm: FC<Props> = ({
             </div>
 
             <div className="col-span-3 overflow-x-scroll overflow-y-hidden">
-              {/* Display an input fopr every height added, which update's that height's value */}
+              {/* Display an input for every height added, which update's that height's value */}
               <div className="flex h-10">
                 {values.heights.map((height, index) => (
                   <HeightInput key={index} index={index} name="heights" />
@@ -241,7 +240,6 @@ const HighJumpResultsForm: FC<Props> = ({
               <div>
                 {athletes.map(({ name, athleteId }, index) => (
                   <AthleteResultsInput
-                    athleteName={name}
                     athleteIndex={index}
                     key={athleteId}
                     name="results"
@@ -295,14 +293,12 @@ const HeightInput: FC<HeightInputProps> = ({ index, ...props }) => {
 
 type AthleteResultInputProps = {
   athleteIndex: number;
-  athleteName: string;
   heights: number[];
 } & FieldAttributes<{}>;
 
 const AthleteResultsInput: FC<AthleteResultInputProps> = ({
   athleteIndex,
   heights,
-  athleteName,
   ...props
 }) => {
   const [field, meta, helpers] = useField<Result[]>(props.name);
@@ -434,7 +430,6 @@ const calculateResults = (formData: FormData, maxNumberOfAthletes: number) => {
 
   const calculatedResults = resultsData.map(
     ({ attemptsAtEachHeight, athleteId }) => {
-      //   This assumes the heights array is in order low to high
       let bestHeight = 0;
       let failsAtBestHeight = 0;
       attemptsAtEachHeight.forEach((value, index) => {
@@ -498,21 +493,16 @@ const calculateResults = (formData: FormData, maxNumberOfAthletes: number) => {
   }); // high to low
 
   // remove duplicates
-  console.log("athletesInJumpOff", athletesInJumpOff);
-
   athletesInJumpOff = Array.from(new Set(athletesInJumpOff));
-
-  console.log("athletesInJumpOff", athletesInJumpOff);
 
   let results: CalculatedResult[] = [];
 
   let placeAdjustment = 0;
 
   for (let i = 0; i < calculatedResults.length - 1; i++) {
-    console.log(i);
     const current = calculatedResults[i];
     const next = calculatedResults[i + 1];
-    // if there are no athletes in the jump off then the first athlete is the winner
+    // if there are no athletes in the jump off then the first athlete is the winner. Need to do this seperately because the condition below for a draw will be met event if the tie breaker has been resolved and there is no jump off.
     if (athletesInJumpOff.length === 0 && i === 0) {
       results.push({
         athleteId: current.athleteId,

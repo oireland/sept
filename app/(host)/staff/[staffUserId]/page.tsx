@@ -36,11 +36,7 @@ const getStaffData = async (staffUserId: string, hostId: string) => {
             athletesBoyOrGirl: true,
             athletesCompeting: true,
             eventType: true,
-            group: {
-              select: {
-                groupName: true,
-              },
-            },
+            groupName: true,
             eventId: true,
             maxNumberOfAthletesPerTeam: true,
             date: true,
@@ -49,11 +45,10 @@ const getStaffData = async (staffUserId: string, hostId: string) => {
                 teams: true,
               },
             },
-            location: {
-              select: {
-                locationName: true,
-              },
-            },
+            locationName: true,
+            recordHolderName: true,
+            recordScore: true,
+            yearRecordSet: true,
           },
         },
         user: {
@@ -99,32 +94,38 @@ const EditStaffPage = async ({
     session!.user.role,
   );
 
-  console.log(staffData!.events);
-
   const staffsEventsTableData: EventTableData[] = staffData!.events.map(
     ({
       name,
       athletesBoyOrGirl,
       eventType,
-      group,
+      groupName,
       eventId,
       athletesCompeting,
       maxNumberOfAthletesPerTeam,
       host,
       date,
-      location,
+      locationName,
+      recordHolderName,
+      recordScore,
+      yearRecordSet,
     }) => ({
       eventId,
-      boyOrGirl: athletesBoyOrGirl,
-      eventType,
-      groupName: group.groupName,
+      eventFullName: `${groupName} ${
+        athletesBoyOrGirl === "BOY" ? "Boy's" : "Girl's"
+      } ${name}`,
       name,
       numberOfAthletes: athletesCompeting.length,
       staffName: staffData!.user.name,
       maxNumberOfAthletes: maxNumberOfAthletesPerTeam * host.teams.length,
       date,
-      locationName: location.locationName,
+      locationName,
       staffUserId,
+      recordString: `${
+        recordScore + (eventType === "TRACK" ? "s" : "m")
+      } - ${yearRecordSet} - ${recordHolderName}`,
+      boyOrGirl: athletesBoyOrGirl,
+      groupName,
     }),
   );
 
@@ -136,6 +137,8 @@ const EditStaffPage = async ({
     ({ eventId, staffName }) =>
       !staffsEventsIds.includes(eventId) && !staffName,
   );
+
+  console.log("all", allEventsData);
 
   return (
     <div className="max-w-full overflow-x-hidden">

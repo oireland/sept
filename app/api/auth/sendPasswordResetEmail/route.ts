@@ -24,7 +24,6 @@ export async function POST(req: Request) {
       expiresIn: "1d",
     });
     const url = getURL(`/resetPassword/${emailToken}`);
-    console.log(url);
 
     await transporter.sendMail({
       to: email,
@@ -33,7 +32,6 @@ export async function POST(req: Request) {
     });
     return NextResponse.json({ message: "success" }, { status: 200 });
   } catch (e) {
-    console.log(e);
     return NextResponse.json(
       { message: "Something went wrong" },
       { status: 500 },
