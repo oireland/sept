@@ -14,9 +14,11 @@ import * as json2csv from "json2csv";
 import { AlertCircleIcon } from "lucide-react";
 import { getServerSession } from "next-auth";
 import CreateRecordsForm from "./CreateRecordsForm";
+import { authOptions } from "@/lib/auth";
 
 const getEventData = async (userId: string) => {
   try {
+    console.log("userId", userId);
     const eventData = await prisma.event.findMany({
       where: {
         host: {
@@ -33,8 +35,15 @@ const getEventData = async (userId: string) => {
         name: true,
         groupName: true,
         athletesBoyOrGirl: true,
+        host: {
+          select: {
+            userId: true,
+          },
+        },
       },
     });
+
+    console.log(eventData);
 
     return eventData.map(
       ({
@@ -61,7 +70,7 @@ const getEventData = async (userId: string) => {
 };
 
 const CreateRecordsPage = async () => {
-  const session = await getServerSession();
+  const session = await getServerSession(authOptions);
 
   const allEventsData = await getEventData(session!.user.userId);
 
