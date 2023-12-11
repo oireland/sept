@@ -64,7 +64,7 @@ const CreateRecordsForm = ({ allowedEventIds }: Props) => {
           recordScore: recordSplit[4],
         });
       });
-
+      console.log(unvalidatedRecordObjectArray);
       const recordsObjectArray = await yup
         .array(RecordSchema)
         .required()

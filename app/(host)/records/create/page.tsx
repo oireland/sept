@@ -63,6 +63,7 @@ const CreateRecordsPage = async () => {
 
   const allEventsData = await getEventData(session!.user.userId);
 
+  console.log("allEventsData", allEventsData);
   const eventsWithNoRecords = allEventsData.filter(
     ({ recordHolderName, recordScore, yearRecordSet }) =>
       !recordHolderName || !recordScore || !yearRecordSet,
@@ -82,27 +83,39 @@ const CreateRecordsPage = async () => {
             <a
               href={`data:text/csv;charset=utf-8,${json2csv.parse(
                 allEventsData,
+                {
+                  delimiter: ",",
+                  escapedQuote: "",
+                },
               )}`}
               download="recordsTemplate"
             >
               Update all event records
             </a>
           </Button>
-          <div className="flex justify-evenly items-center w-full space-x-2">
-            <hr className="w-full h-1" />
-            <span>or</span>
-            <hr className="w-full h-1" />
-          </div>
-          <Button variant={"outline"} asChild className="w-full">
-            <a
-              href={`data:text/csv;charset=utf-8,${json2csv.parse(
-                eventsWithNoRecords,
-              )}`}
-              download="recordsTemplate"
-            >
-              Only update events that have no record
-            </a>
-          </Button>
+          {eventsWithNoRecords.length > 0 && (
+            <>
+              <div className="flex justify-evenly items-center w-full space-x-2">
+                <hr className="w-full h-1" />
+                <span>or</span>
+                <hr className="w-full h-1" />
+              </div>
+              <Button variant={"outline"} asChild className="w-full">
+                <a
+                  href={`data:text/csv;charset=utf-8,${json2csv.parse(
+                    eventsWithNoRecords,
+                    {
+                      delimiter: ",",
+                      escapedQuote: "",
+                    },
+                  )}`}
+                  download="recordsTemplate"
+                >
+                  Only update events that have no record
+                </a>
+              </Button>
+            </>
+          )}
         </div>
       </div>
       <div className="w-full space-y-2">

@@ -48,7 +48,7 @@ enum BoyOrGirl {
 model Group {
   groupName String
   athletes Athlete[] @relation("Group - Athletes")
-  host Host @relation("Host - Groups", fields: [hostId], references: [hostId])
+  host Host @relation("Host - Groups", fields: [hostId], references: [hostId], onDelete: Cascade)
   hostId String
   events Event[] @relation("Group - Events")
   @@id([groupName, hostId])
@@ -57,7 +57,7 @@ model Group {
 model Team {
   teamName String
   athletes Athlete[] @relation("Team - Athletes")
-  host Host @relation("Host - Teams", fields: [hostId], references: [hostId])
+  host Host @relation("Host - Teams", fields: [hostId], references: [hostId], onDelete: Cascade)
   hostId String
   hexColour String
   @@id([teamName, hostId])
@@ -81,7 +81,7 @@ model Athlete {
 model Location {
   locationName String
   events Event[] @relation("Location - Events")
-  host Host @relation("Host - Locations", fields: [hostId], references: [hostId])
+  host Host @relation("Host - Locations", fields: [hostId], references: [hostId], onDelete: Cascade)
   hostId String
   @@id([locationName, hostId])
 }

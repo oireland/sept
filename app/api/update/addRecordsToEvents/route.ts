@@ -26,6 +26,8 @@ export async function PATCH(req: Request) {
       })
     ).map(({ eventId }) => eventId);
 
+    console.log("allowedEventIds", allowedEventIds);
+
     const RecordSchema = yup
       .object({
         eventId: yup
@@ -43,7 +45,7 @@ export async function PATCH(req: Request) {
         yearRecordSet: yup
           .number()
           .integer()
-          .min(1900)
+          .min(1800)
           .max(new Date().getUTCFullYear())
           .required(),
         recordScore: yup.number().required().min(0),
