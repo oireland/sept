@@ -24,12 +24,13 @@ export async function DELETE(
     await prisma.group.deleteMany({
       where: {
         host: {
-          userId: session.user.userId,
-        },
-        AND: {
-          groupName: {
-            in: nameArray,
+          is: {
+            userId: session.user.userId,
           },
+        },
+
+        groupName: {
+          in: nameArray,
         },
       },
     });

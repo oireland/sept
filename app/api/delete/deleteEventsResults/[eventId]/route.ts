@@ -5,7 +5,7 @@ import { NextResponse } from "next/server";
 
 export async function DELETE(
   req: Request,
-  { params }: { params: { eventId: string } }
+  { params }: { params: { eventId: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -17,10 +17,13 @@ export async function DELETE(
     await prisma.result.deleteMany({
       where: {
         event: {
-          eventId: params.eventId,
-          AND: {
+          is: {
+            eventId: params.eventId,
+
             staffMember: {
-              userId: session.user.userId,
+              is: {
+                userId: session.user.userId,
+              },
             },
           },
         },

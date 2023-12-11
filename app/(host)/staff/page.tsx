@@ -9,14 +9,16 @@ import { StaffTableData } from "./columns";
 import dynamic from "next/dynamic";
 
 // client components
-const StaffDataTable = dynamic(() => import("./StaffDataTable"))
+const StaffDataTable = dynamic(() => import("./StaffDataTable"));
 
 async function getStaffData(userId: string): Promise<StaffTableData[]> {
   // fetch data
   const data = await prisma.staff.findMany({
     where: {
       host: {
-        userId,
+        is: {
+          userId,
+        },
       },
     },
     select: {

@@ -20,7 +20,9 @@ const getEventData = async (userId: string) => {
     const eventData = await prisma.event.findMany({
       where: {
         host: {
-          userId,
+          is: {
+            userId,
+          },
         },
       },
       select: {

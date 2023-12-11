@@ -22,8 +22,9 @@ async function getAthleteResults(athleteUserId: string, hostId: string) {
     const results = await prisma.result.findMany({
       where: {
         athlete: {
-          userId: athleteUserId,
-          AND: {
+          is: {
+            userId: athleteUserId,
+
             hostId,
           },
         },

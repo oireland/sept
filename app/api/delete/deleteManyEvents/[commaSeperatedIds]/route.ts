@@ -5,7 +5,7 @@ import { NextResponse } from "next/server";
 
 export async function DELETE(
   req: Request,
-  { params }: { params: { commaSeperatedIds: string } }
+  { params }: { params: { commaSeperatedIds: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -16,7 +16,7 @@ export async function DELETE(
     if (!session?.user || session.user.role !== "HOST") {
       return NextResponse.json(
         { message: "Unauthorised request" },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -25,8 +25,9 @@ export async function DELETE(
         eventId: {
           in: idArray,
         },
-        AND: {
-          host: {
+
+        host: {
+          is: {
             userId: session.user.userId,
           },
         },
@@ -38,7 +39,7 @@ export async function DELETE(
     console.log(e);
     return NextResponse.json(
       { message: "Something went wrong" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

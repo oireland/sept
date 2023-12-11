@@ -14,7 +14,7 @@ const validationSchema = yup.object({
     .test(
       "futureDate",
       "Date must be in the future",
-      (date) => new Date() < date
+      (date) => new Date() < date,
     ),
   locationName: yup.string().required(),
   staffId: yup.string(),
@@ -41,8 +41,8 @@ export async function PATCH(req: Request) {
     await prisma.event.update({
       where: {
         eventId,
-        AND: {
-          host: {
+        host: {
+          is: {
             userId: session.user.userId,
           },
         },

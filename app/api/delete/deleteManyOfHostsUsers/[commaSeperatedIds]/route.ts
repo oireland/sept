@@ -5,7 +5,7 @@ import { NextResponse } from "next/server";
 
 export async function DELETE(
   req: Request,
-  { params }: { params: { commaSeperatedIds: string } }
+  { params }: { params: { commaSeperatedIds: string } },
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -16,19 +16,19 @@ export async function DELETE(
     if (session?.user.role !== "HOST") {
       return NextResponse.json(
         { message: "Unauthorised request" },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
     await prisma.user.deleteMany({
       where: {
         host: {
-          userId: session.user.userId,
-        },
-        AND: {
-          userId: {
-            in: idArray,
+          is: {
+            userId: session.user.userId,
           },
+        },
+        userId: {
+          in: idArray,
         },
       },
     });
@@ -37,7 +37,7 @@ export async function DELETE(
   } catch (e) {
     return NextResponse.json(
       { message: "Something went wrong" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

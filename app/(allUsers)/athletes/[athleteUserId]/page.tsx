@@ -89,9 +89,8 @@ async function getAthleteData(athleteUserId: string, hostId: string) {
     const athlete = await prisma.athlete.findUniqueOrThrow({
       where: {
         userId: athleteUserId,
-        AND: {
-          hostId,
-        },
+
+        hostId,
       },
       select: {
         user: {

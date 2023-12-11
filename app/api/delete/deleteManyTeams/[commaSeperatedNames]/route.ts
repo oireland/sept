@@ -24,7 +24,9 @@ export async function DELETE(
     await prisma.team.deleteMany({
       where: {
         host: {
-          userId: session.user.userId,
+          is: {
+            userId: session.user.userId,
+          },
         },
         AND: {
           teamName: {

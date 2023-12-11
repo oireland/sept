@@ -17,7 +17,9 @@ export async function PATCH(req: Request) {
       await prisma.event.findMany({
         where: {
           host: {
-            userId: session.user.userId,
+            is: {
+              userId: session.user.userId,
+            },
           },
         },
         select: {

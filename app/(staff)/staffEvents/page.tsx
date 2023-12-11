@@ -21,8 +21,9 @@ const getStaffEventsTableData = async (
     const events = await prisma.event.findMany({
       where: {
         hostId,
-        AND: {
-          staffMember: {
+
+        staffMember: {
+          is: {
             userId: staffUserId,
           },
         },

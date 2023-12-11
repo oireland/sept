@@ -38,9 +38,11 @@ export async function POST(req: Request) {
       await prisma.event.findUniqueOrThrow({
         where: {
           host: {
-            staff: {
-              some: {
-                userId: session.user.userId,
+            is: {
+              staff: {
+                some: {
+                  userId: session.user.userId,
+                },
               },
             },
           },
