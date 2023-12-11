@@ -1,9 +1,6 @@
 import FloatingContainer from "@/components/FloatingContainer";
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
-import React from "react";
 
-import * as json2csv from "json2csv";
 import {
   Table,
   TableBody,
@@ -12,10 +9,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import CreateRecordsForm from "./CreateRecordsForm";
 import { prisma } from "@/lib/prisma";
-import { getServerSession } from "next-auth";
+import * as json2csv from "json2csv";
 import { AlertCircleIcon } from "lucide-react";
+import { getServerSession } from "next-auth";
+import CreateRecordsForm from "./CreateRecordsForm";
 
 const getEventData = async (userId: string) => {
   try {
@@ -56,7 +54,6 @@ const getEventData = async (userId: string) => {
       }),
     );
   } catch (e) {
-    console.log(e);
     return [];
   }
 };

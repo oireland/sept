@@ -30,10 +30,13 @@ const CreateRecordsForm = ({ allowedEventIds }: Props) => {
       yearRecordSet: yup
         .number()
         .integer()
-        .min(1900)
+        .min(1800)
         .max(new Date().getUTCFullYear())
         .required(),
-      recordScore: yup.number().required().min(0),
+      recordScore: yup
+        .number()
+        .required()
+        .min(0, "Record Score cannot be less than 0."),
     })
     .required();
 

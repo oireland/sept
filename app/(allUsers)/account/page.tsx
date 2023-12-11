@@ -16,17 +16,22 @@ import axios from "axios";
 import { useSession } from "next-auth/react";
 import Banner from "../../../components/banner";
 import AccountForm from "./AccountForm";
+import toast from "react-hot-toast";
 
 const AccountPage = () => {
   const session = useSession({ required: true });
 
   const deleteAccount = async () => {
+    let toastId = toast.loading("Deleting...");
     try {
       await axios.delete(
         getURL(`/api/delete/deleteOwnAccount/${session.data?.user.userId}`),
       );
+      toast.dismiss(toastId);
+      toastId = toast.success("Account deleted");
     } catch (e) {
-      console.log(e);
+      toast.dismiss(toastId);
+      toast.error("Couldn't delete your account.");
     }
   };
 
