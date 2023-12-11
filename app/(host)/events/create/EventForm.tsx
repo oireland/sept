@@ -164,7 +164,7 @@ const FormikIntegerInput: FC<IntegerInputProps> = ({ label, ...props }) => {
         {meta.touched && meta.error && (
           <div className="flex items-center text-xs text-brg">
             <RiErrorWarningLine className="peer h-5 w-5 pr-1" />
-            <p className="hidden hover:flex peer-hover:flex">{meta.error}</p>
+            <p className="flex">{meta.error}</p>
           </div>
         )}
       </div>
@@ -173,7 +173,9 @@ const FormikIntegerInput: FC<IntegerInputProps> = ({ label, ...props }) => {
           type="number"
           name={field.name}
           onBlur={field.onBlur}
-          onChange={(e) => helpers.setValue(parseInt(e.currentTarget.value))}
+          onChange={(e) =>
+            helpers.setValue(parseInt(e.currentTarget.value, 10))
+          }
           className="input_text h-10 disabled:cursor-not-allowed"
           step={1}
           min={1}

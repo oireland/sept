@@ -273,22 +273,39 @@ const HeightInput: FC<HeightInputProps> = ({ index, ...props }) => {
   const { value } = meta;
   const { setValue } = helpers;
 
+  const [fieldValue, setFieldValue] = useState("");
+
   return (
     <input
-      type="number"
+      type="text"
       step={0.01}
       min={index === 0 ? 0 : value[index - 1] + 0.01} // height must be greater than or equal to the previous height
       name={field.name}
       onBlur={field.onBlur}
       onChange={(e) => {
-        console.log(Number(e.currentTarget.value));
-        let newValue = value;
-        newValue[index] = Number(e.currentTarget.value);
-        setValue(newValue);
+        let targetVal = e.currentTarget.value;
+        if (!targetVal) {
+          targetVal = "0";
+        }
+        // test that the entered value won't be NaN
+        if (/^(\d+\.?\d*)$/.test(targetVal)) {
+          let numberValue =
+            Math.trunc(Number(e.currentTarget.value) * 100) / 100;
+          let newValue = value;
+          newValue[index] = numberValue;
+          setValue(newValue);
+
+          // append a decimal point if there was one in the entered string
+          if (targetVal.endsWith(".")) {
+            setFieldValue(numberValue + ".");
+          } else {
+            setFieldValue(numberValue.toString());
+          }
+        }
       }}
       className="flex w-full h-10 border-b border-r bg-background px-3 py-2 text-xs min-w-[120px]"
-      value={(Math.trunc(value[index] * 100) / 100).toString()}
-      inputMode="decimal"
+      // value={fieldValue.replace(/^0+/, "")}
+      value={fieldValue}
     />
   );
 };
