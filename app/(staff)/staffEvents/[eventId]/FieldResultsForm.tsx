@@ -1,6 +1,6 @@
 "use client";
 
-import { FC } from "react";
+import { FC, useState } from "react";
 import { Formik, Form, FieldAttributes, useField } from "formik";
 
 import { Button } from "@/components/ui/button";
@@ -115,6 +115,8 @@ const FieldScoreInput: FC<FieldScoreInputProps> = ({
   const { value } = meta;
   const { setValue } = helpers;
 
+  const [fieldValue, setFieldValue] = useState("");
+
   return (
     <div className="grid grid-cols-4">
       <label className="text-sm md:text-base overflow-x-clip">{label}</label>
@@ -123,22 +125,34 @@ const FieldScoreInput: FC<FieldScoreInputProps> = ({
         {Array.from(Array(3)).map((a, attemptIndex) => (
           <div key={attemptIndex} className="input_group w-full">
             <input
-              type="number"
+              type="text"
               step={0.01}
               min={0}
               name={field.name}
               onBlur={field.onBlur}
               onChange={(e) => {
-                let newValue = value;
-                newValue[athleteIndex].distances[attemptIndex] = Number(
-                  e.currentTarget.value,
-                );
-                setValue(newValue);
+                let targetVal = e.currentTarget.value;
+                if (!targetVal) {
+                  targetVal = "0";
+                }
+                // test that the entered value won't be NaN
+                if (/^(\d+\.?\d*)$/.test(targetVal)) {
+                  let numberValue =
+                    Math.trunc(Number(e.currentTarget.value) * 100) / 100;
+                  let newValue = value;
+                  newValue[athleteIndex].distances[attemptIndex] = numberValue;
+                  setValue(newValue);
+
+                  // append a decimal point if there was one in the entered string
+                  if (targetVal.endsWith(".")) {
+                    setFieldValue(numberValue + ".");
+                  } else {
+                    setFieldValue(numberValue.toString());
+                  }
+                }
               }}
               className="input_text h-10"
-              value={Number(
-                value[athleteIndex].distances[attemptIndex],
-              ).toString()}
+              value={fieldValue}
             />
           </div>
         ))}
