@@ -281,12 +281,14 @@ const HeightInput: FC<HeightInputProps> = ({ index, ...props }) => {
       name={field.name}
       onBlur={field.onBlur}
       onChange={(e) => {
+        console.log(Number(e.currentTarget.value));
         let newValue = value;
         newValue[index] = Number(e.currentTarget.value);
         setValue(newValue);
       }}
       className="flex w-full h-10 border-b border-r bg-background px-3 py-2 text-xs min-w-[120px]"
-      value={Number(value[index].toString()).toString()}
+      value={(Math.trunc(value[index] * 100) / 100).toString()}
+      inputMode="decimal"
     />
   );
 };
