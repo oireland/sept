@@ -11,7 +11,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import getURL from "@/lib/getURL";
 import { MapIcon } from "lucide-react";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 type FormData = {
   locationName: string;
 };
@@ -31,10 +31,10 @@ const LocationForm: FC = () => {
       router.refresh();
     } catch (e) {
       toast.dismiss(toastId);
-      if (e instanceof Error) {
-        toast.error(e.message);
+      if (e instanceof AxiosError) {
+        toastId = toast.error(e.response?.data);
       } else {
-        toast.error("Something went wrong");
+        toastId = toast.error("Something went wrong!");
       }
     }
   };

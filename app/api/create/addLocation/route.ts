@@ -1,5 +1,6 @@
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 import * as yup from "yup";
@@ -34,7 +35,11 @@ export async function POST(req: Request) {
 
     return NextResponse.json(`${locationName} has been added succesfully!`);
   } catch (e) {
-    console.log(e);
+    if (e instanceof PrismaClientKnownRequestError) {
+      return NextResponse.json("There is already a location with this name.", {
+        status: 400,
+      });
+    }
     return NextResponse.json("Something went wrong", { status: 500 });
   }
 }

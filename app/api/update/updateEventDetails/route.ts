@@ -77,7 +77,6 @@ export async function PATCH(req: Request) {
 
     return NextResponse.json("Location updated successfully");
   } catch (e) {
-    console.log(e);
     return NextResponse.json(e, { status: 500 });
   }
 }

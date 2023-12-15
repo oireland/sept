@@ -17,7 +17,6 @@ const Locations = async () => {
     redirect("/");
   }
   const locations = await getLocations(hostId!);
-  console.log(locations);
   return (
     <div>
       <Banner text="Locations" />

@@ -6,7 +6,7 @@ import FormikInput from "../../../components/FormikInput";
 
 import { Button } from "@/components/ui/button";
 import getURL from "@/lib/getURL";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { AtSign, Library } from "lucide-react";
 import { signIn } from "next-auth/react";
 import { toast } from "react-hot-toast";
@@ -58,8 +58,11 @@ const SignUpForm = () => {
       });
     } catch (e) {
       toast.dismiss(toastId);
-      toastId = toast.error("Something went wrong!");
-      console.log("An error has occured creating the user");
+      if (e instanceof AxiosError) {
+        toastId = toast.error(e.response?.data);
+      } else {
+        toastId = toast.error("Something went wrong!");
+      }
     }
   };
 

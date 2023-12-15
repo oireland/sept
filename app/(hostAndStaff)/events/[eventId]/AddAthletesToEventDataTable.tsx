@@ -17,7 +17,6 @@ const AddAthletesToEventDataTable = ({
 }) => {
   const addAthletesToEvent = async (selectedRowData: AthleteTableData[]) => {
     let toastId = toast.loading("Adding to event...");
-    console.log(selectedRowData);
     try {
       await axios.patch(getURL("/api/update/addAthletesToEvent"), {
         eventId,
@@ -28,7 +27,6 @@ const AddAthletesToEventDataTable = ({
       toast.success("Athletes added to event!");
       window.location.reload();
     } catch (e) {
-      console.log(e instanceof AxiosError);
       toast.dismiss(toastId);
       if (e instanceof AxiosError) {
         toast.error(e.response?.data);

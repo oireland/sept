@@ -18,7 +18,6 @@ import { authOptions } from "@/lib/auth";
 
 const getEventData = async (userId: string) => {
   try {
-    console.log("userId", userId);
     const eventData = await prisma.event.findMany({
       where: {
         host: {
@@ -42,8 +41,6 @@ const getEventData = async (userId: string) => {
         },
       },
     });
-
-    console.log(eventData);
 
     return eventData.map(
       ({
@@ -74,7 +71,6 @@ const CreateRecordsPage = async () => {
 
   const allEventsData = await getEventData(session!.user.userId);
 
-  console.log("allEventsData", allEventsData);
   const eventsWithNoRecords = allEventsData.filter(
     ({ recordHolderName, recordScore, yearRecordSet }) =>
       !recordHolderName || !recordScore || !yearRecordSet,

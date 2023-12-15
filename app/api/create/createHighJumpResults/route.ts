@@ -99,7 +99,6 @@ export async function POST(req: Request) {
 
     return NextResponse.json("Successfully created high jump results");
   } catch (e) {
-    console.log(e);
     return NextResponse.json("Something went wrong", { status: 500 });
   }
 }

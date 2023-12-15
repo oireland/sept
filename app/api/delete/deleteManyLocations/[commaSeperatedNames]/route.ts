@@ -42,9 +42,6 @@ export async function DELETE(
         { status: 400 },
       );
     }
-    return NextResponse.json(
-      { message: "Something went wrong" },
-      { status: 500 },
-    );
+    return NextResponse.json("Something went wrong", { status: 500 });
   }
 }

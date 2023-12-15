@@ -54,7 +54,6 @@ export async function PATCH(req: Request) {
       status: 200,
     });
   } catch (e) {
-    console.log(e);
     if (e instanceof Error) {
       return NextResponse.json(e.message, { status: 400 });
     } else {

@@ -119,10 +119,10 @@ const CreateAthletesForm = ({ allowedGroups, allowedTeams }: Props) => {
       router.push("/athletes");
     } catch (e) {
       toast.dismiss(toastId);
-      if (e instanceof Error || e instanceof AxiosError) {
-        toast.error(e.message);
+      if (e instanceof AxiosError) {
+        toastId = toast.error(e.response?.data);
       } else {
-        toastId = toast.error("Something went wrong");
+        toastId = toast.error("Something went wrong!");
       }
     }
   };

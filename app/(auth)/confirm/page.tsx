@@ -57,7 +57,6 @@ const Confirm: FC = () => {
         toastId = toast.success("Email has been sent");
         setLastSend(new Date());
       } catch (e) {
-        console.log(e);
         toastId = toast.error("An error has occurred");
       }
     } else {

@@ -26,8 +26,6 @@ const CreateStaff = () => {
   const onStaffFileChange = async (resultArray: string[]) => {
     let toastId = toast.loading("Loading file...");
     try {
-      console.log(resultArray);
-
       const unvalidatedStaffObjectArray: {}[] = [];
 
       resultArray.forEach((staff) => {

@@ -27,11 +27,11 @@ const removeSelectedStaff = async (selectedRowData: StaffTableData[]) => {
     // to remove the comma from the end
     commaSeperatedIds = commaSeperatedIds.substring(
       0,
-      commaSeperatedIds.length - 1
+      commaSeperatedIds.length - 1,
     );
 
     await axios.delete(
-      getURL(`/api/delete/deleteManyOfHostsUsers/${commaSeperatedIds}`)
+      getURL(`/api/delete/deleteManyOfHostsUsers/${commaSeperatedIds}`),
     );
 
     toast.dismiss(toastId);
@@ -39,12 +39,10 @@ const removeSelectedStaff = async (selectedRowData: StaffTableData[]) => {
     window.location.reload();
   } catch (e) {
     toast.dismiss(toastId);
-    if (e instanceof Error) {
-      toast.error(e.message);
-    } else if (e instanceof AxiosError) {
-      toast.error(e.message);
+    if (e instanceof AxiosError) {
+      toastId = toast.error(e.response?.data);
     } else {
-      toast.error("Something went wrong");
+      toastId = toast.error("Something went wrong!");
     }
   }
 };

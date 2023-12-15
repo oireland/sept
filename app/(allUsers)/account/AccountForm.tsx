@@ -8,7 +8,7 @@ import FormikInput from "../../../components/FormikInput";
 import PasswordField from "../../../components/FormikPasswordField";
 import { HiOutlineLibrary, HiAtSymbol } from "react-icons/hi";
 import { Button } from "@/components/ui/button";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import getURL from "@/lib/getURL";
 import { toast } from "react-hot-toast";
 import { AtSign, Library } from "lucide-react";
@@ -69,7 +69,11 @@ const AccountForm: FC<Props> = ({ initialValues }) => {
       toastId = toast.success("Account details updated", { duration: 300 });
     } catch (e) {
       toast.dismiss(toastId);
-      toastId = toast.error("Something went wrong!");
+      if (e instanceof AxiosError) {
+        toastId = toast.error(e.response?.data);
+      } else {
+        toastId = toast.error("Something went wrong!");
+      }
     }
   };
 

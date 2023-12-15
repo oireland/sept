@@ -7,7 +7,7 @@ import { HiAtSymbol } from "react-icons/hi";
 import { toast } from "react-hot-toast";
 import { Button } from "@/components/ui/button";
 import getURL from "@/lib/getURL";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import PasswordField from "@/components/FormikPasswordField";
 import { useRouter } from "next/navigation";
 
@@ -21,7 +21,7 @@ const validationSchema: yup.ObjectSchema<FormData> = yup.object().shape({
     .string()
     .matches(
       /(?=^.{6,20}$)((?=.*\w)(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[|!"$%&\/\(\)\?\^\'\\\+\-\*]))^.*/,
-      "At least one: uppercase, lowercase, number and symbol. 6-20 characters."
+      "At least one: uppercase, lowercase, number and symbol. 6-20 characters.",
     )
     .required("Password is required"),
   passwordRepeat: yup
@@ -43,10 +43,10 @@ const ResetPasswordForm = ({ token }: { token: string }) => {
       router.push(getURL("/signin"));
     } catch (e) {
       toast.dismiss(toastId);
-      if (e instanceof Error) {
-        toast.error(e.message);
+      if (e instanceof AxiosError) {
+        toastId = toast.error(e.response?.data);
       } else {
-        toast.error("Something went wrong");
+        toastId = toast.error("Something went wrong!");
       }
     }
   };

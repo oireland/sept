@@ -16,7 +16,6 @@ const Events = async () => {
   const role = session!.user.role;
 
   const data: EventTableData[] = await getEventData(session!.user.userId, role);
-  console.log(data);
 
   return (
     <div>

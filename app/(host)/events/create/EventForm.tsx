@@ -53,9 +53,9 @@ const handleFormSubmit = async ({
   } catch (e) {
     toast.dismiss(toastId);
     if (e instanceof AxiosError) {
-      toastId = toast.error(e.message);
+      toastId = toast.error(e.response?.data);
     } else {
-      toast.error("Something went wrong");
+      toastId = toast.error("Something went wrong!");
     }
   }
 };

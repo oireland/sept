@@ -40,7 +40,6 @@ const FileInputCsv = ({
             name="file"
             onChange={(e) => {
               if (e.currentTarget.files && e.currentTarget.files.length !== 0) {
-                console.log(e.currentTarget.files);
                 setFileName(e.currentTarget.files[0].name);
                 const fileReader = new FileReader();
                 fileReader.readAsText(e.currentTarget.files[0]);

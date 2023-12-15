@@ -38,7 +38,6 @@ export async function DELETE(
 
     return NextResponse.json({ message: "Success" });
   } catch (e) {
-    console.log(e);
     if (e instanceof PrismaClientKnownRequestError) {
       return NextResponse.json("You cannot delete a team that has athletes.", {
         status: 400,

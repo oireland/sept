@@ -73,9 +73,9 @@ const HighJumpResultsForm: FC<Props> = ({
     } catch (e) {
       toast.dismiss(toastId);
       if (e instanceof AxiosError) {
-        toastId = toast.error(e.message);
+        toastId = toast.error(e.response?.data);
       } else {
-        toast.error("Something went wrong");
+        toastId = toast.error("Something went wrong!");
       }
     }
   };
@@ -163,9 +163,7 @@ const HighJumpResultsForm: FC<Props> = ({
       } else {
         await finalResultSubmission(results);
       }
-    } catch (e) {
-      console.log("Error in handleFormSubmit - high jump form", e);
-    }
+    } catch (e) {}
   };
 
   const initialValues: FormData = {
@@ -185,7 +183,6 @@ const HighJumpResultsForm: FC<Props> = ({
       validationSchema={HighJumpResultsInputSchema}
       onSubmit={(values: FormData) => {
         handleFormSubmit(values);
-        console.log(values);
       }}
     >
       {({ values, setValues }) => (

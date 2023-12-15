@@ -209,7 +209,6 @@ export async function POST(req: Request) {
 
     return NextResponse.json("Results created successfully", { status: 200 });
   } catch (e) {
-    console.log(e);
     return NextResponse.json("Something went wrong", { status: 500 });
   }
 }

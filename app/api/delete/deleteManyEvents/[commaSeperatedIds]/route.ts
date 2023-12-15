@@ -36,7 +36,6 @@ export async function DELETE(
 
     return NextResponse.json({ message: "Success" });
   } catch (e) {
-    console.log(e);
     return NextResponse.json(
       { message: "Something went wrong" },
       { status: 500 },

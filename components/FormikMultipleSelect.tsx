@@ -104,7 +104,6 @@ export function FormikMultipleSelect({
                       }}
                       onSelect={() => {
                         setSelected((prev) => [...prev, item]);
-                        console.log(selected, item.value);
                         setValue([
                           ...selected.map(({ value }) => value),
                           item.value,

@@ -138,8 +138,6 @@ const EditStaffPage = async ({
       !staffsEventsIds.includes(eventId) && !staffName,
   );
 
-  console.log("all", allEventsData);
-
   return (
     <div className="max-w-full overflow-x-hidden">
       <Banner text={staffData!.user.name} />

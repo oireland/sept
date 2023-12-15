@@ -64,7 +64,6 @@ const CreateRecordsForm = ({ allowedEventIds }: Props) => {
           recordScore: recordSplit[4],
         });
       });
-      console.log(unvalidatedRecordObjectArray);
       const recordsObjectArray = await yup
         .array(RecordSchema)
         .required()
@@ -101,10 +100,10 @@ const CreateRecordsForm = ({ allowedEventIds }: Props) => {
       router.push("/events");
     } catch (e) {
       toast.dismiss(toastId);
-      if (e instanceof Error || e instanceof AxiosError) {
-        toast.error(e.message);
+      if (e instanceof AxiosError) {
+        toastId = toast.error(e.response?.data);
       } else {
-        toastId = toast.error("Something went wrong");
+        toastId = toast.error("Something went wrong!");
       }
     }
   };

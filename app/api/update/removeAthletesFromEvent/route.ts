@@ -51,7 +51,6 @@ export async function PATCH(req: Request) {
       return NextResponse.json("Invalid request", { status: 400 });
     }
 
-    // TODO: Update complex code about this if needed
     // disconnect the event from each valid athlete
     await Promise.all(
       athletes.map(

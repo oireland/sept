@@ -28,8 +28,6 @@ export async function PATCH(req: Request) {
       })
     ).map(({ eventId }) => eventId);
 
-    console.log("allowedEventIds", allowedEventIds);
-
     const RecordSchema = yup
       .object({
         eventId: yup
@@ -77,7 +75,6 @@ export async function PATCH(req: Request) {
 
     return NextResponse.json("Records Added to Event Successfully");
   } catch (e) {
-    console.log(e);
     if (e instanceof yup.ValidationError) {
       return NextResponse.json("Invalid Request", { status: 400 });
     }

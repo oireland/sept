@@ -130,7 +130,6 @@ async function getAthleteData(athleteUserId: string, hostId: string) {
 
     return athlete;
   } catch (error) {
-    console.log(error);
     return null;
   }
 }

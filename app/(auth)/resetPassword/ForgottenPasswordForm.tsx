@@ -8,7 +8,7 @@ import { HiAtSymbol } from "react-icons/hi";
 import { toast } from "react-hot-toast";
 import { Button } from "@/components/ui/button";
 import getURL from "@/lib/getURL";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { AtSign } from "lucide-react";
 
 interface FormData {
@@ -35,10 +35,10 @@ const ForgottenPasswordForm: FC<Props> = ({ setIsSent }) => {
       setIsSent(true);
     } catch (e) {
       toast.dismiss(toastId);
-      if (e instanceof Error) {
-        toast.error(e.message);
+      if (e instanceof AxiosError) {
+        toastId = toast.error(e.response?.data);
       } else {
-        toast.error("Something went wrong");
+        toastId = toast.error("Something went wrong!");
       }
     }
   };

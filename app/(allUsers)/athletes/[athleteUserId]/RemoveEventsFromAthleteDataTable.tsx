@@ -32,10 +32,10 @@ const RemoveEventsFromAthlete = ({
       window.location.reload();
     } catch (e) {
       toast.dismiss(toastId);
-      if (e instanceof Error || e instanceof AxiosError) {
-        toast.error(e.message);
+      if (e instanceof AxiosError) {
+        toastId = toast.error(e.response?.data);
       } else {
-        toast.error("Something went wrong");
+        toastId = toast.error("Something went wrong!");
       }
     }
   };

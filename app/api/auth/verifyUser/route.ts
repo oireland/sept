@@ -27,7 +27,6 @@ export async function PATCH(req: Request) {
       { status: 200, statusText: `Your email ${email} has been verified.` },
     );
   } catch (e) {
-    console.log(e);
     return NextResponse.json(e, {
       status: 400,
       statusText: "Failed to confirm the email address.",

@@ -28,7 +28,6 @@ export async function PATCH(req: Request) {
     });
     return NextResponse.json("Updated Successfully");
   } catch (e) {
-    console.log(e);
     return NextResponse.json("Something went wrong", { status: 500 });
   }
 }

@@ -31,7 +31,6 @@ export async function DELETE(
     });
     return NextResponse.json("Deleted Results");
   } catch (e) {
-    console.log(e);
     return NextResponse.json("Something went wrong", { status: 500 });
   }
 }

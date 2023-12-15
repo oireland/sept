@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import getURL from "@/lib/getURL";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { useRouter } from "next/navigation";
 import React from "react";
 import toast from "react-hot-toast";
@@ -18,8 +18,12 @@ const ClearResultsButton = ({ eventId }: { eventId: string }) => {
       toastId = toast.success("Results have been reset");
       router.refresh();
     } catch (e) {
-      toast.dismiss();
-      toastId = toast.error("Something went wrong");
+      toast.dismiss(toastId);
+      if (e instanceof AxiosError) {
+        toastId = toast.error(e.response?.data);
+      } else {
+        toastId = toast.error("Something went wrong!");
+      }
     }
   }
 

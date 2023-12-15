@@ -60,7 +60,6 @@ export const authOptions: NextAuthOptions = {
             emailVerified: user.emailVerified,
           };
         } catch (e) {
-          console.log(e);
           if (e instanceof PrismaClientInitializationError) {
             throw new Error("Connection Error");
           }
