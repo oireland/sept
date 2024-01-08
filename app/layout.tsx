@@ -31,6 +31,8 @@ export default function RootLayout({
           <Header />
           <Toaster position="top-center" />
           {children}
+          {/* Gives space at the bottom of the page */}
+          <div className="mt-10"></div>
         </NextAuthProvider>
       </body>
     </html>

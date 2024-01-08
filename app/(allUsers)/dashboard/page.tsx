@@ -11,6 +11,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import AthleteSignupPermissionToggle from "./AthleteSignupPermissionToggle";
+import ResetEvents from "./ResetSportsDayButton";
+import { Switch } from "@/components/ui/switch";
 
 const Scoreboard = dynamic(() => import("./Scoreboard"));
 
@@ -114,14 +116,16 @@ const Dashboard = async () => {
 
         {/* HOST ONLY - Toggle permission for athletes to sign up to events themselves */}
         {session!.user.role === "HOST" && (
-          <div>
+          <>
             <h2 className="text-xl font-semibold md:text-2xl lg:text-3xl">
-              Athlete Permissions
+              Settings / Actions
             </h2>
             <AthleteSignupPermissionToggle
               isToggled={isAthleteEventSignupAllowed}
             />
-          </div>
+
+            <ResetEvents />
+          </>
         )}
       </div>
     </div>
