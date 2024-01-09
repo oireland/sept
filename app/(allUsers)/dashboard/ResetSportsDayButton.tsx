@@ -22,7 +22,7 @@ const ResetEvents = () => {
   async function resetEvents() {
     let toastId = toast.loading("Resetting Events...");
     try {
-      await axios.patch(getURL("/api/update/resetEvents"));
+      await axios.delete(getURL("/api/update/resetEvents"));
 
       toast.dismiss(toastId);
       toast.success("Your events have been reset");
@@ -40,7 +40,7 @@ const ResetEvents = () => {
   return (
     <div>
       <h4 className="text-xl font-semibold">Reset Events</h4>
-      <p>
+      <p className="text-lg">
         To delete all results and remove all athletes from events, click "Reset
         Events" below. This action is not reversible.
       </p>

@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 
-export async function PATCH(req: Request) {
+export async function DELETE(req: Request) {
   try {
     const session = await getServerSession(authOptions);
 
