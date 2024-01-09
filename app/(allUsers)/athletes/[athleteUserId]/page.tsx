@@ -70,9 +70,11 @@ async function getEventsData(
         maxNumberOfAthletes: maxNumberOfAthletesPerTeam * numberOfTeams,
         locationName,
         date,
-        recordString: `${
-          recordScore + (eventType === "TRACK" ? "s" : "m")
-        } - ${yearRecordSet} - ${recordHolderName}`,
+        recordString: recordScore
+          ? `${
+              recordScore + (eventType === "TRACK" ? "s" : "m")
+            } - ${yearRecordSet} - ${recordHolderName}`
+          : "No Record Set",
         boyOrGirl,
         groupName,
       }),
@@ -196,9 +198,11 @@ const EditAthlete = async ({
       maxNumberOfAthletes: maxNumberOfAthletesPerTeam * numberOfTeams,
       locationName,
       date,
-      recordString: `${
-        recordScore + (eventType === "TRACK" ? "s" : "m")
-      } - ${yearRecordSet} - ${recordHolderName}`,
+      recordString: recordScore
+        ? `${
+            recordScore + (eventType === "TRACK" ? "s" : "m")
+          } - ${yearRecordSet} - ${recordHolderName}`
+        : "No Record Set",
       boyOrGirl: athletesBoyOrGirl,
       groupName,
     }),

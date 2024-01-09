@@ -1,5 +1,6 @@
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { Prisma } from "@prisma/client";
 import { getServerSession } from "next-auth";
 import { NextResponse } from "next/server";
 
@@ -11,9 +12,34 @@ export async function DELETE(req: Request) {
       return NextResponse.json("Unauthorised Request", { status: 401 });
     }
 
-    await prisma.$executeRaw`DELETE FROM "_Athletes - Events"`;
+    const athleteIds = (
+      await prisma.host.findUniqueOrThrow({
+        where: {
+          userId: session.user.userId,
+        },
+        select: {
+          athletes: {
+            select: {
+              athleteId: true,
+            },
+          },
+        },
+      })
+    ).athletes.map(({ athleteId }) => athleteId);
 
-    await prisma.result.deleteMany();
+    console.log(athleteIds);
+
+    await prisma.$executeRaw`DELETE FROM "_Athletes - Events" WHERE "A" IN (${Prisma.join(
+      athleteIds,
+    )})`;
+
+    await prisma.result.deleteMany({
+      where: {
+        athleteId: {
+          in: athleteIds,
+        },
+      },
+    });
 
     return NextResponse.json("Successfully reset events.");
   } catch (e) {
