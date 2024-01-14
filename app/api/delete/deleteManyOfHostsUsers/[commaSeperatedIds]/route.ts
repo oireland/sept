@@ -22,11 +22,22 @@ export async function DELETE(
 
     await prisma.user.deleteMany({
       where: {
-        host: {
-          is: {
-            userId: session.user.userId,
+        OR: [
+          {
+            staff: {
+              host: {
+                userId: session.user.userId,
+              },
+            },
           },
-        },
+          {
+            athlete: {
+              host: {
+                userId: session.user.userId,
+              },
+            },
+          },
+        ],
         userId: {
           in: idArray,
         },
