@@ -35,9 +35,7 @@ export async function DELETE(
 
     return NextResponse.json("Successfully deleted users");
   } catch (e) {
-    return NextResponse.json(
-      { message: "Something went wrong" },
-      { status: 500 },
-    );
+    console.log(e);
+    return NextResponse.json("Something went wrong", { status: 500 });
   }
 }

@@ -5,6 +5,7 @@ import { NextResponse } from "next/server";
 import * as yup from "yup";
 import * as bcrypt from "bcrypt";
 import { prisma } from "@/lib/prisma";
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 
 const requestSchema = yup.object({
   staff: yup.array(StaffSchema),
@@ -49,11 +50,15 @@ export async function POST(req: Request) {
       }),
     );
 
-    return NextResponse.json(
-      { message: "Staff successfully created" },
-      { status: 200 },
-    );
+    return NextResponse.json("Staff successfully created", { status: 200 });
   } catch (e) {
+    console.log(e);
+    if (e instanceof PrismaClientKnownRequestError) {
+      return NextResponse.json(
+        "At least one of the staff members you are trying to sign up already has an account.",
+        { status: 400 },
+      );
+    }
     return NextResponse.json(e, { status: 500 });
   }
 }

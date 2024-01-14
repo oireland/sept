@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import SingleCsvForm from "../../../../components/SingleCsvForm";
 import FloatingContainer from "@/components/FloatingContainer";
 import InfoDialog from "./infoDialog";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import getURL from "@/lib/getURL";
 import * as yup from "yup";
 import { StaffSchema } from "@/lib/yupSchemas";
@@ -14,11 +14,6 @@ import { useRouter, redirect } from "next/navigation";
 type Staff = yup.InferType<typeof StaffSchema>;
 
 const CreateStaff = () => {
-  const session = useSession({ required: true });
-  if (session.data?.user.role !== "HOST") {
-    redirect("/");
-  }
-
   const router = useRouter();
 
   const [staff, setStaff] = useState<Staff[]>();
@@ -58,11 +53,10 @@ const CreateStaff = () => {
       toast.dismiss(toastId);
       toastId = toast.success("File uploaded successfully");
     } catch (e) {
-      if (e instanceof Error) {
-        toast.dismiss(toastId);
-        toastId = toast.error(e.message);
+      toast.dismiss(toastId);
+      if (e instanceof AxiosError) {
+        toastId = toast.error(e.response?.data);
       } else {
-        toast.dismiss(toastId);
         toastId = toast.error("The file is invalid");
       }
       setStaff(undefined);
@@ -83,9 +77,13 @@ const CreateStaff = () => {
       toast.dismiss(toastId);
       toastId = toast.success("Staff created successfully");
       router.push("/staff");
-    } catch (error) {
+    } catch (e) {
       toast.dismiss(toastId);
-      toastId = toast.error("Something went wrong");
+      if (e instanceof AxiosError) {
+        toastId = toast.error(e.response?.data);
+      } else {
+        toastId = toast.error("The file is invalid");
+      }
     }
   };
 

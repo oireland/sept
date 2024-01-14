@@ -27,8 +27,6 @@ export async function DELETE(req: Request) {
       })
     ).athletes.map(({ athleteId }) => athleteId);
 
-    console.log(athleteIds);
-
     await prisma.$executeRaw`DELETE FROM "_Athletes - Events" WHERE "A" IN (${Prisma.join(
       athleteIds,
     )})`;

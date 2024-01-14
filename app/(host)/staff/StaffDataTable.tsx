@@ -12,17 +12,9 @@ import toast from "react-hot-toast";
 const removeSelectedStaff = async (selectedRowData: StaffTableData[]) => {
   let toastId = toast.loading("Deleting...");
   try {
-    const validatedData = await yup
-      .array(StaffTableDataSchema)
-      .validate(selectedRowData);
-
-    if (!validatedData) {
-      throw new Error("Invalid Selection");
-    }
-
     let commaSeperatedIds = "";
-    validatedData.forEach(({ id }) => {
-      commaSeperatedIds = commaSeperatedIds.concat(id + ",");
+    selectedRowData.forEach(({ userId }) => {
+      commaSeperatedIds = commaSeperatedIds.concat(userId + ",");
     });
     // to remove the comma from the end
     commaSeperatedIds = commaSeperatedIds.substring(
@@ -38,6 +30,7 @@ const removeSelectedStaff = async (selectedRowData: StaffTableData[]) => {
     toastId = toast.success("Staff deleted!");
     window.location.reload();
   } catch (e) {
+    console.log(e);
     toast.dismiss(toastId);
     if (e instanceof AxiosError) {
       toastId = toast.error(e.response?.data);

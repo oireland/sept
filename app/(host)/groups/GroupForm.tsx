@@ -29,6 +29,7 @@ const GroupForm: FC = () => {
       router.refresh();
     } catch (e) {
       toast.dismiss(toastId);
+
       if (e instanceof AxiosError) {
         toastId = toast.error(e.response?.data);
       } else {
