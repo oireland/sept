@@ -68,21 +68,21 @@ const CreateStaff = () => {
     if (!staff) {
       toast.dismiss(toastId);
       toastId = toast.error("The file you have uploaded is invalid");
-    }
-
-    try {
-      await axios.post(getURL("/api/create/createManyStaff"), {
-        staff: staff,
-      });
-      toast.dismiss(toastId);
-      toastId = toast.success("Staff created successfully");
-      router.push("/staff");
-    } catch (e) {
-      toast.dismiss(toastId);
-      if (e instanceof AxiosError) {
-        toastId = toast.error(e.response?.data);
-      } else {
-        toastId = toast.error("The file is invalid");
+    } else {
+      try {
+        await axios.post(getURL("/api/create/createManyStaff"), {
+          staff: staff,
+        });
+        toast.dismiss(toastId);
+        toastId = toast.success("Staff created successfully");
+        router.push("/staff");
+      } catch (e) {
+        toast.dismiss(toastId);
+        if (e instanceof AxiosError) {
+          toastId = toast.error(e.response?.data);
+        } else {
+          toastId = toast.error("The file is invalid");
+        }
       }
     }
   };
