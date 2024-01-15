@@ -121,6 +121,8 @@ const CreateAthletesForm = ({ allowedGroups, allowedTeams }: Props) => {
       toast.dismiss(toastId);
       if (e instanceof AxiosError) {
         toastId = toast.error(e.response?.data);
+      } else if (e instanceof Error) {
+        toastId = toast.error(e.message);
       } else {
         toastId = toast.error("Something went wrong!");
       }

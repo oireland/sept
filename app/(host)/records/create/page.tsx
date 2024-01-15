@@ -15,6 +15,8 @@ import { AlertCircleIcon } from "lucide-react";
 import { getServerSession } from "next-auth";
 import CreateRecordsForm from "./CreateRecordsForm";
 import { authOptions } from "@/lib/auth";
+import Link from "next/link";
+import getURL from "@/lib/getURL";
 
 const getEventData = async (userId: string) => {
   try {
@@ -75,6 +77,25 @@ const CreateRecordsPage = async () => {
     ({ recordHolderName, recordScore, yearRecordSet }) =>
       !recordHolderName || !recordScore || !yearRecordSet,
   );
+
+  if (allEventsData.length === 0) {
+    return (
+      <FloatingContainer className="space-y-3 p-4">
+        <h2 className="mt-2 text-center text-xl font-semibold text-brg sm:text-2xl">
+          You have no events!
+        </h2>
+        <p className="text-center">
+          You must create events before you can add records, so that we can link
+          the records to the events.
+        </p>
+        <div className="flex justify-center">
+          <Button variant={"outline"}>
+            <Link href={getURL("/events/create")}>Add Events</Link>
+          </Button>
+        </div>
+      </FloatingContainer>
+    );
+  }
 
   return (
     <FloatingContainer className="space-y-4 p-4">
