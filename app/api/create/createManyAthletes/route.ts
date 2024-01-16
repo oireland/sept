@@ -5,6 +5,7 @@ import { NextResponse } from "next/server";
 import * as yup from "yup";
 import bcrypt from "bcrypt";
 import { BoyOrGirl } from "@prisma/client";
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 
 export async function POST(req: Request) {
   try {
@@ -67,7 +68,8 @@ export async function POST(req: Request) {
 
     await Promise.all(
       athletes.map(async ({ boyOrGirl, email, groupName, name, teamName }) => {
-        const password = await bcrypt.hash(email, 10);
+        // low number of salt rounds used since the hash needs to be quick
+        const password = await bcrypt.hash(email, 4);
 
         return prisma.user.create({
           data: {
@@ -111,6 +113,12 @@ export async function POST(req: Request) {
       { status: 200 },
     );
   } catch (e) {
+    if (e instanceof PrismaClientKnownRequestError) {
+      return NextResponse.json(
+        "At least one of your athletes already has an account with the email address in the file",
+        { status: 400 },
+      );
+    }
     return NextResponse.json(e, { status: 500 });
   }
 }

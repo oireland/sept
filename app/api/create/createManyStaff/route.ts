@@ -28,7 +28,8 @@ export async function POST(req: Request) {
 
     await Promise.all(
       staff.map(async ({ name, email }) => {
-        const password = await bcrypt.hash(email, 10);
+        // low salt rounds to be quick given the high potential data volume
+        const password = await bcrypt.hash(email, 4);
 
         return prisma.user.create({
           data: {
