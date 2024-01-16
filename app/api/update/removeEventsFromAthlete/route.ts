@@ -57,25 +57,23 @@ export async function PATCH(req: Request) {
     }
 
     // update each valid event to have the athlete competing
-    await Promise.all(
-      eventIds?.map(
-        async (eventId) =>
-          await prisma.event.update({
-            where: {
-              eventId,
-              hostId,
-              groupName: athleteGroupName,
-              athletesBoyOrGirl: athleteBoyOrGirl,
-            },
-            data: {
-              athletesCompeting: {
-                disconnect: {
-                  userId: athleteUserId,
-                },
+    eventIds?.forEach(
+      async (eventId) =>
+        await prisma.event.update({
+          where: {
+            eventId,
+            hostId,
+            groupName: athleteGroupName,
+            athletesBoyOrGirl: athleteBoyOrGirl,
+          },
+          data: {
+            athletesCompeting: {
+              disconnect: {
+                userId: athleteUserId,
               },
             },
-          }),
-      ),
+          },
+        }),
     );
 
     return NextResponse.json("Successfully added events to athlete", {

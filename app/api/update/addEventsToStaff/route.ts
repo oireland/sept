@@ -29,25 +29,22 @@ export async function PATCH(req: Request) {
     if (hostId === null || staffHostId === null || hostId !== staffHostId) {
       return NextResponse.json("Invalid request", { status: 400 });
     }
-    // TODO: Might need to update document about this
     // update each event to have the staff member
-    await Promise.all(
-      events?.map(
-        async ({ eventId }) =>
-          await prisma.event.update({
-            where: {
-              eventId,
-              hostId,
-            },
-            data: {
-              staffMember: {
-                connect: {
-                  userId: staffUserId,
-                },
+    events?.forEach(
+      async ({ eventId }) =>
+        await prisma.event.update({
+          where: {
+            eventId,
+            hostId,
+          },
+          data: {
+            staffMember: {
+              connect: {
+                userId: staffUserId,
               },
             },
-          }),
-      ),
+          },
+        }),
     );
 
     return NextResponse.json("Successfully added events to staff", {

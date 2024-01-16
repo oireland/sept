@@ -71,25 +71,23 @@ export async function PATCH(req: Request) {
     }
 
     // update each event to have the athlete competing but only if the max number of athletes will not be exceeded
-    await Promise.all(
-      eventIds.map(
-        async (eventId) =>
-          await prisma.event.update({
-            where: {
-              eventId,
-              hostId,
-              groupName: athleteGroupName,
-              athletesBoyOrGirl: athleteBoyOrGirl,
-            },
-            data: {
-              athletesCompeting: {
-                connect: {
-                  userId: athleteUserId,
-                },
+    eventIds.forEach(
+      async (eventId) =>
+        await prisma.event.update({
+          where: {
+            eventId,
+            hostId,
+            groupName: athleteGroupName,
+            athletesBoyOrGirl: athleteBoyOrGirl,
+          },
+          data: {
+            athletesCompeting: {
+              connect: {
+                userId: athleteUserId,
               },
             },
-          }),
-      ),
+          },
+        }),
     );
 
     return NextResponse.json("Successfully added events to athlete", {

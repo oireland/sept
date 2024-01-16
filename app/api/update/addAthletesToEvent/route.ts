@@ -127,22 +127,20 @@ export async function PATCH(req: Request) {
     }
 
     // update each athlete to be competing in the event
-    await Promise.all(
-      filteredAthletes?.map(
-        async ({ userId }) =>
-          await prisma.athlete.update({
-            where: {
-              userId,
-            },
-            data: {
-              events: {
-                connect: {
-                  eventId,
-                },
+    filteredAthletes?.forEach(
+      async ({ userId }) =>
+        await prisma.athlete.update({
+          where: {
+            userId,
+          },
+          data: {
+            events: {
+              connect: {
+                eventId,
               },
             },
-          }),
-      ),
+          },
+        }),
     );
 
     return NextResponse.json("Successfully added athletes to event", {

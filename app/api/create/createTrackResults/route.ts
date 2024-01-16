@@ -149,9 +149,10 @@ export async function POST(req: Request) {
     });
 
     // remove the event from athletes who didn't compete (all 0s)
-    await Promise.all(
-      athletesWithZeroTimeIds.map((athleteId) =>
-        prisma.athlete.update({
+
+    athletesWithZeroTimeIds.forEach(
+      async (athleteId) =>
+        await prisma.athlete.update({
           where: { athleteId },
           data: {
             events: {
@@ -161,7 +162,6 @@ export async function POST(req: Request) {
             },
           },
         }),
-      ),
     );
 
     // check for record broken
