@@ -52,9 +52,9 @@ export async function PATCH(req: Request) {
     }
 
     // disconnect the event from each valid athlete
-    athletes.forEach(
-      async ({ userId }) =>
-        await prisma.athlete.update({
+    await Promise.all(
+      athletes.map(({ userId }) =>
+        prisma.athlete.update({
           where: {
             userId,
             hostId,
@@ -69,6 +69,7 @@ export async function PATCH(req: Request) {
             },
           },
         }),
+      ),
     );
 
     return NextResponse.json("Successfully removed athletes from event", {

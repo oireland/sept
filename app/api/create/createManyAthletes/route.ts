@@ -66,12 +66,14 @@ export async function POST(req: Request) {
 
     const { athletes } = await requestSchema.validate(await req.json());
 
-    athletes.forEach(
-      async ({ boyOrGirl, email, groupName, name, teamName }) => {
+    const start = new Date().getTime();
+
+    await Promise.all(
+      athletes.map(async ({ boyOrGirl, email, groupName, name, teamName }) => {
         // low number of salt rounds used since the hash needs to be quick
         const password = await bcrypt.hash(email, 4);
 
-        await prisma.user.create({
+        return prisma.user.create({
           data: {
             email,
             name,
@@ -105,10 +107,12 @@ export async function POST(req: Request) {
             },
           },
         });
-      },
+      }),
     );
 
-    const endTime = new Date().getTime();
+    const end = new Date().getTime();
+
+    console.log("Execution time w/ salt 4 (ms): ", end - start);
 
     return NextResponse.json(
       { message: "Athletes successfully created" },

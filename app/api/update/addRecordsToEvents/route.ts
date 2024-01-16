@@ -58,9 +58,9 @@ export async function PATCH(req: Request) {
 
     const { records } = await requestSchema.validate(await req.json());
 
-    records.forEach(
-      async ({ eventId, recordHolderName, yearRecordSet, recordScore }) =>
-        await prisma.event.update({
+    await Promise.all(
+      records.map(({ eventId, recordHolderName, yearRecordSet, recordScore }) =>
+        prisma.event.update({
           where: {
             eventId,
           },
@@ -70,6 +70,7 @@ export async function PATCH(req: Request) {
             recordScore,
           },
         }),
+      ),
     );
 
     return NextResponse.json("Records Added to Event Successfully");

@@ -26,28 +26,30 @@ export async function POST(req: Request) {
       return NextResponse.json({ message: "Empty Request" }, { status: 400 });
     }
 
-    staff.forEach(async ({ name, email }) => {
-      // low salt rounds to be quick given the high potential data volume
-      const password = await bcrypt.hash(email, 4);
+    await Promise.all(
+      staff.map(async ({ name, email }) => {
+        // low salt rounds to be quick given the high potential data volume
+        const password = await bcrypt.hash(email, 4);
 
-      await prisma.user.create({
-        data: {
-          name,
-          email,
-          password,
-          role: "STAFF",
-          staff: {
-            create: {
-              host: {
-                connect: {
-                  userId: session.user.userId,
+        return prisma.user.create({
+          data: {
+            name,
+            email,
+            password,
+            role: "STAFF",
+            staff: {
+              create: {
+                host: {
+                  connect: {
+                    userId: session.user.userId,
+                  },
                 },
               },
             },
           },
-        },
-      });
-    });
+        });
+      }),
+    );
 
     return NextResponse.json("Staff successfully created", { status: 200 });
   } catch (e) {

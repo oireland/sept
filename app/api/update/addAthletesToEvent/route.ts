@@ -127,9 +127,9 @@ export async function PATCH(req: Request) {
     }
 
     // update each athlete to be competing in the event
-    filteredAthletes?.forEach(
-      async ({ userId }) =>
-        await prisma.athlete.update({
+    await Promise.all(
+      filteredAthletes?.map(({ userId }) =>
+        prisma.athlete.update({
           where: {
             userId,
           },
@@ -141,6 +141,7 @@ export async function PATCH(req: Request) {
             },
           },
         }),
+      ),
     );
 
     return NextResponse.json("Successfully added athletes to event", {

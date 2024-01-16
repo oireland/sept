@@ -30,9 +30,9 @@ export async function PATCH(req: Request) {
       return NextResponse.json("Invalid request", { status: 400 });
     }
     // update each event to have the staff member
-    events?.forEach(
-      async ({ eventId }) =>
-        await prisma.event.update({
+    await Promise.all(
+      events?.map(({ eventId }) =>
+        prisma.event.update({
           where: {
             eventId,
             hostId,
@@ -45,6 +45,7 @@ export async function PATCH(req: Request) {
             },
           },
         }),
+      ),
     );
 
     return NextResponse.json("Successfully added events to staff", {
