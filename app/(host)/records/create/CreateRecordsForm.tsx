@@ -30,11 +30,16 @@ const CreateRecordsForm = ({ allowedEventIds }: Props) => {
       yearRecordSet: yup
         .number()
         .integer()
-        .min(1800)
-        .max(new Date().getUTCFullYear())
+        .typeError("Year Record Set must be an integer")
+        .min(1700, "Year Record Set cannot be before 1700")
+        .max(
+          new Date().getUTCFullYear(),
+          "Year Record Set cannot be a year in the future",
+        )
         .required(),
       recordScore: yup
         .number()
+        .typeError("Record Score must be a number")
         .required()
         .min(0, "Record Score cannot be less than 0."),
     })
@@ -102,6 +107,8 @@ const CreateRecordsForm = ({ allowedEventIds }: Props) => {
       toast.dismiss(toastId);
       if (e instanceof AxiosError) {
         toastId = toast.error(e.response?.data);
+      } else if (e instanceof Error) {
+        toastId = toast.error(e.message);
       } else {
         toastId = toast.error("Something went wrong!");
       }

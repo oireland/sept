@@ -40,11 +40,11 @@ const LoginForm: FC = () => {
       const signinRes = await signIn("credentials", {
         email,
         password,
-        redirect: true,
-        callbackUrl: "/dashboard",
+        redirect: false,
       });
+
       if (signinRes?.error) {
-        throw new Error(signinRes.error);
+        throw new Error("Invalid Email Address or Password");
       }
       router.push("/dashboard");
       toast.dismiss(toastId);
@@ -53,6 +53,8 @@ const LoginForm: FC = () => {
       toast.dismiss(toastId);
       if (e instanceof AxiosError) {
         toastId = toast.error(e.response?.data);
+      } else if (e instanceof Error) {
+        toastId = toast.error(e.message);
       } else {
         toastId = toast.error("Something went wrong!");
       }
