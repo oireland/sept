@@ -115,7 +115,7 @@ const FieldScoreInput: FC<FieldScoreInputProps> = ({
   const { value } = meta;
   const { setValue } = helpers;
 
-  const [fieldValue, setFieldValue] = useState("");
+  const [fieldValues, setFieldValues] = useState(["", "", ""]);
 
   return (
     <div className="grid grid-cols-4">
@@ -135,24 +135,25 @@ const FieldScoreInput: FC<FieldScoreInputProps> = ({
                 if (!targetVal) {
                   targetVal = "0";
                 }
-                // test that the entered value won't be NaN
-                if (/^(\d+\.?\d*)$/.test(targetVal)) {
-                  let numberValue =
-                    Math.trunc(Number(e.currentTarget.value) * 100) / 100;
+                // test that the entered value won't be NaN and isn't over 2 dp
+                if (/^(\d+\.?(\d?){2})$/.test(targetVal)) {
+                  let numberValue = Number(
+                    Number(e.currentTarget.value).toFixed(2),
+                  );
+
                   let newValue = value;
                   newValue[athleteIndex].distances[attemptIndex] = numberValue;
+
                   setValue(newValue);
 
-                  // append a decimal point if there was one in the entered string
-                  if (targetVal.endsWith(".")) {
-                    setFieldValue(numberValue + ".");
-                  } else {
-                    setFieldValue(numberValue.toString());
-                  }
+                  let tempValues = fieldValues;
+
+                  tempValues[attemptIndex] = targetVal;
+                  setFieldValues(tempValues);
                 }
               }}
               className="input_text h-10"
-              value={fieldValue}
+              value={fieldValues[attemptIndex]}
             />
           </div>
         ))}
