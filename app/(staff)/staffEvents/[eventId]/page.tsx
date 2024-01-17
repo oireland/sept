@@ -193,6 +193,8 @@ const EnterEventResults = async ({
 
   // Display a table with the results in.
   if (haveAthletesCompeted) {
+    // sort results from 1st place to last, so that they are properly ordered in the leaderboard
+    eventResults.sort((a, b) => a.place - b.place);
     return (
       <FloatingContainer>
         <h2 className="text-center text-xl font-semibold">Results</h2>

@@ -95,7 +95,6 @@ const HighJumpResultsForm: FC<Props> = ({
             points: maxNumberOfAthletesTotal - 1,
           };
         }
-
         return athlete;
       },
     );
