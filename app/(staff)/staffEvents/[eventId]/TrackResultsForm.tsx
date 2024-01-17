@@ -130,10 +130,13 @@ const TrackScoreInput: FC<TrackScoreInputProps> = ({
             if (!targetVal) {
               targetVal = "0";
             }
-            // test that the entered value won't be NaN
-            if (/^(\d+\.?\d*)$/.test(targetVal)) {
-              let numberValue =
-                Math.trunc(Number(e.currentTarget.value) * 100) / 100;
+            // test that the entered value won't be NaN and isn't over 2 dp
+            if (/^(\d+\.?(\d?){2})$/.test(targetVal)) {
+              console.log("Won't be NaN");
+              let numberValue = Number(
+                Number(e.currentTarget.value).toFixed(2),
+              );
+
               let newValue = value;
               newValue[index].time = numberValue;
               setValue(newValue);
@@ -142,7 +145,7 @@ const TrackScoreInput: FC<TrackScoreInputProps> = ({
               if (targetVal.endsWith(".")) {
                 setFieldValue(numberValue + ".");
               } else {
-                setFieldValue(numberValue.toString());
+                setFieldValue(targetVal);
               }
             }
           }}

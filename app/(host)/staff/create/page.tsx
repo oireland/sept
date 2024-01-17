@@ -70,9 +70,18 @@ const CreateStaff = () => {
       toastId = toast.error("The file you have uploaded is invalid");
     } else {
       try {
-        await axios.post(getURL("/api/create/createManyStaff"), {
-          staff: staff,
-        });
+        const staffSublists = [];
+        for (let i = 0; i < staff.length; i += 20) {
+          const subList = staff.slice(i, i + 20);
+          staffSublists.push(subList);
+        }
+
+        for (const sublist of staffSublists) {
+          await axios.post(getURL("/api/create/createManyStaff"), {
+            staff: sublist,
+          });
+        }
+
         toast.dismiss(toastId);
         toastId = toast.success("Staff created successfully");
         router.push("/staff");

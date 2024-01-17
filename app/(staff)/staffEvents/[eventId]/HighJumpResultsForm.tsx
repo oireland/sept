@@ -284,10 +284,10 @@ const HeightInput: FC<HeightInputProps> = ({ index, ...props }) => {
         if (!targetVal) {
           targetVal = "0";
         }
-        // test that the entered value won't be NaN
-        if (/^(\d+\.?\d*)$/.test(targetVal)) {
-          let numberValue =
-            Math.trunc(Number(e.currentTarget.value) * 100) / 100;
+        // test that the entered value won't be NaN and isn't over 2 dp
+        if (/^(\d+\.?(\d?){2})$/.test(targetVal)) {
+          let numberValue = Number(Number(e.currentTarget.value).toFixed(2));
+
           let newValue = value;
           newValue[index] = numberValue;
           setValue(newValue);
@@ -296,12 +296,11 @@ const HeightInput: FC<HeightInputProps> = ({ index, ...props }) => {
           if (targetVal.endsWith(".")) {
             setFieldValue(numberValue + ".");
           } else {
-            setFieldValue(numberValue.toString());
+            setFieldValue(targetVal);
           }
         }
       }}
       className="flex w-full h-10 border-b border-r bg-background px-3 py-2 text-xs min-w-[120px]"
-      // value={fieldValue.replace(/^0+/, "")}
       value={fieldValue}
     />
   );

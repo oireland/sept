@@ -111,16 +111,11 @@ const CreateAthletesForm = ({ allowedGroups, allowedTeams }: Props) => {
         throw new Error("Please upload a valid file");
       }
 
-      console.log(athletes);
-
       // split the list of athletes into smaller chunks of 20, so that the vercel serverless function does not timeout
       const athleteSublists = [];
       for (let i = 0; i < athletes.length; i += 20) {
         const sublist = athletes.slice(i, i + 20);
         athleteSublists.push(sublist);
-        // await axios.post(getURL("/api/create/createManyAthletes"), {
-        //   sublist,
-        // });
       }
 
       for (const sublist of athleteSublists) {
@@ -129,12 +124,9 @@ const CreateAthletesForm = ({ allowedGroups, allowedTeams }: Props) => {
         });
       }
 
-      // await axios.post(getURL("/api/create/createManyAthletes"), {
-      //   athletes,
-      // });
       toast.dismiss(toastId);
       toastId = toast.success("Athletes created successfully");
-      // router.push("/athletes");
+      router.push("/athletes");
     } catch (e) {
       toast.dismiss(toastId);
       if (e instanceof AxiosError) {
