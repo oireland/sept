@@ -240,7 +240,6 @@ const EnterEventResults = async ({
             </TableBody>
           </Table>
         </div>
-
         <hr className="my-2" />
         <div className="flex items-center justify-between">
           <BackButton />

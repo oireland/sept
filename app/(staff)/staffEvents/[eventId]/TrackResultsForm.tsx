@@ -111,13 +111,11 @@ const TrackScoreInput: FC<TrackScoreInputProps> = ({
 
   const { value } = meta;
   const { setValue } = helpers;
-
   const [fieldValue, setFieldValue] = useState("");
 
   return (
     <div className="grid grid-cols-4">
       <label className="text-sm md:text-base overflow-x-clip">{label}</label>
-
       <div className="col-span-3 input_group flex space-x-1">
         <Input
           type="number"
@@ -132,7 +130,6 @@ const TrackScoreInput: FC<TrackScoreInputProps> = ({
             }
             // test that the entered value won't be NaN and isn't over 2 dp
             if (/^(\d+\.?(\d?){2})$/.test(targetVal)) {
-              console.log("Won't be NaN");
               let numberValue = Number(
                 Number(e.currentTarget.value).toFixed(2),
               );

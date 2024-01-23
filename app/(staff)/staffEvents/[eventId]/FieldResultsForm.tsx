@@ -99,28 +99,18 @@ type FieldScoreInputProps = {
   athleteIndex: number;
 } & FieldAttributes<{}>;
 
-const FieldScoreInput: FC<FieldScoreInputProps> = ({
-  placeholder,
-  label,
-  athleteIndex,
-  ...props
-}) => {
-  const [field, meta, helpers] = useField<
-    {
+const FieldScoreInput: FC<FieldScoreInputProps> = ({placeholder, label, athleteIndex, ...props}) => {
+  const [field, meta, helpers] = useField<{
       athleteUserId: string;
-      distances: number[];
-    }[]
-  >(props.name);
+      distances: number[];}[]>(props.name);
 
   const { value } = meta;
   const { setValue } = helpers;
-
   const [fieldValues, setFieldValues] = useState(["", "", ""]);
 
   return (
     <div className="grid grid-cols-4">
       <label className="text-sm md:text-base overflow-x-clip">{label}</label>
-
       <div className="col-span-3 flex space-x-1">
         {Array.from(Array(3)).map((a, attemptIndex) => (
           <div key={attemptIndex} className="input_group w-full">

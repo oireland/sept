@@ -125,6 +125,14 @@ const HeaderDropdownMenu = ({
                     My Events
                   </Link>
                 </DropdownMenuItem>
+                <DropdownMenuItem className="p-0">
+                  <Link
+                    href={`/results/${userId}`}
+                    className="h-full  w-full px-2 py-1.5 text-sm md:text-base "
+                  >
+                    My Results
+                  </Link>
+                </DropdownMenuItem>
               </>
             )
           )}
