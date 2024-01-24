@@ -82,7 +82,7 @@ export const columns: ColumnDef<EventTableData>[] = [
     header: () => <div>Time</div>,
     cell: ({ row }) => {
       let date = row.original.date;
-      return <div>{date.toLocaleTimeString().slice(0, -3)}</div>;
+      return <div>{date.toUTCString().slice(-12, -7)}</div>; // get only the hour and minute
     },
   },
   {

@@ -46,6 +46,15 @@ export const columns: ColumnDef<EventTableData>[] = [
     },
   },
   {
+    accessorKey: "date",
+    id: "Time",
+    header: () => <div>Time</div>,
+    cell: ({ row }) => {
+      let date = row.original.date;
+      return <div>{date.toUTCString().slice(-12, -7)}</div>; // get only the hour and minute
+    },
+  },
+  {
     accessorKey: "recordString",
     id: "Record",
     header: () => <div>Record</div>,
