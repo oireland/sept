@@ -28,11 +28,19 @@ const ClearResultsButton = dynamic(() => import("./ClearResultsButton"));
 const FieldResultsForm = dynamic(() => import("./FieldResultsForm"));
 const TrackResultsForm = dynamic(() => import("./TrackResultsForm"));
 
-async function getEventData(eventId: string, hostId: string) {
+async function getEventData(
+  eventId: string,
+  hostId: string,
+  staffUserId: string,
+) {
   try {
     const event = await prisma.event.findUniqueOrThrow({
       where: {
         eventId,
+        hostId, // only get event data if the host of the staff member is the host of the event
+        staffMember: {
+          userId: staffUserId, // only get the event data if the current staff member has been assigned
+        },
       },
       select: {
         hostId: true,
@@ -71,10 +79,6 @@ async function getEventData(eventId: string, hostId: string) {
         },
       },
     });
-
-    if (event.hostId !== hostId) {
-      return null;
-    }
 
     return event;
   } catch (e) {
@@ -122,7 +126,7 @@ const EnterEventResults = async ({
     redirect(getURL("/"));
   }
 
-  const eventData = await getEventData(params.eventId, hostId!);
+  const eventData = await getEventData(params.eventId, hostId!, userId);
 
   if (eventData === null) {
     redirect(getURL("/events"));
@@ -145,6 +149,32 @@ const EnterEventResults = async ({
   const titleText = `${groupName} ${
     athletesBoyOrGirl === "BOY" ? "Boy's" : "Girl's"
   } ${name}`;
+
+  // No athletes competing in the event
+  if (athletesCompeting.length === 0) {
+    return (
+      <FloatingContainer className="space-y-3 p-4 text-center">
+        <h2 className="mt-2  text-xl font-semibold text-brg sm:text-2xl">
+          There are no athletes signed up for this event!
+        </h2>
+        <p>Add athletes to this event:</p>
+
+        <div className="grid grid-cols-3">
+          <div></div>
+          <div>
+            <Button variant={"outline"}>
+              <Link href={getURL(`/events/${params.eventId}`)}>
+                Add Athletes
+              </Link>
+            </Button>
+          </div>
+          <div className="flex justify-end">
+            <BackButton />
+          </div>
+        </div>
+      </FloatingContainer>
+    );
+  }
 
   const teamsBeingExceeded = getTeamsBeingExceeded(
     maxNumberOfAthletesPerTeam,
